@@ -1,0 +1,16 @@
+{
+  "name": "sensible-ui",
+  "version": "1.0.5",
+  "description": "Sensible UI contains all utility functions and stuff to setup a Sensible project",
+  "main": "src/index.ts",
+  "scripts": {
+    "initpub": "npm publish --access public",
+    "pub": "npm version patch --force && npm publish"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "react-with-native": "^1.2.23",
+    "sensible-core": "^1.0.6"
+  }
+}

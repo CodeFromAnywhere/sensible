@@ -1,0 +1,52 @@
+Arguments: 
+  /Users/bcbs/.nvm/versions/node/v14.17.5/bin/node /Users/bcbs/.yarn/bin/yarn.js add tsmorpth
+
+PATH: 
+  /Library/PostgreSQL/12/bin:/Users/bcbs/.yarn/bin:/Users/bcbs/.config/yarn/global/node_modules/.bin:/Users/bcbs/.nvm/versions/node/v14.17.5/bin:/Users/bcbs/google-cloud-sdk/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Applications/VMware Fusion.app/Contents/Public:/usr/local/go/bin:/Library/Apple/usr/bin:/Library/PostgreSQL/12/bin:/Users/bcbs/.yarn/bin:/Users/bcbs/.config/yarn/global/node_modules/.bin:/Users/bcbs/.nvm/versions/node/v14.17.5/bin:/Users/bcbs/google-cloud-sdk/bin:/Users/bcbs/.cargo/bin
+
+Yarn version: 
+  1.22.15
+
+Node version: 
+  14.17.5
+
+Platform: 
+  darwin x64
+
+Trace: 
+  Error: https://registry.yarnpkg.com/tsmorpth: Not found
+      at Request.params.callback [as _callback] (/Users/bcbs/.yarn/lib/cli.js:67031:18)
+      at Request.self.callback (/Users/bcbs/.yarn/lib/cli.js:140885:22)
+      at Request.emit (events.js:400:28)
+      at Request.<anonymous> (/Users/bcbs/.yarn/lib/cli.js:141857:10)
+      at Request.emit (events.js:400:28)
+      at IncomingMessage.<anonymous> (/Users/bcbs/.yarn/lib/cli.js:141779:12)
+      at Object.onceWrapper (events.js:519:28)
+      at IncomingMessage.emit (events.js:412:35)
+      at endReadableNT (internal/streams/readable.js:1317:12)
+      at processTicksAndRejections (internal/process/task_queues.js:82:21)
+
+npm manifest: 
+  {
+    "name": "mage",
+    "version": "1.0.0",
+    "description": "",
+    "main": "src/index.ts",
+    "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+      "typescript-parser": "^2.6.1"
+    },
+    "devDependencies": {
+      "@types/node": "^17.0.0"
+    }
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile

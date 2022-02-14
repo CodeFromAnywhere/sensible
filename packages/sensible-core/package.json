@@ -1,0 +1,13 @@
+{
+  "name": "sensible-core",
+  "version": "1.0.6",
+  "description": "All types and util functions used in any sensible project",
+  "main": "src/index.ts",
+  "source": "src/index.ts",
+  "scripts": {
+    "initpub": "npm publish --access public",
+    "pub": "npm version patch --force && npm publish"
+  },
+  "author": "",
+  "license": "ISC"
+}

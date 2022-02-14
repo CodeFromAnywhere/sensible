@@ -1,0 +1,19 @@
+{
+  "name": "mage",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "node build/index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "colors": "^1.4.0",
+    "ts-morph": "^13.0.2",
+    "typescript-parser": "^2.6.1"
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.0"
+  }
+}

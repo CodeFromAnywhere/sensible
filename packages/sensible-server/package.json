@@ -1,0 +1,19 @@
+{
+  "name": "sensible-server",
+  "version": "1.0.5",
+  "description": "Sensible Server Stuff",
+  "main": "src/index.ts",
+  "scripts": {
+    "initpub": "npm publish --access public",
+    "pub": "npm version patch --force && npm publish"
+  },
+  "author": "Wijnand Karsens",
+  "license": "ISC",
+  "dependencies": {
+    "@types/server": "^1.0.4",
+    "sensible-core": "^1.0.3",
+    "sequelize": "^6.16.1",
+    "sequelize-typescript": "^2.1.2",
+    "server": "^1.0.37"
+  }
+}

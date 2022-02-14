@@ -1,0 +1,22 @@
+{
+  "name": "sensibleframework-core",
+  "version": "0.0.1",
+  "description": "",
+  "main": "src/index.ts",
+  "type": "commonjs",
+  "source": "src/index.ts",
+  "scripts": {
+    "initpub": "npm publish --access public",
+    "pub": "npm version patch --force && npm publish",
+    "release": "standard-version",
+    "lint": "tsc --noEmit && eslint ./ --ext .ts",
+    "build": "tsc",
+    "dev": "tsc -w"
+  },
+  "author": "Wijnand Karsens",
+  "license": "ISC",
+  "dependencies": {
+    "sensible-core": "^1.0.4",
+    "sensible-server": "^1.0.2"
+  }
+}
