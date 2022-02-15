@@ -20,6 +20,11 @@
     "@babel/helper-validator-identifier" "^7.16.7"
     to-fast-properties "^2.0.0"
 
+"@types/bluebird@*":
+  version "3.5.36"
+  resolved "https://registry.yarnpkg.com/@types/bluebird/-/bluebird-3.5.36.tgz#00d9301d4dc35c2f6465a8aec634bb533674c652"
+  integrity sha512-HBNx4lhkxN7bx6P0++W8E289foSu8kO8GCk2unhuVggO+cE7rh9DhZUyPhUxNRG9m+5B5BTKxZQ5ZP92x/mx9Q==
+
 "@types/body-parser@*":
   version "1.19.2"
   resolved "https://registry.yarnpkg.com/@types/body-parser/-/body-parser-1.19.2.tgz#aea2059e28b7658639081347ac4fab3de166e6f0"
@@ -32,6 +37,13 @@
   version "3.4.35"
   resolved "https://registry.yarnpkg.com/@types/connect/-/connect-3.4.35.tgz#5fcf6ae445e4021d1fc2219a4873cc73a3bb2ad1"
   integrity sha512-cdeYyv4KWoEgpBISTxWvqYsVy444DOqehiF3fM3ne10AmJ62RSyNkUnxMJXHQWRQQX2eR94m5y1IZyDwBjV9FQ==
+  dependencies:
+    "@types/node" "*"
+
+"@types/continuation-local-storage@*":
+  version "3.2.4"
+  resolved "https://registry.yarnpkg.com/@types/continuation-local-storage/-/continuation-local-storage-3.2.4.tgz#655c8ffd9327aa60fb8ae773a5f2efbc973a7cbb"
+  integrity sha512-OT32vCVMymU1JMPKDeY0lX3cduAr0Pm/VwIbxygMeDS4lRcv57qYXn9bMwBRcRnEpXKBb/r4xYaZCARTZllP0A==
   dependencies:
     "@types/node" "*"
 
@@ -89,6 +101,11 @@
   dependencies:
     "@types/express" "*"
 
+"@types/lodash@*":
+  version "4.14.178"
+  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.178.tgz#341f6d2247db528d4a13ddbb374bcdc80406f4f8"
+  integrity sha512-0d5Wd09ItQWH1qFbEyQ7oTQ3GZrMfth5JkbN3EvTKLXcHLRDSXeLnlvlOn0wvxVIwK5o2M8JzP/OWz7T3NRsbw==
+
 "@types/mime@^1":
   version "1.3.2"
   resolved "https://registry.yarnpkg.com/@types/mime/-/mime-1.3.2.tgz#93e25bf9ee75fe0fd80b594bc4feb0e862111b5a"
@@ -114,6 +131,16 @@
   resolved "https://registry.yarnpkg.com/@types/range-parser/-/range-parser-1.2.4.tgz#cd667bcfdd025213aafb7ca5915a932590acdcdc"
   integrity sha512-EEhsLsD6UsDM1yFhAvy0Cjr6VwmpMWqFBCb9w07wVugF7w9nfajxLuVmngTIpgS6svCnm6Vaw+MZhoDCKnOfsw==
 
+"@types/sequelize@^4.28.11":
+  version "4.28.11"
+  resolved "https://registry.yarnpkg.com/@types/sequelize/-/sequelize-4.28.11.tgz#8b0c530bac4e6d73a0416a94db0de820cc4d47c3"
+  integrity sha512-2zeMcB5ZI+u1UwxM4sa3gLu8eSp0Gk+emTKPWXuNk3ePFo4EUYLgmIhGV6b+kYoshXpZHG3nJVMK00tuh5vEQA==
+  dependencies:
+    "@types/bluebird" "*"
+    "@types/continuation-local-storage" "*"
+    "@types/lodash" "*"
+    "@types/validator" "*"
+
 "@types/serve-static@*":
   version "1.13.10"
   resolved "https://registry.yarnpkg.com/@types/serve-static/-/serve-static-1.13.10.tgz#f5e0ce8797d2d7cc5ebeda48a52c96c4fa47a8d9"
@@ -133,6 +160,11 @@
     "@types/express-session" "*"
     "@types/formidable" "*"
     "@types/helmet" "0.0.48"
+
+"@types/validator@*":
+  version "13.7.1"
+  resolved "https://registry.yarnpkg.com/@types/validator/-/validator-13.7.1.tgz#cdab1b4779f6b1718a08de89d92d2603b71950cb"
+  integrity sha512-I6OUIZ5cYRk5lp14xSOAiXjWrfVoMZVjDuevBYgQDYzZIjsf2CAISpEcXOkFAtpAHbmWIDLcZObejqny/9xq5Q==
 
 accepts@~1.3.4, accepts@~1.3.5, accepts@~1.3.7:
   version "1.3.8"
@@ -1323,10 +1355,10 @@ send@0.17.2:
     range-parser "~1.2.1"
     statuses "~1.5.0"
 
-sensible-core@^1.0.3:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/sensible-core/-/sensible-core-1.0.3.tgz#af6d8f558142c8419fb6272b4cf2595b00c66035"
-  integrity sha512-bN0mANO1Of+px+jaUJqlI1bL6B7gh2tw0uIvgzgM5ADwkpA3ArzKP919LO4MKnf7gB4oaz5y+rfrbd6khjixzQ==
+sensible-core@^1.0.7:
+  version "1.0.7"
+  resolved "https://registry.yarnpkg.com/sensible-core/-/sensible-core-1.0.7.tgz#60051840eaf424a986defa6e800088dd7a2b6672"
+  integrity sha512-ju/6D5wPfBTLU5MqM3+CWTPJOUhVkPd9MwY/vv8D2QI7wxi3aidoR7NgFeckCLXpYXx+wqRwUConK/bhvlX8Mg==
 
 sequelize-pool@^7.1.0:
   version "7.1.0"

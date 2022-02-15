@@ -1,4 +1,5 @@
 {
+  //TODO: Figure out these TSCONFIG_SETTINGS
   "compilerOptions": {
     // This was actually kind of a nightmare to figure out.
     // There is a LOT of outdated, incorrect advise out there.
@@ -24,7 +25,7 @@
     // "noFallthroughCasesInSwitch": true /* Report errors for fallthrough cases in switch statement. */,
     "importHelpers": true,
     "skipLibCheck": true,
-    "outDir": "./dist/tsc/",
+    "outDir": "./build/tsc/",
     "types": ["node", "jest"],
     "lib": ["ES6", "DOM"]
   },

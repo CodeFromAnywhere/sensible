@@ -1,10 +1,14 @@
 {
   "name": "mage",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
-  "main": "src/index.ts",
+  "main": "build/index.js",
+  "source": "src/index.ts",
   "scripts": {
-    "dev": "node build/index.js"
+    "dev": "node build/index.js",
+    "initpub": "npm publish --access public",
+    "pub": "npm version patch --force && npm publish",
+    "build": "tsc"
   },
   "author": "",
   "license": "ISC",

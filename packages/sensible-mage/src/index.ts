@@ -26,17 +26,20 @@ const oldStuff = () => {
   // console.dir(type, config);
 };
 
-const mergeObjectArray = objectArray => {
+const mergeObjectArray = (objectArray: any[]) => {
+  return objectArray.reduce(
+    (previous, current) => ({ ...previous, ...current }),
+    {}
+  );
+};
 
-    return objectArray.reduce((previous, current)=> {...previous,...current}, {});
-}
+const logLengthObject = (object: { [key: string]: any[] }) => {
+  const lengths = mergeObjectArray(
+    Object.keys(object).map((key) => ({ [key]: object[key].length }))
+  );
 
-const logLengthObject = (object: { [key:string]: any[]} )=> {
-
-    const lengths = mergeObjectArray(Object.keys(object).map(key=>({[key]:object[key].length})));
-
-    console.log(lengths)
-}
+  console.log(lengths);
+};
 
 export const parseStuff = async () => {
   const dir = process.argv[2];
@@ -64,9 +67,6 @@ export const parseStuff = async () => {
     const classes = file.getClasses();
     const consts = file.getVariableDeclarations();
     const exports = file.getExportSymbols();
-
-    
-    logLens
 
     functions.map((func) => {
       console.log(func.getTypeParameters().map((p) => p.getFullText()));

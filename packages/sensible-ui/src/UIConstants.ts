@@ -1,4 +1,4 @@
-import { getEnv } from "react-with-native";
+import { getEnv } from "react-with-native-env";
 
 /**
  * put an .env in your root folder of your frontend project that looks like this:
