@@ -2,7 +2,6 @@ export declare type Endpoint = {
     method: "GET" | "POST";
     body: object;
     response: object;
-    description?: string;
 };
 export declare type API<TAllEndpoints extends unknown> = <TEndpoint extends keyof TAllEndpoints>(endpoint: TEndpoint, method: TAllEndpoints[TEndpoint] extends Endpoint ? TAllEndpoints[TEndpoint]["method"] : never, body?: TAllEndpoints[TEndpoint] extends Endpoint ? TAllEndpoints[TEndpoint]["body"] : never, options?: {
     isExternal?: boolean;

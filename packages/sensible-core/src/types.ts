@@ -2,7 +2,6 @@ export type Endpoint = {
   method: "GET" | "POST"; //| "POST_MULTIPART", sockets also in the future.
   body: object;
   response: object;
-  description?: string;
 };
 
 export type API<TAllEndpoints extends unknown> = <
