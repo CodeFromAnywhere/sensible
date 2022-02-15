@@ -11,7 +11,7 @@ var __assign = (this && this.__assign) || function () {
     return __assign.apply(this, arguments);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.shuffleArray = exports.generatePassword = exports.makeArrayString = exports.isEmail = exports.mergeObjectsArray = exports.slugify = exports.earthDistance = exports.uuid = exports.notEmpty = void 0;
+exports.shuffleArray = exports.generatePassword = exports.makeArrayString = exports.isEmail = exports.mergeObjectsArray = exports.slugify = exports.earthDistance = exports.createEnum = exports.uuid = exports.notEmpty = void 0;
 function notEmpty(value) {
     return value !== null && value !== undefined;
 }
@@ -23,6 +23,21 @@ function uuid() {
     });
 }
 exports.uuid = uuid;
+/**
+ * creates an enum object from a readonly const array so you don't have to
+ * ------
+ * const taskNames = ["a","b","c"] as const;
+ * type TaskNames = typeof taskNames[number];
+ * const enummm = createEnum(taskNames);
+ * (value of enummm: { a: "a", b: "b", c: "c" })
+ */
+var createEnum = function (array) {
+    return array.reduce(function (previous, current) {
+        var _a;
+        return __assign(__assign({}, previous), (_a = {}, _a[current] = current, _a));
+    }, {});
+};
+exports.createEnum = createEnum;
 function earthDistance(lat1, long1, lat2, long2, response) {
     var m = Math.PI / 180;
     lat1 = lat1 * m;

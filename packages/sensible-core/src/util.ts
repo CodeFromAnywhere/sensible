@@ -12,6 +12,21 @@ export function uuid() {
   });
 }
 
+/**
+ * creates an enum object from a readonly const array so you don't have to
+ * ------
+ * const taskNames = ["a","b","c"] as const;
+ * type TaskNames = typeof taskNames[number];
+ * const enummm = createEnum(taskNames);
+ * (value of enummm: { a: "a", b: "b", c: "c" })
+ */
+export const createEnum = <T extends readonly string[]>(
+  array: T
+): { [K in typeof array[number]]: K } =>
+  array.reduce((previous, current) => {
+    return { ...previous, [current]: current };
+  }, {} as any);
+
 export function earthDistance(
   lat1: number,
   long1: number,
