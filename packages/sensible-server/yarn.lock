@@ -117,9 +117,9 @@
   integrity sha512-iiUgKzV9AuaEkZqkOLDIvlQiL6ltuZd9tGcW3gwpnX8JbuiuhFlEGmmFXEXkN50Cvq7Os88IY2v0dkDqXYWVgA==
 
 "@types/node@*":
-  version "17.0.17"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-17.0.17.tgz#a8ddf6e0c2341718d74ee3dc413a13a042c45a0c"
-  integrity sha512-e8PUNQy1HgJGV3iU/Bp2+D/DXh3PYeyli8LgIwsQcs1Ar1LoaWHSIT6Rw+H2rNJmiq6SNWiDytfx8+gYj7wDHw==
+  version "17.0.18"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-17.0.18.tgz#3b4fed5cfb58010e3a2be4b6e74615e4847f1074"
+  integrity sha512-eKj4f/BsN/qcculZiRSujogjvp5O/k4lOW5m35NopjZM/QwLOR075a8pJW5hD+Rtdm2DaCVPENS6KtSQnUD6BA==
 
 "@types/qs@*":
   version "6.9.7"
@@ -1356,9 +1356,9 @@ send@0.17.2:
     statuses "~1.5.0"
 
 sensible-core@^1.0.7:
-  version "1.0.7"
-  resolved "https://registry.yarnpkg.com/sensible-core/-/sensible-core-1.0.7.tgz#60051840eaf424a986defa6e800088dd7a2b6672"
-  integrity sha512-ju/6D5wPfBTLU5MqM3+CWTPJOUhVkPd9MwY/vv8D2QI7wxi3aidoR7NgFeckCLXpYXx+wqRwUConK/bhvlX8Mg==
+  version "1.0.8"
+  resolved "https://registry.yarnpkg.com/sensible-core/-/sensible-core-1.0.8.tgz#5d47a064bc11847d3488e66891da63c7cf8b7cc7"
+  integrity sha512-8CkFoiS8I22MFWUbH1zGunMWwsUKGibqmNtT8+l2b+DnEFf/aaF3OQPtEw/nyJXNVPYufFFcJIxztKAy0T8H0Q==
 
 sequelize-pool@^7.1.0:
   version "7.1.0"

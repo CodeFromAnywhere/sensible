@@ -1,11 +1,11 @@
-import { Op as OpTypes } from "sequelize/types/operators";
+import { Op } from "sequelize/types/operators";
 declare type IsBetween = {
-    [OpTypes.and]: [
+    [Op.and]: [
         {
-            [OpTypes.gte]: number;
+            [Op.gte]: number;
         },
         {
-            [OpTypes.lte]: number;
+            [Op.lte]: number;
         }
     ];
 };
