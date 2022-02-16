@@ -15,4 +15,5 @@ __exportStar(require("./server"), exports);
 __exportStar(require("./util"), exports);
 __exportStar(require("./types"), exports);
 __exportStar(require("./createMakeEndpoint"), exports);
+// export * from "./defaultEndpoints";
 //# sourceMappingURL=index.js.map

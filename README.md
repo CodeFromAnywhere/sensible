@@ -2,6 +2,14 @@
   <img src="./assets/icon.png" width="250" />
 </p>
 
+# The Shared Full Stack Typescript Framework
+
+With strict conventions and the newest typescript and code sharing possibilities, we were able to create the most advanced typescript framework ever and boost the productivity of hundreds of development teams, maybe even by a factor of 10 or more.
+
+`Insert blurps here`
+
+## Getting Started
+
 To create a Sensible project, run:
 
 `yarn create sensible-app APPNAME`

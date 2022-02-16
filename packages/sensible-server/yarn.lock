@@ -1356,23 +1356,23 @@ send@0.17.2:
     statuses "~1.5.0"
 
 sensible-core@^1.0.7:
-  version "1.0.8"
-  resolved "https://registry.yarnpkg.com/sensible-core/-/sensible-core-1.0.8.tgz#5d47a064bc11847d3488e66891da63c7cf8b7cc7"
-  integrity sha512-8CkFoiS8I22MFWUbH1zGunMWwsUKGibqmNtT8+l2b+DnEFf/aaF3OQPtEw/nyJXNVPYufFFcJIxztKAy0T8H0Q==
+  version "1.0.12"
+  resolved "https://registry.yarnpkg.com/sensible-core/-/sensible-core-1.0.12.tgz#55f126792469c8fea488c07c249d649476ecf1cb"
+  integrity sha512-hSbm99MvfbmouoSfSwBkSYGEuGJqTqF4hpSpts9W/zQv/0G2vE1Z4LZ53qncZu98auw+erJY8xJ1HIhSmhZbyw==
 
 sequelize-pool@^7.1.0:
   version "7.1.0"
   resolved "https://registry.yarnpkg.com/sequelize-pool/-/sequelize-pool-7.1.0.tgz#210b391af4002762f823188fd6ecfc7413020768"
   integrity sha512-G9c0qlIWQSK29pR/5U2JF5dDQeqqHRragoyahj/Nx4KOOQ3CPPfzxnfqFPCSB7x5UgjOgnZ61nSxz+fjDpRlJg==
 
-sequelize-typescript@^2.1.2:
+sequelize-typescript@^2.1.1:
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/sequelize-typescript/-/sequelize-typescript-2.1.2.tgz#fcc2d3263ccc622710328c278f83e89f632a6d5a"
   integrity sha512-+vhugJk1LLq5EVeLWi/UrkpGLrJGVD0R3UpEGHYouf6qeLRBL1V7QCIZr0pHZA57+nJPoK4PPTD+sGHS11uvvw==
   dependencies:
     glob "7.2.0"
 
-sequelize@^6.16.1:
+sequelize@^6.12.0-alpha.1:
   version "6.16.1"
   resolved "https://registry.yarnpkg.com/sequelize/-/sequelize-6.16.1.tgz#2c84036ae0a64843cdfa52c8e3d0bee9c52ce116"
   integrity sha512-YFGqrwkmEhSbpZBxay5+PRKMiZNNUJzgIixCyFkLm9+/5Rqq5jBADEjTAC8RYHzwsOGNboYh18imXrYNCjBZCQ==

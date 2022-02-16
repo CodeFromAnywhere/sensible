@@ -1,62 +1,90 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.defaultEndpoints = void 0;
-var createMakeEndpoint_1 = require("./createMakeEndpoint");
-var makeEndpoint = (0, createMakeEndpoint_1.createMakeEndpoint)();
-exports.defaultEndpoints = [
-    makeEndpoint("docs", "GET", function (ctx) { return __awaiter(void 0, void 0, void 0, function () {
-        var endpoints, models;
-        return __generator(this, function (_a) {
-            endpoints = [];
-            models = [];
-            return [2 /*return*/, {
-                    endpoints: endpoints,
-                    models: models,
-                    success: false,
-                    response: "Not implemented yet",
-                }];
-        });
-    }); }),
-    makeEndpoint("recent", "GET", function (ctx) { return __awaiter(void 0, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            return [2 /*return*/, { success: false, response: "Not implemented yet", recent: [] }];
-        });
-    }); }),
-];
+// "typescript-json-schema": "^0.53.0"
+// import { Endpoint } from "sensible-core";
+// import { createMakeEndpoint } from "./createMakeEndpoint";
+// import * as TJS from "typescript-json-schema";
+// interface DocsEndpoint extends Endpoint {
+//   method: "GET";
+//   body: {};
+//   response: {
+//     endpoints?: Endpoint[];
+//     models?: object[];
+//     success: boolean;
+//     response: string;
+//   };
+// }
+// interface RecentEndpoint extends Endpoint {
+//   method: "GET";
+//   body: {};
+//   response: {
+//     success: boolean;
+//     response: string;
+//     recent?: (Endpoint & {
+//       endpoint: string;
+//     })[];
+//   };
+// }
+// interface DefaultEndpoints {
+//   docs: DocsEndpoint;
+//   recent: RecentEndpoint;
+// }
+// const makeEndpoint = createMakeEndpoint<DefaultEndpoints>();
+// export const makeDocsEndpoints = (files: string[]) => {
+//   return [
+//     makeEndpoint("docs", "GET", async (ctx) => {
+//       // optionally pass argument to schema generator
+//       const settings: TJS.PartialArgs = {
+//         required: true,
+//       };
+//       // optionally pass ts compiler options
+//       const compilerOptions: TJS.CompilerOptions = {
+//         strictNullChecks: true,
+//       };
+//       const program = TJS.getProgramFromFiles(
+//         // this should be given so the endpoint should be created in a function (makeDocsEndpoints(types):Middleware[])
+//         files,
+//         compilerOptions
+//       );
+//       // We can either get the schema for one file and one type...
+//       const schema = TJS.generateSchema(program, "*", settings);
+//       // ... or a generator that lets us incrementally get more schemas
+//       const generator = TJS.buildGenerator(program, settings);
+//       if (!generator) {
+//         return {
+//           response: "Couldn't make generator",
+//           success: false,
+//         };
+//       }
+//       // // generator can be also reused to speed up generating the schema if usecase allows:
+//       // const schemaWithReusedGenerator = TJS.generateSchema(
+//       //   program,
+//       //   "MyType",
+//       //   settings,
+//       //   [],
+//       //   generator
+//       // );
+//       // all symbols
+//       const schemas = generator
+//         .getUserSymbols()
+//         .map((symbol) => generator.getSchemaForSymbol(symbol));
+//       // Get symbols for different types from generator.
+//       // generator.getSchemaForSymbol("MyType");
+//       // generator.getSchemaForSymbol("AnotherType");
+//       const endpoints = schemas as Endpoint[];
+//       const models: object[] = [];
+//       return {
+//         endpoints,
+//         models,
+//         success: true,
+//         response: "Wow",
+//       };
+//     }),
+//     makeEndpoint("recent", "GET", async (ctx) => {
+//       return { success: false, response: "Not implemented yet", recent: [] };
+//     }),
+//   ];
+// };
+// export const makeDefaultEndpoints = (files: string[]) => {
+//   return [...makeDocsEndpoints(files)];
+// };
 //# sourceMappingURL=defaultEndpoints.js.map
