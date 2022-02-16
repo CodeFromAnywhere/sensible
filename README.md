@@ -4,11 +4,15 @@
 
 # The Shared Full Stack Typescript Framework
 
-With strict conventions and the newest typescript and code sharing possibilities, we were able to create the most advanced typescript framework ever and boost the productivity of hundreds of development teams, maybe even by a factor of 10 or more.
+With strict conventions and the newest typescript and code sharing possibilities, we were able to create the most advanced typescript framework ever and boost the productivity of hundreds of development teams, maybe even by a factor of 10 or more if you compare it to the industry standard.
 
 `Insert blurps here`
 
-## Getting Started
+Sensible's mission is to boost the productivity of 100.000+ Software Developers, making it as easy as possible to build a high-quality full-stack mobile/desktop app/website.
+
+Wanna try? Just enter `yarn create sensible-app APPNAME` and see the magic.
+
+## Documentation
 
 To create a Sensible project, run:
 
