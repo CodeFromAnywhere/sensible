@@ -1,0 +1,37 @@
+{
+  // CFA TSConfig.json v1.0
+  // code from anywhere tsconfig should be the same anywhere
+  "compilerOptions": {
+    "outDir": "build", // we build every package before publishing so people get precompiled common.js
+    "target": "ES5", // this is supported almost anywhere
+    "sourceMap": true, // make sure the code is mapped to the source code, so you can Cmd+Click on any definition
+    "declarationMap": true, // make sure the declaration files are in there and they are mapped to the source, so you can also Cmd+Click those
+    "declaration": true, // makes declarations for all exports
+    "strict": true, //always use strict
+    "skipDefaultLibCheck": true, //checking these could cause errors sometimes
+    "skipLibCheck": true, //we don't make them, so we don't need to check them
+    "moduleResolution": "node", //not sure how to set these, seems important though
+    "forceConsistentCasingInFileNames": false, //this is default, maybe we should set this to true
+    "esModuleInterop": true, //in order to be able to import React in both ways
+    "strictPropertyInitialization": false, //make classes shorter
+    "experimentalDecorators": true, //need for decorators in classes
+    //dependant on type of project
+    //"jsx": "react-jsx", //only specify this if project contains react code (jsx)
+    "lib": [
+      "ES5",
+      "ES6",
+      "ES7",
+      "ES2017",
+      "ES2018",
+      "ES2019",
+      "ES2020",
+      "ES2021",
+      "ESNext"
+      // "DOM" //only for web stuff
+      //"WebWorker",//only for webworker stuff
+      //"ScriptHost",//only for ScriptHost stuff
+    ]
+  },
+  "include": ["src"], //always put everything in src
+  "exclude": ["node_modules", "build"] //never check node_modules and build folder
+}

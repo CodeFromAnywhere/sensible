@@ -5,9 +5,9 @@ www.sensibleframework.co
 </a>
 </p>
 
-# The Shared Full Stack Typescript Framework
+# The fastest way to build an app
 
-With strict conventions and the newest typescript and code sharing possibilities, we were able to create the most advanced typescript framework ever and boost the productivity of hundreds of development teams, maybe even by a factor of 10 or more if you compare it to the industry standard.
+**The Shared Full Stack Typescript Framework** With strict conventions and the newest typescript and code sharing possibilities, we were able to create the most advanced typescript framework ever and boost the productivity of hundreds of development teams, maybe even by a factor of 10 or more if you compare it to the industry standard.
 
 `Insert blurps here`
 
