@@ -1,6 +1,6 @@
 <p align="center">
 <a href="https://www.sensibleframework.co" target="_blank">
-<img src="./assets/icon.png" width="250" />
+<img src="./assets/icon.png" width="250" /><br />
 www.sensibleframework.co
 </a>
 </p>
