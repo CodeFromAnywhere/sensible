@@ -13,7 +13,7 @@ With strict conventions and the newest typescript and code sharing possibilities
 
 Sensible's mission is to boost the productivity of 100.000+ Software Developers, making it as easy as possible to build a high-quality full-stack mobile/desktop app/website.
 
-Wanna try? Just enter `yarn create sensible-app APPNAME` and see the magic.
+Wanna try? Just enter `yarn create sensible-app APPNAME` and see the magic, or [check out this demo](https://www.sensibleframework.co/demo)
 
 ## Documentation
 
