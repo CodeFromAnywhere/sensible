@@ -66,3 +66,4 @@ Future:
 - cli to add certain features to your app/website such as cms, webview, etc.
 - sensible examples section on the site fetching all sensible-core-_ and sensible-ui-_ from npm
 - migration guide + cli upgrade command to upgrade the framework version
+- make it possible not to have to run any command but just click "Create A New Project" from the homepage, so no-coders can get started as well using plugable-cms from the start.
