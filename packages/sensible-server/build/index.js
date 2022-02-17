@@ -10,8 +10,11 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.makeDocsEndpoints = exports.makeDefaultEndpoints = void 0;
+const defaultEndpoints_1 = require("./defaultEndpoints");
+Object.defineProperty(exports, "makeDocsEndpoints", { enumerable: true, get: function () { return defaultEndpoints_1.makeDocsEndpoints; } });
+Object.defineProperty(exports, "makeDefaultEndpoints", { enumerable: true, get: function () { return defaultEndpoints_1.makeDefaultEndpoints; } });
 __exportStar(require("./DefaultModel"), exports);
 __exportStar(require("./util"), exports);
 __exportStar(require("./types"), exports);
 __exportStar(require("./createMakeEndpoint"), exports);
-// export * from "./defaultEndpoints";

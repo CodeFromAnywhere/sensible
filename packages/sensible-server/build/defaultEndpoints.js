@@ -1,89 +1,47 @@
 "use strict";
-// "typescript-json-schema": "^0.53.0"
-// import { Endpoint } from "sensible-core";
-// import { createMakeEndpoint } from "./createMakeEndpoint";
-// import * as TJS from "typescript-json-schema";
-// interface DocsEndpoint extends Endpoint {
-//   method: "GET";
-//   body: {};
-//   response: {
-//     endpoints?: Endpoint[];
-//     models?: object[];
-//     success: boolean;
-//     response: string;
-//   };
-// }
-// interface RecentEndpoint extends Endpoint {
-//   method: "GET";
-//   body: {};
-//   response: {
-//     success: boolean;
-//     response: string;
-//     recent?: (Endpoint & {
-//       endpoint: string;
-//     })[];
-//   };
-// }
-// interface DefaultEndpoints {
-//   docs: DocsEndpoint;
-//   recent: RecentEndpoint;
-// }
-// const makeEndpoint = createMakeEndpoint<DefaultEndpoints>();
-// export const makeDocsEndpoints = (files: string[]) => {
-//   return [
-//     makeEndpoint("docs", "GET", async (ctx) => {
-//       // optionally pass argument to schema generator
-//       const settings: TJS.PartialArgs = {
-//         required: true,
-//       };
-//       // optionally pass ts compiler options
-//       const compilerOptions: TJS.CompilerOptions = {
-//         strictNullChecks: true,
-//       };
-//       const program = TJS.getProgramFromFiles(
-//         // this should be given so the endpoint should be created in a function (makeDocsEndpoints(types):Middleware[])
-//         files,
-//         compilerOptions
-//       );
-//       // We can either get the schema for one file and one type...
-//       const schema = TJS.generateSchema(program, "*", settings);
-//       // ... or a generator that lets us incrementally get more schemas
-//       const generator = TJS.buildGenerator(program, settings);
-//       if (!generator) {
-//         return {
-//           response: "Couldn't make generator",
-//           success: false,
-//         };
-//       }
-//       // // generator can be also reused to speed up generating the schema if usecase allows:
-//       // const schemaWithReusedGenerator = TJS.generateSchema(
-//       //   program,
-//       //   "MyType",
-//       //   settings,
-//       //   [],
-//       //   generator
-//       // );
-//       // all symbols
-//       const schemas = generator
-//         .getUserSymbols()
-//         .map((symbol) => generator.getSchemaForSymbol(symbol));
-//       // Get symbols for different types from generator.
-//       // generator.getSchemaForSymbol("MyType");
-//       // generator.getSchemaForSymbol("AnotherType");
-//       const endpoints = schemas as Endpoint[];
-//       const models: object[] = [];
-//       return {
-//         endpoints,
-//         models,
-//         success: true,
-//         response: "Wow",
-//       };
-//     }),
-//     makeEndpoint("recent", "GET", async (ctx) => {
-//       return { success: false, response: "Not implemented yet", recent: [] };
-//     }),
-//   ];
-// };
-// export const makeDefaultEndpoints = (files: string[]) => {
-//   return [...makeDocsEndpoints(files)];
-// };
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.makeDefaultEndpoints = exports.makeDocsEndpoints = void 0;
+const sensible_core_1 = require("sensible-core");
+const createMakeEndpoint_1 = require("./createMakeEndpoint");
+const getSchema_1 = require("./getSchema");
+const getTypesFromSchema = (schema, shouldInclude) => {
+    return schema?.definitions
+        ? Object.keys(schema.definitions)
+            .map((name) => {
+            if (shouldInclude(name)) {
+                return { name, definition: schema.definitions[name] };
+            }
+            return null;
+        })
+            .filter(sensible_core_1.notEmpty)
+        : [];
+};
+const isEndpoint = (typeName) => typeName.endsWith("Endpoint") || typeName.endsWith("Endpoints");
+const isModel = (typeName) => typeName.endsWith("Type");
+const isOther = (typeName) => !isEndpoint(typeName) && !isModel(typeName);
+const makeDocsEndpoints = (typeFiles) => {
+    const makeEndpoint = (0, createMakeEndpoint_1.createMakeEndpoint)(typeFiles);
+    return [
+        makeEndpoint("docs", "GET", async (ctx) => {
+            const schema = (0, getSchema_1.getSchema)(typeFiles);
+            const endpoints = getTypesFromSchema(schema, isEndpoint);
+            const models = getTypesFromSchema(schema, isModel);
+            const other = getTypesFromSchema(schema, isOther);
+            return {
+                endpoints,
+                models,
+                other,
+                success: true,
+                response: "Wow",
+            };
+        }),
+        makeEndpoint("recent", "GET", async (ctx) => {
+            return { success: false, response: "Not implemented yet", recent: [] };
+        }),
+    ];
+};
+exports.makeDocsEndpoints = makeDocsEndpoints;
+const makeDefaultEndpoints = (typeFiles) => {
+    return [...(0, exports.makeDocsEndpoints)(typeFiles)];
+};
+exports.makeDefaultEndpoints = makeDefaultEndpoints;
