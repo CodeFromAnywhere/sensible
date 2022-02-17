@@ -16,12 +16,17 @@ const Home: NextPage = () => {
       </Head>
 
       <main className="p-4">
-        <h1 className={"text-5xl"}>Sensible Docs</h1>
+        <h1 className={"text-5xl"}>Sensible Docs...</h1>
 
-        {recentSites.concat(["http://localhost:4000"]).map((site) => {
-          <div onClick={() => router.push(`/${encodeURIComponent(site)}`)}>
-            {site}
-          </div>;
+        {recentSites.concat(["http://localhost:4000"]).map((site, index) => {
+          return (
+            <p
+              key={`site${index}`}
+              onClick={() => router.push(`/${encodeURIComponent(site)}`)}
+            >
+              {site}
+            </p>
+          );
         })}
       </main>
       <footer className={""}>
