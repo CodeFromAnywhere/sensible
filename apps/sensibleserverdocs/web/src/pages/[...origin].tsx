@@ -4,7 +4,8 @@ import { ActivityIndicator, Input } from "react-with-native";
 import { useRouter } from "next/router";
 import { useQuery } from "react-query";
 import * as TJS from "typescript-json-schema";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import useStore from "../store";
 
 type PropertiesObject = {
   [key: string]: TJS.DefinitionOrBoolean;
@@ -78,16 +79,23 @@ type Docs = {
 const Home: NextPage = () => {
   const router = useRouter();
   const { origin } = router.query;
-  const [search, setSearch] = useState("");
+  const originString = origin
+    ? Array.isArray(origin)
+      ? origin.join("/")
+      : origin
+    : null;
+  const originUrl = originString ? decodeURIComponent(originString) : null;
 
+  const [search, setSearch] = useState("");
+  const [recentSites, setRecentSites] = useStore("recentSites");
+
+  useEffect(() => {
+    if (originUrl && !recentSites.includes(originUrl)) {
+      setRecentSites(recentSites.concat([originUrl]));
+    }
+  }, []);
   const docs = useQuery<Docs | { success: boolean }>(["docs", origin], () => {
-    const originString = origin
-      ? Array.isArray(origin)
-        ? origin.join("/")
-        : origin
-      : null;
-    const url =
-      originString && `${decodeURIComponent(originString)}/sensible/docs`;
+    const url = originString && `${originUrl}/sensible/docs`;
 
     console.log({ url });
     if (url) {
