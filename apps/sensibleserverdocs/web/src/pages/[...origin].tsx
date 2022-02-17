@@ -101,6 +101,7 @@ const Home: NextPage = () => {
     if (url) {
       return fetch(url, {
         method: "GET",
+        mode: "no-cors",
         headers: {
           "Access-Control-Allow-Origin": "*",
         },
