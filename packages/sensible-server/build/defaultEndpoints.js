@@ -4,12 +4,15 @@ exports.makeDefaultEndpoints = exports.makeDocsEndpoints = void 0;
 const sensible_core_1 = require("sensible-core");
 const createMakeEndpoint_1 = require("./createMakeEndpoint");
 const getSchema_1 = require("./getSchema");
-const getTypesFromSchema = (schema, shouldInclude) => {
+const getTypesFromSchema = (schema, shouldBeIncluded) => {
     return schema?.definitions
         ? Object.keys(schema.definitions)
-            .map((name) => {
-            if (shouldInclude(name)) {
-                return { name, definition: schema.definitions[name] };
+            .map((definitionKey) => {
+            if (shouldBeIncluded(definitionKey)) {
+                return {
+                    name: definitionKey,
+                    definition: schema.definitions[definitionKey],
+                };
             }
             return null;
         })
@@ -42,6 +45,7 @@ const makeDocsEndpoints = (typeFiles) => {
 };
 exports.makeDocsEndpoints = makeDocsEndpoints;
 const makeDefaultEndpoints = (typeFiles) => {
-    return [...(0, exports.makeDocsEndpoints)(typeFiles)];
+    // for now we only have doc-endpoints. Don't know what needs to be there more actually, but let's see.
+    return (0, exports.makeDocsEndpoints)(typeFiles);
 };
 exports.makeDefaultEndpoints = makeDefaultEndpoints;

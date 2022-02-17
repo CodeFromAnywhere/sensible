@@ -1,6 +1,8 @@
 import * as TJS from "typescript-json-schema";
 
+//just generate the schema once every server restart because there can't be any changes without the server restarting.
 let cachedSchema: TJS.Definition | null = null;
+
 export const getSchema = (files: string[]) => {
   if (cachedSchema) {
     return cachedSchema;

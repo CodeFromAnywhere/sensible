@@ -21,6 +21,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getSchema = void 0;
 const TJS = __importStar(require("typescript-json-schema"));
+//just generate the schema once every server restart because there can't be any changes without the server restarting.
 let cachedSchema = null;
 const getSchema = (files) => {
     if (cachedSchema) {

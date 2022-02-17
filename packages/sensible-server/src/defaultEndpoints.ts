@@ -5,13 +5,16 @@ import { getSchema } from "./getSchema";
 
 const getTypesFromSchema = (
   schema: TJS.Definition | null,
-  shouldInclude: (typeName: string) => boolean
+  shouldBeIncluded: (typeName: string) => boolean
 ) => {
   return schema?.definitions
     ? Object.keys(schema.definitions)
-        .map((name) => {
-          if (shouldInclude(name)) {
-            return { name, definition: schema.definitions![name] };
+        .map((definitionKey) => {
+          if (shouldBeIncluded(definitionKey)) {
+            return {
+              name: definitionKey,
+              definition: schema.definitions![definitionKey],
+            };
           }
           return null;
         })
@@ -88,5 +91,6 @@ export const makeDocsEndpoints = (typeFiles: string[]) => {
 };
 
 export const makeDefaultEndpoints = (typeFiles: string[]) => {
-  return [...makeDocsEndpoints(typeFiles)];
+  // for now we only have doc-endpoints. Don't know what needs to be there more actually, but let's see.
+  return makeDocsEndpoints(typeFiles);
 };
