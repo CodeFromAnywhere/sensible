@@ -1,4 +1,4 @@
-import { Endpoint, mergeObjectsArray, notEmpty } from "sensible-core";
+import { Endpoint } from "sensible-core";
 import server from "server";
 import { getSchema } from "./getSchema";
 import { ServerEndpoint } from "./types";
@@ -75,84 +75,12 @@ const getEndpointsInterfacesObject = (schema: TJS.Definition | null) => {
     }
   });
 
-  // const allEndpointsSchema = AllEndpointsSchema?.allOf?.reduce(
-  //   (all, definition) => {
-  //     const realDefinition = getDefinition(definition);
-
-  //     if (realDefinition) {
-  //       if (realDefinition.$ref) {
-  //         // here we should go to the defition it refers to
-  //         const defKey = realDefinition.$ref.split("/").pop(); //UserEndpoints
-
-  //         if (defKey) {
-  //           const allEndpointDefinitions = getDefinition(
-  //             schema?.definitions?.[defKey]
-  //           );
-
-  //           const keyValueArray = allEndpointDefinitions?.properties
-  //             ? Object.keys(allEndpointDefinitions.properties)
-  //                 ?.map((key) => {
-  //                   const value = getDefinition(
-  //                     allEndpointDefinitions?.properties?.[key]
-  //                   )
-  //                     ?.$ref?.split("/")
-  //                     .pop();
-
-  //                   return { [key]: value };
-  //                 })
-  //                 .filter(notEmpty)
-  //             : [];
-
-  //           const keyValueObject = mergeObjectsArray(keyValueArray);
-  //           return { ...all, ...keyValueObject };
-  //         } else {
-  //           return all;
-  //         }
-  //       } else {
-  //         const key = realDefinition.$schema;
-  //         const value = null;
-  //         return { ...all, [key || "WTF"]: value };
-  //       }
-  //     } else {
-  //       return { ...all };
-  //     }
-  //   },
-  //   [] as any
-  // );
-
   return allEndpointsSchema;
 };
-// export function validate(typeName: string): (value: unknown) => any {
-//   const validator: any = ajv.getSchema(`Schema#/definitions/${typeName}`);
-//   return (value: unknown): any => {
-//     if (!validator) {
-//       throw new Error(
-//         `No validator defined for Schema#/definitions/${typeName}`
-//       );
-//     }
-
-//     const valid = validator(value);
-
-//     if (!valid) {
-//       throw new Error(
-//         "Invalid " +
-//           typeName +
-//           ": " +
-//           ajv.errorsText(
-//             validator.errors!.filter((e: any) => e.keyword !== "if"),
-//             { dataVar: typeName }
-//           )
-//       );
-//     }
-
-//     return value as any;
-//   };
-// }
 
 export const ajv = new Ajv({
   allErrors: true,
   coerceTypes: true,
-  unicode: true,
   useDefaults: true,
 });
 
