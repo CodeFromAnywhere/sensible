@@ -7,6 +7,9 @@ const Home: NextPage = () => {
   const router = useRouter();
   const [recentSites, setRecentSites] = useStore("recentSites");
 
+  const sites = recentSites.includes("http://localhost:4000")
+    ? recentSites
+    : recentSites.concat(["http://localhost:4000"]);
   return (
     <div className="flex flex-col flex-1 max-w-3xl items-center">
       <Head>
@@ -18,7 +21,7 @@ const Home: NextPage = () => {
       <main className="p-4">
         <h1 className={"text-5xl"}>Sensible Docs...</h1>
 
-        {recentSites.concat(["http://localhost:4000"]).map((site, index) => {
+        {sites.map((site, index) => {
           return (
             <p
               key={`site${index}`}
