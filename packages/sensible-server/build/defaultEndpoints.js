@@ -87,4 +87,3 @@
 // export const makeDefaultEndpoints = (files: string[]) => {
 //   return [...makeDocsEndpoints(files)];
 // };
-//# sourceMappingURL=defaultEndpoints.js.map

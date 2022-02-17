@@ -1,4 +1,4 @@
-import { Op } from "sequelize/types/operators";
+import { Op } from "sequelize";
 //not exported from main place, found through looking in their code
 //we also can't get the correct type from their @types package, weirdly enough.
 //so we also need to have sequelize in this package.
