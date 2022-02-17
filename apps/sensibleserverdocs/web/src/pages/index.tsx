@@ -18,8 +18,8 @@ const Home: NextPage = () => {
       <main className="p-4">
         <h1 className={"text-5xl"}>Sensible Docs</h1>
 
-        {recentSites.map((site) => {
-          <div onClick={() => router.push(`/${decodeURIComponent(site)}`)}>
+        {recentSites.concat(["http://localhost:4000"]).map((site) => {
+          <div onClick={() => router.push(`/${encodeURIComponent(site)}`)}>
             {site}
           </div>;
         })}
