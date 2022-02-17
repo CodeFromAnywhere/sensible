@@ -101,9 +101,9 @@ const Home: NextPage = () => {
     if (url) {
       return fetch(url, {
         method: "GET",
-        mode: "no-cors",
+        mode: "cors",
         headers: {
-          "Access-Control-Allow-Origin": "*",
+          "Content-Type": "application/json",
         },
       }).then((res) => res.json());
     } else {
@@ -112,7 +112,7 @@ const Home: NextPage = () => {
   });
 
   return (
-    <div className="flex flex-col flex-1 max-w-3xl items-center">
+    <div className="flex flex-col flex-1 items-center bg-green-300">
       <Head>
         <title>Sensible Docs</title>
         <meta name="description" content="Sensible Docs" />
@@ -126,7 +126,7 @@ const Home: NextPage = () => {
         placeholder="Search endpoints, models &amp; types..."
       />
 
-      <main className="p-4">
+      <main className="p-4 mx-6 lg:mx-20 bg-blue-50">
         <h1 className={"text-5xl"}>Sensible Docs</h1>
 
         {docs.isLoading ? (
