@@ -6,6 +6,8 @@ import { ServerEndpoint } from "./types";
 import * as TJS from "typescript-json-schema";
 import Ajv from "ajv";
 
+export type Keys<TObject> = Extract<keyof TObject, string>;
+
 export const ajv = new Ajv({
   allErrors: true,
   coerceTypes: true,
@@ -17,7 +19,7 @@ export const typeHasIncorrectInterface = (
   data: any,
   schema: TJS.Definition
 ): false | string => {
-  console.log("Validating", typeName, data, schema);
+  //console.log("Validating", typeName, data);
   // ajv.addSchema(schema, typeName);
   //ajv.addMetaSchema(require("ajv/lib/refs/json-schema-draft-07.json"));
   const validateFunction = ajv.compile(schema);
@@ -46,7 +48,7 @@ const getDefinition = (
 export const createMakeEndpoint = <TAllEndpoints extends unknown>(
   files: string[]
 ) => {
-  return <TEndpoint extends keyof TAllEndpoints>(
+  return <TEndpoint extends Keys<TAllEndpoints>>(
     path: TEndpoint,
     method: TAllEndpoints[TEndpoint] extends Endpoint
       ? TAllEndpoints[TEndpoint]["method"]
@@ -66,68 +68,69 @@ export const createMakeEndpoint = <TAllEndpoints extends unknown>(
       const extendedCtx = { ...ctx, body };
 
       const schema = getCachedSchema(files);
-
       const { endpointSchemas, endpoints } =
         getCachedEndpointSchemas<TAllEndpoints>(schema);
-
       const endpointInterfaceName: string | undefined = endpoints[path];
       const endpointSchema: TJS.Definition | undefined = endpointSchemas[path];
 
       const bodySchema = getDefinition(endpointSchema?.properties?.body);
-
       const responseSchema = getDefinition(
         endpointSchema?.properties?.response
       );
 
-      if (!bodySchema || !responseSchema) {
-        return {
-          success: false,
-          response: "Couldn't find bodySchema or repsonseSchema",
-        };
-      }
+      const isUserEndpoint = !path.startsWith("sensible/");
 
-      // console.dir(
-      //   { endpointSchema, bodySchema, responseSchema },
-      //   { depth: 999 }
-      // );
+      if (isUserEndpoint) {
+        if (!bodySchema || !responseSchema) {
+          return {
+            success: false,
+            response: "Couldn't find bodySchema or repsonseSchema",
+          };
+        }
 
-      if (!endpointInterfaceName || !schema) {
-        return {
-          response: "Couldn't find schema and/or endpoint interface name",
-          success: false,
-        };
-      }
-      const bodyErrors = typeHasIncorrectInterface(
-        endpointInterfaceName,
-        body,
-        schema
-      );
-      if (bodyErrors) {
-        return {
-          response: "Body is invalid",
-          success: false,
-          errors: !bodySchema ? "Body schema undefined" : bodyErrors,
-        };
-      }
+        // console.dir(
+        //   { endpointSchema, bodySchema, responseSchema },
+        //   { depth: 999 }
+        // );
 
+        if (!endpointInterfaceName || !schema) {
+          return {
+            response: "Couldn't find schema and/or endpoint interface name",
+            success: false,
+          };
+        }
+        const bodyErrors = typeHasIncorrectInterface(
+          endpointInterfaceName,
+          body,
+          schema
+        );
+        if (bodyErrors) {
+          return {
+            response: "Body is invalid",
+            success: false,
+            errors: !bodySchema ? "Body schema undefined" : bodyErrors,
+          };
+        }
+      }
       const response = await endpoint(extendedCtx);
 
       // response validation
+      if (isUserEndpoint && endpointInterfaceName && schema) {
+        const responseErrors = typeHasIncorrectInterface(
+          endpointInterfaceName,
+          response,
+          schema
+        );
 
-      const responseErrors = typeHasIncorrectInterface(
-        endpointInterfaceName,
-        response,
-        schema
-      );
-
-      if (responseErrors) {
-        return {
-          response: "Response is invalid",
-          success: false,
-          errors: !responseSchema
-            ? "Response schema undefined"
-            : responseErrors,
-        };
+        if (responseErrors) {
+          return {
+            response: "Response is invalid",
+            success: false,
+            errors: !responseSchema
+              ? "Response schema undefined"
+              : responseErrors,
+          };
+        }
       }
 
       return response;
