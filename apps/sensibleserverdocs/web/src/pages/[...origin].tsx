@@ -117,6 +117,7 @@ const Home: NextPage = () => {
         <title>Sensible Docs</title>
         <meta name="description" content="Sensible Docs" />
         <link rel="icon" href="/favicon.ico" />
+        <meta name="referrer" content="no-referrer-when-downgrade" />
       </Head>
 
       <input
