@@ -64,10 +64,12 @@ export const makeDefaultEndpoints = (typeFiles: string[]) => {
   // for now we only have doc-endpoints. Don't know what needs to be there more actually, but let's see.
   return makeDocsEndpoints(makeEndpoint, typeFiles).concat([
     //redirect anything that doesn't work to the docs
-    get("*", (ctx) =>
-      redirect(
-        `https://docs.sensibleframework.co/${ctx.req.protocol}://${ctx.req.headers.host}`
-      )
-    ),
+    get("*", (ctx) => {
+      const origin = encodeURIComponent(
+        `${ctx.req.protocol}://${ctx.req.headers.host}`
+      );
+
+      return redirect(`https://docs.sensibleframework.co/${origin}`);
+    }),
   ]);
 };

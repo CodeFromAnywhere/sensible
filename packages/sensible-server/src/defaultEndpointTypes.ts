@@ -34,19 +34,9 @@ export interface RecentEndpoint extends Endpoint {
   };
 }
 
-export interface AnyEndpoint extends Endpoint {
-  method: "GET";
-  body: {};
-  response: {
-    success: boolean;
-    response: string;
-  };
-}
-
 export interface DefaultEndpoints {
   "sensible/docs": DocsEndpoint;
   "sensible/recent": RecentEndpoint;
-  //"*": AnyEndpoint;
 }
 
 export interface AllEndpoints extends DefaultEndpoints {}

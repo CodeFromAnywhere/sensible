@@ -1,0 +1,43 @@
+{
+  "name": "lalala",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@badrap/bar-of-progress": "^0.1.2",
+    "next": "12.0.10",
+    "next-transpile-linked-modules": "^1.0.11",
+    "next-transpile-modules": "^9.0.0",
+    "react": "17.0.2",
+    "react-dom": "17.0.2",
+    "react-query": "^3.34.15",
+    "react-with-native": "^1.3.8",
+    "react-with-native-date-input": "^1.0.13",
+    "react-with-native-form": "^1.0.98",
+    "react-with-native-notification": "^1.0.32",
+    "react-with-native-number-input": "^1.0.7",
+    "react-with-native-password-input": "^1.0.33",
+    "react-with-native-phone-input": "^1.0.7",
+    "react-with-native-router": "^1.0.8",
+    "react-with-native-select-input": "^1.2.3",
+    "react-with-native-store": "^2.0.26",
+    "react-with-native-text-input": "^1.0.39",
+    "react-with-native-textarea-input": "^1.1.10",
+    "react-with-native-toggle-input": "^1.0.39",
+    "typescript-json-schema": "^0.53.0"
+  },
+  "devDependencies": {
+    "@types/node": "17.0.18",
+    "@types/react": "17.0.39",
+    "autoprefixer": "^10.4.2",
+    "eslint": "8.9.0",
+    "eslint-config-next": "12.0.10",
+    "postcss": "^8.4.6",
+    "tailwindcss": "^3.0.23",
+    "typescript": "4.5.5"
+  }
+}
