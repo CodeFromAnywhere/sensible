@@ -91,7 +91,12 @@ const Home: NextPage = () => {
 
     console.log({ url });
     if (url) {
-      return fetch(url, { method: "GET" }).then((res) => res.json());
+      return fetch(url, {
+        method: "GET",
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
+      }).then((res) => res.json());
     } else {
       return { success: false };
     }
