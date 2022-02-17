@@ -1,7 +1,7 @@
 import { Endpoint, notEmpty } from "sensible-core";
 import { createMakeEndpoint } from "./createMakeEndpoint";
 import * as TJS from "typescript-json-schema";
-import { getSchema } from "./getSchema";
+import { getCachedSchema } from "./getCachedSchema";
 
 const getTypesFromSchema = (
   schema: TJS.Definition | null,
@@ -70,7 +70,7 @@ export const makeDocsEndpoints = (typeFiles: string[]) => {
 
   return [
     makeEndpoint("docs", "GET", async (ctx) => {
-      const schema = getSchema(typeFiles);
+      const schema = getCachedSchema(typeFiles);
       const endpoints = getTypesFromSchema(schema, isEndpoint);
       const models = getTypesFromSchema(schema, isModel);
       const other = getTypesFromSchema(schema, isOther);
