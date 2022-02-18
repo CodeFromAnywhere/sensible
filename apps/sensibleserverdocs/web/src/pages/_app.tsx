@@ -4,6 +4,7 @@ import ProgressBar from "@badrap/bar-of-progress";
 import Router from "next/router";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { StoreProvider } from "../store";
+import { ToastContainer } from "react-with-native-notification";
 
 const progress = new ProgressBar();
 
@@ -24,6 +25,7 @@ const queryClient = new QueryClient({
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     <QueryClientProvider client={queryClient}>
+      <ToastContainer />
       <StoreProvider>
         <Component {...pageProps} />
       </StoreProvider>
