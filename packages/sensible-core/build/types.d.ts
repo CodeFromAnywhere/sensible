@@ -1,5 +1,12 @@
 export declare type Endpoint = {
-    method: "GET" | "POST";
+    /**
+     * api path to endpoint (can contain '/')
+     */
+    path: string;
+    /**
+     * SOCKET and SUB aren't supported yet
+     */
+    method: "GET" | "POST" | "DELETE" | "SOCKET" | "SUB";
     body: object;
     response: object;
 };

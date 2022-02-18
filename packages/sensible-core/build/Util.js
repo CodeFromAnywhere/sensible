@@ -11,7 +11,11 @@ var __assign = (this && this.__assign) || function () {
     return __assign.apply(this, arguments);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.shuffleArray = exports.generatePassword = exports.makeArrayString = exports.isEmail = exports.mergeObjectsArray = exports.slugify = exports.earthDistance = exports.createEnum = exports.uuid = exports.notEmpty = exports.objectMap = void 0;
+exports.shuffleArray = exports.generatePassword = exports.makeArrayString = exports.isEmail = exports.mergeObjectsArray = exports.slugify = exports.earthDistance = exports.createEnum = exports.uuid = exports.notEmpty = exports.objectMap = exports.onlyUnique = void 0;
+function onlyUnique(value, index, self) {
+    return self.indexOf(value) === index;
+}
+exports.onlyUnique = onlyUnique;
 function objectMap(object, mapFn) {
     return Object.keys(object).reduce(function (result, key) {
         result[key] = mapFn(object[key], key);

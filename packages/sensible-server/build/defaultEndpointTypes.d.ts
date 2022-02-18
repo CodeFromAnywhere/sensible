@@ -1,22 +1,11 @@
 import { Endpoint } from "sensible-core";
-import * as TJS from "typescript-json-schema";
+import { ModelSchemaObject } from ".";
 export interface DocsEndpoint extends Endpoint {
     method: "GET";
     body: {};
     response: {
         constants: object;
-        endpoints?: {
-            name: string;
-            definition: TJS.DefinitionOrBoolean;
-        }[];
-        models?: {
-            name: string;
-            definition: TJS.DefinitionOrBoolean;
-        }[];
-        other?: {
-            name: string;
-            definition: TJS.DefinitionOrBoolean;
-        }[];
+        schema?: ModelSchemaObject;
         success: boolean;
         response: string;
     };

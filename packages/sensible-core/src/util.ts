@@ -1,3 +1,11 @@
+export function onlyUnique<T extends unknown>(
+  value: T,
+  index: number,
+  self: T[]
+) {
+  return self.indexOf(value) === index;
+}
+
 export function objectMap<
   T extends { [key: string]: T[string] },
   U extends unknown

@@ -5,6 +5,7 @@ import { getCachedEndpointSchemas } from "./getCachedEndpointSchemas";
 import { ServerEndpoint } from "./types";
 import * as TJS from "typescript-json-schema";
 import Ajv from "ajv";
+import { InterpretableTypes } from ".";
 
 export type Keys<TObject> = Extract<keyof TObject, string>;
 
@@ -46,7 +47,7 @@ const getDefinition = (
 };
 
 export const createMakeEndpoint = <TAllEndpoints extends unknown>(
-  files: string[]
+  interpretableTypes: InterpretableTypes
 ) => {
   return <TEndpoint extends Keys<TAllEndpoints>>(
     path: TEndpoint,
@@ -67,7 +68,7 @@ export const createMakeEndpoint = <TAllEndpoints extends unknown>(
         : never = method === "POST" ? ctx.data : ctx.query;
       const extendedCtx = { ...ctx, body };
 
-      const schema = getCachedSchema(files);
+      const schema = getCachedSchema(interpretableTypes);
       const { endpointSchemas, endpoints } =
         getCachedEndpointSchemas<TAllEndpoints>(schema);
       const endpointInterfaceName: string | undefined = endpoints[path];

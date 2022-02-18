@@ -1,14 +1,17 @@
 import path from "path";
 import fs from "fs";
 import { mergeObjectsArray } from "sensible-core";
+import { FolderPath, Path } from ".";
 
+export const isArrayGuard = (moduleExports: any) =>
+  typeof moduleExports === "object" && Array.isArray(moduleExports);
 /**
  * @param slug what should the suffix or the name of thie file be (plural also possible)
  * @returns file path array
  */
-export const findFiles = (slug: string, location: string) => {
+export const findFiles = (slug: string, basePath: string): FolderPath[] => {
   return findFilesRecursively({
-    location,
+    basePath,
     match: (fileName) =>
       fileName === slug ||
       fileName === slug + "s" ||
@@ -19,24 +22,28 @@ export const findFiles = (slug: string, location: string) => {
 
 export const findFilesRecursively = ({
   match,
-  location,
+  basePath,
+  relativePath,
   onlyInSubFolders,
 }: {
   match: (fileName: string) => boolean;
-  location: Path;
+  basePath: Path;
+  relativePath?: string;
   /**
    * only find files in folders of this location, not in this location itself
    */
   onlyInSubFolders?: boolean;
-}): Path[] => {
+}): FolderPath[] => {
+  const location = relativePath ? path.join(basePath, relativePath) : basePath;
+
   const contents = fs.readdirSync(location, { withFileTypes: true });
 
   return contents.reduce((all, fileOrFolder) => {
     if (fileOrFolder.isDirectory()) {
       const folder = fileOrFolder;
-      const thisFolderLocation = path.join(location, folder.name);
       const thisFolder = findFilesRecursively({
-        location: thisFolderLocation,
+        basePath,
+        relativePath: relativePath + "/" + folder.name,
         match,
         onlyInSubFolders: false,
       });
@@ -46,15 +53,13 @@ export const findFilesRecursively = ({
       const file = fileOrFolder;
       const filePath: Path = path.join(location, file.name);
       const allWithMatchedFile = match(withoutExtension(file.name))
-        ? all.concat([filePath])
+        ? all.concat([{ relativeFolder: relativePath, path: filePath }])
         : all;
       return allWithMatchedFile;
     }
     return all;
-  }, [] as Path[]);
+  }, [] as FolderPath[]);
 };
-
-export type Path = string;
 
 export const withoutExtension = (fileName: string) => {
   const pieces = fileName.split(".");

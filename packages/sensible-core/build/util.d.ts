@@ -1,3 +1,4 @@
+export declare function onlyUnique<T extends unknown>(value: T, index: number, self: T[]): boolean;
 export declare function objectMap<T extends {
     [key: string]: T[string];
 }, U extends unknown>(object: T, mapFn: (value: T[string], key?: string) => U): {

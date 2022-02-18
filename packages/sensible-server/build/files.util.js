@@ -3,17 +3,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.importFromFiles = exports.withoutExtension = exports.findFilesRecursively = exports.findFiles = void 0;
+exports.importFromFiles = exports.withoutExtension = exports.findFilesRecursively = exports.findFiles = exports.isArrayGuard = void 0;
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
 const sensible_core_1 = require("sensible-core");
+const isArrayGuard = (moduleExports) => typeof moduleExports === "object" && Array.isArray(moduleExports);
+exports.isArrayGuard = isArrayGuard;
 /**
  * @param slug what should the suffix or the name of thie file be (plural also possible)
  * @returns file path array
  */
-const findFiles = (slug, location) => {
+const findFiles = (slug, basePath) => {
     return (0, exports.findFilesRecursively)({
-        location,
+        basePath,
         match: (fileName) => fileName === slug ||
             fileName === slug + "s" ||
             fileName.endsWith(`.${slug}`) ||
@@ -21,14 +23,15 @@ const findFiles = (slug, location) => {
     });
 };
 exports.findFiles = findFiles;
-const findFilesRecursively = ({ match, location, onlyInSubFolders, }) => {
+const findFilesRecursively = ({ match, basePath, relativePath, onlyInSubFolders, }) => {
+    const location = relativePath ? path_1.default.join(basePath, relativePath) : basePath;
     const contents = fs_1.default.readdirSync(location, { withFileTypes: true });
     return contents.reduce((all, fileOrFolder) => {
         if (fileOrFolder.isDirectory()) {
             const folder = fileOrFolder;
-            const thisFolderLocation = path_1.default.join(location, folder.name);
             const thisFolder = (0, exports.findFilesRecursively)({
-                location: thisFolderLocation,
+                basePath,
+                relativePath: relativePath + "/" + folder.name,
                 match,
                 onlyInSubFolders: false,
             });
@@ -39,7 +42,7 @@ const findFilesRecursively = ({ match, location, onlyInSubFolders, }) => {
             const file = fileOrFolder;
             const filePath = path_1.default.join(location, file.name);
             const allWithMatchedFile = match((0, exports.withoutExtension)(file.name))
-                ? all.concat([filePath])
+                ? all.concat([{ relativeFolder: relativePath, path: filePath }])
                 : all;
             return allWithMatchedFile;
         }

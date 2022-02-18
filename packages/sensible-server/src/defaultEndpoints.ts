@@ -1,4 +1,4 @@
-import { Endpoint, notEmpty } from "sensible-core";
+import { notEmpty } from "sensible-core";
 import { createMakeEndpoint } from "./createMakeEndpoint";
 import * as TJS from "typescript-json-schema";
 import { getCachedSchema } from "./getCachedSchema";
@@ -7,9 +7,8 @@ import {
   DocsEndpoint,
 } from "./defaultEndpointTypes";
 import server from "server";
-import { redirect, render } from "server/reply";
-import { Middleware } from "server/typings/common";
-import { ServerEndpoint } from ".";
+import { redirect } from "server/reply";
+import { InterpretableTypes, Path, ServerEndpoint } from "./types";
 
 const getTypesFromSchema = (
   schema: TJS.Definition | null,
@@ -38,23 +37,18 @@ const isOther = (typeName) => !isEndpoint(typeName) && !isModel(typeName);
 
 export const makeDocsEndpoints = (
   makeEndpoint: any,
-  typeFiles: string[],
+  interpretableTypes: InterpretableTypes,
   constants: object
 ) => {
   const docsEndpoint: ServerEndpoint<DocsEndpoint> = async (ctx) => {
     ctx.res.header("Access-Control-Allow-Origin", "*");
     ctx.res.header("Access-Control-Allow-Headers", "X-Requested-With");
 
-    const schema = getCachedSchema(typeFiles);
-    const endpoints = getTypesFromSchema(schema, isEndpoint);
-    const models = getTypesFromSchema(schema, isModel);
-    const other = getTypesFromSchema(schema, isOther);
+    const schema = getCachedSchema(interpretableTypes);
 
     return {
       constants,
-      endpoints,
-      models,
-      other,
+      schema,
       success: true,
       response: "Wow",
     };
@@ -75,15 +69,15 @@ export const makeDocsEndpoints = (
 const { get, post } = server.router;
 
 export const makeDefaultEndpoints = (
-  typeFiles: string[],
+  interpretableTypes: InterpretableTypes,
   constants: object
 ) => {
   const makeEndpoint = createMakeEndpoint<AllDefaultEndpoints>(
-    typeFiles //.concat(defaultEndpointsTypeFiles)
+    interpretableTypes //.concat(defaultEndpointsTypeFiles)
   );
 
   // for now we only have doc-endpoints. Don't know what needs to be there more actually, but let's see.
-  return makeDocsEndpoints(makeEndpoint, typeFiles, constants).concat([
+  return makeDocsEndpoints(makeEndpoint, interpretableTypes, constants).concat([
     //redirect anything that doesn't work to the docs
     get("*", (ctx) => {
       const origin = encodeURIComponent(

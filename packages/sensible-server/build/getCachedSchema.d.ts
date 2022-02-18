@@ -1,3 +1,3 @@
-import * as TJS from "typescript-json-schema";
-export declare const getCachedSchema: (files: string[]) => TJS.Definition | null;
+import { ModelSchemaObject, InterpretableTypes } from ".";
+export declare const getCachedSchema: (typeFilesObject: InterpretableTypes) => ModelSchemaObject;
 //# sourceMappingURL=getCachedSchema.d.ts.map

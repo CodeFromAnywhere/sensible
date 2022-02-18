@@ -1,9 +1,20 @@
+import { objectMap } from "sensible-core";
 import * as TJS from "typescript-json-schema";
+import {
+  EndpointExample,
+  isArrayGuard,
+  ModelSchemaObject,
+  TypeExample,
+  InterpretableTypes,
+  importFromFiles,
+} from ".";
 
 //just generate the schema once every server restart because there can't be any changes without the server restarting.
-let cachedSchema: TJS.Definition | null = null;
+let cachedSchema: ModelSchemaObject | null = null;
 
-export const getCachedSchema = (files: string[]) => {
+export const getCachedSchema = (
+  typeFilesObject: InterpretableTypes
+): ModelSchemaObject => {
   if (cachedSchema) {
     return cachedSchema;
   }
@@ -22,10 +33,30 @@ export const getCachedSchema = (files: string[]) => {
     skipLibCheck: true,
   };
 
-  const program = TJS.getProgramFromFiles(files, compilerOptions);
+  const schema = objectMap(typeFilesObject, (typeFiles) => {
+    const endpointsProgram = TJS.getProgramFromFiles(
+      typeFiles.endpoints,
+      compilerOptions
+    );
+    const typesProgram = TJS.getProgramFromFiles(
+      typeFiles.endpoints,
+      compilerOptions
+    );
+    const examples: (EndpointExample | TypeExample)[] = importFromFiles({
+      files: typeFiles.examples,
+      guard: isArrayGuard,
+    }).flat();
 
-  // We can either get the schema for one file and one type...
-  const schema = TJS.generateSchema(program, "*", settings);
+    const endpoints = TJS.generateSchema(endpointsProgram, "*", settings);
+    const types = TJS.generateSchema(typesProgram, "*", settings);
+
+    return {
+      endpoints,
+      types,
+      examples,
+    };
+  });
+
   cachedSchema = schema;
   return schema;
 };

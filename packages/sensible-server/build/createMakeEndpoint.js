@@ -33,13 +33,13 @@ const getDefinition = (definitionOrBooleanOrUndefined) => {
         ? definitionOrBooleanOrUndefined
         : null;
 };
-const createMakeEndpoint = (files) => {
+const createMakeEndpoint = (interpretableTypes) => {
     return (path, method, endpoint) => {
         const callMethod = method === "GET" ? "get" : "post";
         return server_1.default.router[callMethod](`/${path}`, async (ctx) => {
             const body = method === "POST" ? ctx.data : ctx.query;
             const extendedCtx = { ...ctx, body };
-            const schema = (0, getCachedSchema_1.getCachedSchema)(files);
+            const schema = (0, getCachedSchema_1.getCachedSchema)(interpretableTypes);
             const { endpointSchemas, endpoints } = (0, getCachedEndpointSchemas_1.getCachedEndpointSchemas)(schema);
             const endpointInterfaceName = endpoints[path];
             const endpointSchema = endpointSchemas[path];
