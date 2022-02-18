@@ -1,0 +1,5 @@
+{
+  "devDependencies": {
+    "@svgr/webpack": "^6.2.1"
+  }
+}

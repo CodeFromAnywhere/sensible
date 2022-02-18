@@ -15,6 +15,7 @@ const getTypesFromSchema = (
   schema: TJS.Definition | null,
   shouldBeIncluded: (typeName: string) => boolean
 ) => {
+  console.log({ all: schema?.definitions?.AllEndpoints });
   return schema?.definitions
     ? Object.keys(schema.definitions)
         .map((definitionKey) => {
@@ -35,7 +36,11 @@ const isEndpoint = (typeName) =>
 const isModel = (typeName) => typeName.endsWith("Type");
 const isOther = (typeName) => !isEndpoint(typeName) && !isModel(typeName);
 
-export const makeDocsEndpoints = (makeEndpoint: any, typeFiles: string[]) => {
+export const makeDocsEndpoints = (
+  makeEndpoint: any,
+  typeFiles: string[],
+  constants: object
+) => {
   const docsEndpoint: ServerEndpoint<DocsEndpoint> = async (ctx) => {
     ctx.res.header("Access-Control-Allow-Origin", "*");
     ctx.res.header("Access-Control-Allow-Headers", "X-Requested-With");
@@ -46,6 +51,7 @@ export const makeDocsEndpoints = (makeEndpoint: any, typeFiles: string[]) => {
     const other = getTypesFromSchema(schema, isOther);
 
     return {
+      constants,
       endpoints,
       models,
       other,
@@ -68,13 +74,16 @@ export const makeDocsEndpoints = (makeEndpoint: any, typeFiles: string[]) => {
 // const defaultEndpointsTypeFiles = [resolve("./defaultEndpointTypes.ts")];
 const { get, post } = server.router;
 
-export const makeDefaultEndpoints = (typeFiles: string[]) => {
+export const makeDefaultEndpoints = (
+  typeFiles: string[],
+  constants: object
+) => {
   const makeEndpoint = createMakeEndpoint<AllDefaultEndpoints>(
     typeFiles //.concat(defaultEndpointsTypeFiles)
   );
 
   // for now we only have doc-endpoints. Don't know what needs to be there more actually, but let's see.
-  return makeDocsEndpoints(makeEndpoint, typeFiles).concat([
+  return makeDocsEndpoints(makeEndpoint, typeFiles, constants).concat([
     //redirect anything that doesn't work to the docs
     get("*", (ctx) => {
       const origin = encodeURIComponent(

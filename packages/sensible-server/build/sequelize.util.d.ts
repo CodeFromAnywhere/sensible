@@ -1,4 +1,4 @@
-import { Op } from "sequelize/types/operators";
+import { Op } from "sequelize";
 declare type IsBetween = {
     [Op.and]: [
         {
@@ -11,4 +11,4 @@ declare type IsBetween = {
 };
 export declare const isBetweenSequelize: (lower: number, higher: number) => IsBetween;
 export {};
-//# sourceMappingURL=util.d.ts.map
+//# sourceMappingURL=sequelize.util.d.ts.map

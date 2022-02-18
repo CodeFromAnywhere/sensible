@@ -5,6 +5,7 @@ export interface DocsEndpoint extends Endpoint {
   method: "GET";
   body: {};
   response: {
+    constants: object;
     endpoints?: {
       name: string;
       definition: TJS.DefinitionOrBoolean;

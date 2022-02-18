@@ -91,3 +91,4 @@ const createMakeEndpoint = (files) => {
     };
 };
 exports.createMakeEndpoint = createMakeEndpoint;
+//# sourceMappingURL=createMakeEndpoint.js.map

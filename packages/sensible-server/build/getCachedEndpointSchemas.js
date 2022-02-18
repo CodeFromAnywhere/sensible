@@ -1,12 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getCachedEndpointSchemas = void 0;
-function objectMap(object, mapFn) {
-    return Object.keys(object).reduce(function (result, key) {
-        result[key] = mapFn(object[key]);
-        return result;
-    }, {});
-}
+const sensible_core_1 = require("sensible-core");
 const getDefinition = (definitionOrBooleanOrUndefined) => {
     const type = typeof definitionOrBooleanOrUndefined;
     return typeof definitionOrBooleanOrUndefined === "object"
@@ -26,12 +21,12 @@ const getCachedEndpointSchemas = (schema) => {
     if (!AllEndpointsSchema || !AllEndpointsSchema.properties) {
         throw new Error("Couldn't find AllEndpoints interface");
     }
-    const endpoints = objectMap(AllEndpointsSchema.properties, (value) => {
+    const endpoints = (0, sensible_core_1.objectMap)(AllEndpointsSchema.properties, (value) => {
         if (isDefinition(value)) {
             return value.$ref?.split("/").pop();
         }
     });
-    const endpointSchemas = objectMap(endpoints, (interfaceName) => {
+    const endpointSchemas = (0, sensible_core_1.objectMap)(endpoints, (interfaceName) => {
         if (interfaceName) {
             const definitionOrBooleanOrUndefined = 
             //@ts-ignore <-- fix later
@@ -47,3 +42,4 @@ const getCachedEndpointSchemas = (schema) => {
     return response;
 };
 exports.getCachedEndpointSchemas = getCachedEndpointSchemas;
+//# sourceMappingURL=getCachedEndpointSchemas.js.map

@@ -1,15 +1,5 @@
 import * as TJS from "typescript-json-schema";
-
-function objectMap<T extends { [key: string]: T[string] }, U extends unknown>(
-  object: T,
-  mapFn: (value: T[string]) => U
-): { [key: string]: U } {
-  return Object.keys(object).reduce(function (result, key) {
-    result[key] = mapFn(object[key]);
-    return result;
-  }, {});
-}
-
+import { objectMap } from "sensible-core";
 const getDefinition = (
   definitionOrBooleanOrUndefined: TJS.DefinitionOrBoolean | undefined
 ) => {

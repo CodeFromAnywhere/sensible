@@ -28,3 +28,4 @@ __decorate([
     __metadata("design:type", Date)
 ], DefaultModel.prototype, "updatedAt", void 0);
 exports.DefaultModel = DefaultModel;
+//# sourceMappingURL=DefaultModel.js.map

@@ -9,3 +9,4 @@ const isBetweenSequelize = (lower, higher) => {
     return isBetween;
 };
 exports.isBetweenSequelize = isBetweenSequelize;
+//# sourceMappingURL=sequelize.util.js.map

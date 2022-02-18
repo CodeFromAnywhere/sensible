@@ -10,6 +10,7 @@ const getCachedSchema_1 = require("./getCachedSchema");
 const server_1 = __importDefault(require("server"));
 const reply_1 = require("server/reply");
 const getTypesFromSchema = (schema, shouldBeIncluded) => {
+    console.log({ all: schema?.definitions?.AllEndpoints });
     return schema?.definitions
         ? Object.keys(schema.definitions)
             .map((definitionKey) => {
@@ -27,22 +28,28 @@ const getTypesFromSchema = (schema, shouldBeIncluded) => {
 const isEndpoint = (typeName) => typeName.endsWith("Endpoint") || typeName.endsWith("Endpoints");
 const isModel = (typeName) => typeName.endsWith("Type");
 const isOther = (typeName) => !isEndpoint(typeName) && !isModel(typeName);
-const makeDocsEndpoints = (makeEndpoint, typeFiles) => {
+const makeDocsEndpoints = (makeEndpoint, typeFiles, constants) => {
+    const docsEndpoint = async (ctx) => {
+        ctx.res.header("Access-Control-Allow-Origin", "*");
+        ctx.res.header("Access-Control-Allow-Headers", "X-Requested-With");
+        const schema = (0, getCachedSchema_1.getCachedSchema)(typeFiles);
+        const endpoints = getTypesFromSchema(schema, isEndpoint);
+        const models = getTypesFromSchema(schema, isModel);
+        const other = getTypesFromSchema(schema, isOther);
+        return {
+            constants,
+            endpoints,
+            models,
+            other,
+            success: true,
+            response: "Wow",
+        };
+    };
     return [
-        makeEndpoint("sensible/docs", "GET", async (ctx) => {
-            const schema = (0, getCachedSchema_1.getCachedSchema)(typeFiles);
-            const endpoints = getTypesFromSchema(schema, isEndpoint);
-            const models = getTypesFromSchema(schema, isModel);
-            const other = getTypesFromSchema(schema, isOther);
-            return {
-                endpoints,
-                models,
-                other,
-                success: true,
-                response: "Wow",
-            };
-        }),
+        makeEndpoint("sensible/docs", "GET", docsEndpoint),
         makeEndpoint("sensible/recent", "GET", async (ctx) => {
+            ctx.res.header("Access-Control-Allow-Origin", "*");
+            ctx.res.header("Access-Control-Allow-Headers", "X-Requested-With");
             return { success: false, response: "Not implemented yet", recent: [] };
         }),
     ];
@@ -50,11 +57,11 @@ const makeDocsEndpoints = (makeEndpoint, typeFiles) => {
 exports.makeDocsEndpoints = makeDocsEndpoints;
 // const defaultEndpointsTypeFiles = [resolve("./defaultEndpointTypes.ts")];
 const { get, post } = server_1.default.router;
-const makeDefaultEndpoints = (typeFiles) => {
+const makeDefaultEndpoints = (typeFiles, constants) => {
     const makeEndpoint = (0, createMakeEndpoint_1.createMakeEndpoint)(typeFiles //.concat(defaultEndpointsTypeFiles)
     );
     // for now we only have doc-endpoints. Don't know what needs to be there more actually, but let's see.
-    return (0, exports.makeDocsEndpoints)(makeEndpoint, typeFiles).concat([
+    return (0, exports.makeDocsEndpoints)(makeEndpoint, typeFiles, constants).concat([
         //redirect anything that doesn't work to the docs
         get("*", (ctx) => {
             const origin = encodeURIComponent(`${ctx.req.protocol}://${ctx.req.headers.host}`);
@@ -63,3 +70,4 @@ const makeDefaultEndpoints = (typeFiles) => {
     ]);
 };
 exports.makeDefaultEndpoints = makeDefaultEndpoints;
+//# sourceMappingURL=defaultEndpoints.js.map

@@ -1,3 +1,16 @@
+export function objectMap<
+  T extends { [key: string]: T[string] },
+  U extends unknown
+>(
+  object: T,
+  mapFn: (value: T[string], key?: string) => U
+): { [key: string]: U } {
+  return Object.keys(object).reduce(function (result, key) {
+    result[key] = mapFn(object[key], key);
+    return result;
+  }, {} as any);
+}
+
 export function notEmpty<TValue>(
   value: TValue | null | undefined
 ): value is TValue {

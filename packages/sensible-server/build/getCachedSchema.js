@@ -48,3 +48,4 @@ const getCachedSchema = (files) => {
     return schema;
 };
 exports.getCachedSchema = getCachedSchema;
+//# sourceMappingURL=getCachedSchema.js.map

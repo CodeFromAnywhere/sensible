@@ -10,7 +10,7 @@ export const getCachedSchema = (files: string[]) => {
   // optionally pass argument to schema generator
   const settings: TJS.PartialArgs = {
     required: true,
-    noExtraProps: true,
+    noExtraProps: true, //disable this to get composition of interface/type in anyOf (so I can divide endpoints into model sections)
     strictNullChecks: true,
   };
   //

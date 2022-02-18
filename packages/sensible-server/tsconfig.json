@@ -4,6 +4,9 @@
     "module": "CommonJS",
     "outDir": "build",
     "strict": true,
+    "sourceMap": true, // make sure the code is mapped to the source code, so you can Cmd+Click on any definition
+    "declarationMap": true, // make sure the declaration files are in there and they are mapped to the source, so you can also Cmd+Click those
+    "declaration": true, // makes declarations for all exports
     "noImplicitAny": false,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
