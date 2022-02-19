@@ -18,7 +18,7 @@ const Endpoint = ({
   definition: TJS.Definition;
   id: string;
 }) => {
-  const { apiUrl, searchString } = useSiteParams();
+  const { apiUrl, searchString, locationString } = useSiteParams();
 
   const getFirstEnum = (key: string): string | undefined =>
     getDefinition(definition?.properties?.[key])?.enum?.[0] as
@@ -220,6 +220,7 @@ const Endpoint = ({
 
   const bodyElement = (
     <ObjectInterface
+      // model={model}
       title="Body"
       properties={body?.properties}
       reference={response?.$ref}
@@ -228,6 +229,7 @@ const Endpoint = ({
   );
   const responseElement = (
     <ObjectInterface
+      //model={model}
       title="Response"
       properties={response?.properties}
       reference={response?.$ref}
@@ -235,8 +237,14 @@ const Endpoint = ({
     />
   );
 
+  const isSelected = locationString === identifier;
   return (
-    <div id={identifier} className="mb-4 border rounded-md">
+    <div
+      id={identifier}
+      className={`mb-4 border rounded-md ${
+        isSelected ? `animate-pulse-bg-once ${methodBg}` : ""
+      }`}
+    >
       {/* Endpoint Header */}
       <div
         className={`flex items-center justify-between p-4 cursor-pointer`}

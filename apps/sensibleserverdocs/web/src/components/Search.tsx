@@ -5,6 +5,7 @@ import BsSlashSquareIcon from "../../public/BsSlashSquare.svg";
 import { useEffect, useRef, useState } from "react";
 
 const Search = () => {
+  const [focusIcon, setFocusIcon] = useState(true);
   const { router, api, searchString } = useSiteParams();
 
   const inputRef = useRef<HTMLInputElement>(null);
@@ -17,6 +18,7 @@ const Search = () => {
         if (document.activeElement !== inputElement) {
           inputRef.current?.focus();
           event.preventDefault();
+          setFocusIcon(false);
         }
       }
     });
@@ -35,8 +37,6 @@ const Search = () => {
     );
   };
 
-  const [focusIcon, setFocusIcon] = useState(true);
-
   return (
     <div className="flex flex-row px-4 ml-4 mr-2 my-4 items-center rounded-md bg-gray-200 hover:bg-gray-100">
       <Svg src={CgSearchIcon} className="w-5 h-5" />
@@ -49,7 +49,10 @@ const Search = () => {
         className="w-full p-3 text-md bg-transparent focus:outline-none"
         placeholder="Search..."
       />
-      {focusIcon ? <Svg src={BsSlashSquareIcon} className="w-5 h-5" /> : null}
+      <Svg
+        src={BsSlashSquareIcon}
+        className={`w-5 h-5 ${focusIcon ? "block" : "hide"}`}
+      />
     </div>
   );
 };
