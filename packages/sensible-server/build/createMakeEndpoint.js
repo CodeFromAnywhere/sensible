@@ -72,7 +72,19 @@ const createMakeEndpoint = (interpretableTypes) => {
                     };
                 }
             }
-            const response = await endpoint(extendedCtx);
+            let response = {
+                success: false,
+                response: "Couldn't update response",
+            };
+            try {
+                response = await endpoint(extendedCtx);
+            }
+            catch (e) {
+                return {
+                    response: e,
+                    success: false,
+                };
+            }
             // response validation
             if (isUserEndpoint && endpointInterfaceName && schema) {
                 const responseErrors = (0, exports.typeHasIncorrectInterface)(endpointInterfaceName, response, schema);

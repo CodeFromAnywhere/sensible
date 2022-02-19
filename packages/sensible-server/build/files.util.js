@@ -31,7 +31,9 @@ const findFilesRecursively = ({ match, basePath, relativePath, onlyInSubFolders,
             const folder = fileOrFolder;
             const thisFolder = (0, exports.findFilesRecursively)({
                 basePath,
-                relativePath: relativePath + "/" + folder.name,
+                relativePath: relativePath
+                    ? `${relativePath}/${folder.name}`
+                    : folder.name,
                 match,
                 onlyInSubFolders: false,
             });

@@ -43,7 +43,9 @@ export const findFilesRecursively = ({
       const folder = fileOrFolder;
       const thisFolder = findFilesRecursively({
         basePath,
-        relativePath: relativePath + "/" + folder.name,
+        relativePath: relativePath
+          ? `${relativePath}/${folder.name}`
+          : folder.name,
         match,
         onlyInSubFolders: false,
       });

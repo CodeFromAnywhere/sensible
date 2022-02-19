@@ -18,6 +18,7 @@ export const getCachedSchema = (
   if (cachedSchema) {
     return cachedSchema;
   }
+
   // optionally pass argument to schema generator
   const settings: TJS.PartialArgs = {
     required: true,

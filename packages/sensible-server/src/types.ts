@@ -8,11 +8,13 @@ export type ServerEndpoint<TEndpoint extends Endpoint> = (
   ctx: Context & { body: TEndpoint["body"] }
 ) => Promise<TEndpoint["response"]>;
 
+export type RootModel = "root";
+export type AllEndpointsModel = "AllEndpoints";
 export type Path = string;
 export type FolderPath = { relativeFolder: string | undefined; path: Path };
 
 export type InterpretableTypes = {
-  [key: "root" | string]: {
+  [key in RootModel | AllEndpointsModel | string]: {
     endpoints: Path[];
     types: Path[];
     examples: Path[];
@@ -37,7 +39,7 @@ export type TypeExample = {
 
 export type ModelSchemaObject = {
   //maybe should type it better?
-  [key: string | "other"]: {
+  [key: string | RootModel | AllEndpointsModel]: {
     endpoints: TJS.Definition | null;
     types: TJS.Definition | null;
     examples: (EndpointExample | TypeExample)[];

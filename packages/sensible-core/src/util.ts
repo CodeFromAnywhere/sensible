@@ -3,7 +3,7 @@ export function onlyUnique<T extends unknown>(
   index: number,
   self: T[]
 ) {
-  return self.indexOf(value) === index;
+  return self.findIndex((_, i) => i === index) === index;
 }
 
 export function objectMap<

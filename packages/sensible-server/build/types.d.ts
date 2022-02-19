@@ -7,13 +7,15 @@ export declare type WithDataValues<TModel> = TModel & {
 export declare type ServerEndpoint<TEndpoint extends Endpoint> = (ctx: Context & {
     body: TEndpoint["body"];
 }) => Promise<TEndpoint["response"]>;
+export declare type RootModel = "root";
+export declare type AllEndpointsModel = "AllEndpoints";
 export declare type Path = string;
 export declare type FolderPath = {
     relativeFolder: string | undefined;
     path: Path;
 };
 export declare type InterpretableTypes = {
-    [key: "root" | string]: {
+    [key in RootModel | AllEndpointsModel | string]: {
         endpoints: Path[];
         types: Path[];
         examples: Path[];
@@ -33,7 +35,7 @@ export declare type TypeExample = {
     value: any;
 };
 export declare type ModelSchemaObject = {
-    [key: string | "other"]: {
+    [key: string | RootModel | AllEndpointsModel]: {
         endpoints: TJS.Definition | null;
         types: TJS.Definition | null;
         examples: (EndpointExample | TypeExample)[];

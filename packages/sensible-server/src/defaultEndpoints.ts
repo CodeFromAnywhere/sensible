@@ -10,30 +10,25 @@ import server from "server";
 import { redirect } from "server/reply";
 import { InterpretableTypes, Path, ServerEndpoint } from "./types";
 
-const getTypesFromSchema = (
-  schema: TJS.Definition | null,
-  shouldBeIncluded: (typeName: string) => boolean
-) => {
-  console.log({ all: schema?.definitions?.AllEndpoints });
-  return schema?.definitions
-    ? Object.keys(schema.definitions)
-        .map((definitionKey) => {
-          if (shouldBeIncluded(definitionKey)) {
-            return {
-              name: definitionKey,
-              definition: schema.definitions![definitionKey],
-            };
-          }
-          return null;
-        })
-        .filter(notEmpty)
-    : [];
-};
-
-const isEndpoint = (typeName) =>
-  typeName.endsWith("Endpoint") || typeName.endsWith("Endpoints");
-const isModel = (typeName) => typeName.endsWith("Type");
-const isOther = (typeName) => !isEndpoint(typeName) && !isModel(typeName);
+// const getTypesFromSchema = (
+//   schema: TJS.Definition | null,
+//   shouldBeIncluded: (typeName: string) => boolean
+// ) => {
+//   console.log({ all: schema?.definitions?.AllEndpoints });
+//   return schema?.definitions
+//     ? Object.keys(schema.definitions)
+//         .map((definitionKey) => {
+//           if (shouldBeIncluded(definitionKey)) {
+//             return {
+//               name: definitionKey,
+//               definition: schema.definitions![definitionKey],
+//             };
+//           }
+//           return null;
+//         })
+//         .filter(notEmpty)
+//     : [];
+// };
 
 export const makeDocsEndpoints = (
   makeEndpoint: any,

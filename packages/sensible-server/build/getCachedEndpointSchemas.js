@@ -17,7 +17,10 @@ const getCachedEndpointSchemas = (schema) => {
     if (cachedEndpointSchemas) {
         return cachedEndpointSchemas;
     }
-    const AllEndpointsSchema = getDefinition(schema?.definitions?.AllEndpoints);
+    const firstKey = Object.keys(schema)[0];
+    const firstModel = schema[firstKey];
+    const firstModelEndpoints = firstModel.endpoints;
+    const AllEndpointsSchema = getDefinition(firstModelEndpoints?.definitions?.AllEndpoints);
     if (!AllEndpointsSchema || !AllEndpointsSchema.properties) {
         throw new Error("Couldn't find AllEndpoints interface");
     }
@@ -28,13 +31,7 @@ const getCachedEndpointSchemas = (schema) => {
     });
     const endpointSchemas = (0, sensible_core_1.objectMap)(endpoints, (interfaceName) => {
         if (interfaceName) {
-            const definitionOrBooleanOrUndefined = 
-            //@ts-ignore <-- fix later
-            schema?.definitions?.[interfaceName];
-            if (isDefinition(definitionOrBooleanOrUndefined)) {
-                const definition = definitionOrBooleanOrUndefined;
-                return definition;
-            }
+            return getDefinition(firstModelEndpoints?.definitions?.[interfaceName]);
         }
     });
     const response = { endpointSchemas, endpoints };

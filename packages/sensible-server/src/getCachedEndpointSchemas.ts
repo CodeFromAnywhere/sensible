@@ -1,5 +1,6 @@
 import * as TJS from "typescript-json-schema";
 import { objectMap } from "sensible-core";
+import { ModelSchemaObject } from ".";
 const getDefinition = (
   definitionOrBooleanOrUndefined: TJS.DefinitionOrBoolean | undefined
 ) => {
@@ -16,21 +17,28 @@ const isDefinition = (
 };
 
 let cachedEndpointSchemas: {
-  endpointSchemas: { [key: string]: TJS.Definition | undefined };
+  endpointSchemas: { [key: string]: TJS.Definition | null | undefined };
   endpoints: { [key: string]: string | undefined };
 } | null = null;
+
 export const getCachedEndpointSchemas = <
   TAllEndpoints extends unknown,
   TEndpoint extends keyof TAllEndpoints = keyof TAllEndpoints
 >(
-  schema: TJS.Definition | null
+  schema: ModelSchemaObject
 ) => {
   // only needs to be calculated once per server startup.
   if (cachedEndpointSchemas) {
     return cachedEndpointSchemas;
   }
 
-  const AllEndpointsSchema = getDefinition(schema?.definitions?.AllEndpoints);
+  const firstKey = Object.keys(schema)[0];
+  const firstModel = schema[firstKey];
+  const firstModelEndpoints = firstModel.endpoints;
+
+  const AllEndpointsSchema = getDefinition(
+    firstModelEndpoints?.definitions?.AllEndpoints
+  );
   if (!AllEndpointsSchema || !AllEndpointsSchema.properties) {
     throw new Error("Couldn't find AllEndpoints interface");
   }
@@ -43,19 +51,14 @@ export const getCachedEndpointSchemas = <
     [key in TEndpoint]: string | undefined;
   };
 
-  const endpointSchemas = objectMap(endpoints, (interfaceName) => {
-    if (interfaceName) {
-      const definitionOrBooleanOrUndefined =
-        //@ts-ignore <-- fix later
-        schema?.definitions?.[interfaceName];
-      if (isDefinition(definitionOrBooleanOrUndefined)) {
-        const definition = definitionOrBooleanOrUndefined;
-        return definition;
+  const endpointSchemas = objectMap(
+    endpoints,
+    (interfaceName: string | undefined) => {
+      if (interfaceName) {
+        return getDefinition(firstModelEndpoints?.definitions?.[interfaceName]);
       }
     }
-  }) as {
-    [key in TEndpoint]: TJS.Definition | undefined;
-  };
+  );
 
   const response = { endpointSchemas, endpoints };
   cachedEndpointSchemas = response;

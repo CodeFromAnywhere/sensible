@@ -4,30 +4,29 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.makeDefaultEndpoints = exports.makeDocsEndpoints = void 0;
-const sensible_core_1 = require("sensible-core");
 const createMakeEndpoint_1 = require("./createMakeEndpoint");
 const getCachedSchema_1 = require("./getCachedSchema");
 const server_1 = __importDefault(require("server"));
 const reply_1 = require("server/reply");
-const getTypesFromSchema = (schema, shouldBeIncluded) => {
-    console.log({ all: schema?.definitions?.AllEndpoints });
-    return schema?.definitions
-        ? Object.keys(schema.definitions)
-            .map((definitionKey) => {
-            if (shouldBeIncluded(definitionKey)) {
-                return {
-                    name: definitionKey,
-                    definition: schema.definitions[definitionKey],
-                };
-            }
-            return null;
-        })
-            .filter(sensible_core_1.notEmpty)
-        : [];
-};
-const isEndpoint = (typeName) => typeName.endsWith("Endpoint") || typeName.endsWith("Endpoints");
-const isModel = (typeName) => typeName.endsWith("Type");
-const isOther = (typeName) => !isEndpoint(typeName) && !isModel(typeName);
+// const getTypesFromSchema = (
+//   schema: TJS.Definition | null,
+//   shouldBeIncluded: (typeName: string) => boolean
+// ) => {
+//   console.log({ all: schema?.definitions?.AllEndpoints });
+//   return schema?.definitions
+//     ? Object.keys(schema.definitions)
+//         .map((definitionKey) => {
+//           if (shouldBeIncluded(definitionKey)) {
+//             return {
+//               name: definitionKey,
+//               definition: schema.definitions![definitionKey],
+//             };
+//           }
+//           return null;
+//         })
+//         .filter(notEmpty)
+//     : [];
+// };
 const makeDocsEndpoints = (makeEndpoint, interpretableTypes, constants) => {
     const docsEndpoint = async (ctx) => {
         ctx.res.header("Access-Control-Allow-Origin", "*");

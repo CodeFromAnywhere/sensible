@@ -1,4 +1,4 @@
-import { Endpoint } from "sensible-core";
+import { DefaultResponse, Endpoint } from "sensible-core";
 import server from "server";
 import { getCachedSchema } from "./getCachedSchema";
 import { getCachedEndpointSchemas } from "./getCachedEndpointSchemas";
@@ -71,8 +71,10 @@ export const createMakeEndpoint = <TAllEndpoints extends unknown>(
       const schema = getCachedSchema(interpretableTypes);
       const { endpointSchemas, endpoints } =
         getCachedEndpointSchemas<TAllEndpoints>(schema);
+
       const endpointInterfaceName: string | undefined = endpoints[path];
-      const endpointSchema: TJS.Definition | undefined = endpointSchemas[path];
+      const endpointSchema: TJS.Definition | null | undefined =
+        endpointSchemas[path];
 
       const bodySchema = getDefinition(endpointSchema?.properties?.body);
       const responseSchema = getDefinition(
@@ -113,8 +115,19 @@ export const createMakeEndpoint = <TAllEndpoints extends unknown>(
           };
         }
       }
-      const response = await endpoint(extendedCtx);
 
+      let response: any = {
+        success: false,
+        response: "Couldn't update response",
+      };
+      try {
+        response = await endpoint(extendedCtx);
+      } catch (e) {
+        return {
+          response: e,
+          success: false,
+        };
+      }
       // response validation
       if (isUserEndpoint && endpointInterfaceName && schema) {
         const responseErrors = typeHasIncorrectInterface(
