@@ -10,14 +10,30 @@ import BsChevronUpIcon from "../../public/BsChevronUp.svg";
 import useStore from "../store";
 import ObjectInterface from "./ObjectInterface";
 import { useSiteParams } from "../hooks/useSiteParams";
-import { toQueryString } from "sensible-ui";
-const Endpoint = ({
+
+const getTypeInterfaceString = ({
+  name,
+  definition,
+  properties,
+}: {
+  name: string;
+  definition: any;
+  properties: string[];
+}) => {
+  return `interface ${name} {\n\t${properties
+    .map(
+      (key) => `${key}: ${getDefinition(definition?.properties?.[key])?.type}`
+    )
+    .join(`\n\t`)}\n}`;
+};
+const TypeDefinition = ({
   definition,
   id,
 }: {
   definition: TJS.Definition;
   id: string;
 }) => {
+  const [expandedTypes, setExpandedTypes] = useStore("expandedTypes");
   const { apiUrl, searchString } = useSiteParams();
 
   const getFirstEnum = (key: string): string | undefined =>
@@ -28,8 +44,6 @@ const Endpoint = ({
   const method = getFirstEnum("method");
   const path = getFirstEnum("path");
   const identifier = `${method}:${path}`;
-
-  const [expandedTypes, setExpandedTypes] = useStore("expandedTypes");
 
   const isExpanded = apiUrl
     ? !!expandedTypes[apiUrl]?.find((x) => x === identifier)
@@ -133,33 +147,6 @@ const Endpoint = ({
     </p>
   );
 
-  const copyLinkElement = (
-    <div
-      className={`ml-3 cursor-pointer rounded-full p-2 ${methodBgHover}`}
-      onClick={(e) => {
-        e.stopPropagation();
-
-        const query = {
-          search: searchString,
-          location: identifier,
-        };
-
-        const url =
-          window.location.protocol +
-          "//" +
-          window.location.host +
-          window.location.pathname +
-          toQueryString(query);
-        navigator.clipboard.writeText(url);
-        toast({
-          title: "Copied",
-          body: `Copied ${url}`,
-        });
-      }}
-    >
-      <Svg src={AiOutlineCopyIcon} className="w-4 h-4" />
-    </div>
-  );
   const copyCodeElement = (
     <div
       className={`cursor-pointer rounded-full p-2 ${methodBgHover}`}
@@ -218,23 +205,6 @@ const Endpoint = ({
   const expandedDescriptionElement =
     description && isExpanded ? <p className="mt-6">{description}</p> : null;
 
-  const bodyElement = (
-    <ObjectInterface
-      title="Body"
-      properties={body?.properties}
-      reference={response?.$ref}
-      required={body?.required}
-    />
-  );
-  const responseElement = (
-    <ObjectInterface
-      title="Response"
-      properties={response?.properties}
-      reference={response?.$ref}
-      required={response?.required}
-    />
-  );
-
   return (
     <div id={identifier} className="mb-4 border rounded-md">
       {/* Endpoint Header */}
@@ -248,7 +218,6 @@ const Endpoint = ({
           {titleElement}
           {descriptionElement}
         </div>
-        {copyLinkElement}
         {copyCodeElement}
         {copyCurlElement}
         {arrowElement}
@@ -261,11 +230,10 @@ const Endpoint = ({
           } transition-all ease-in overflow-clip duration-1000`}
         >
           <div className="mx-4">{expandedDescriptionElement}</div>
-          {bodyElement}
-          {responseElement}
+          Coming soon....{" "}
         </div>
       </div>
     </div>
   );
 };
-export default Endpoint;
+export default TypeDefinition;

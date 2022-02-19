@@ -3435,10 +3435,10 @@ sensible-core@^1.0.7:
   resolved "https://registry.yarnpkg.com/sensible-core/-/sensible-core-1.0.12.tgz#55f126792469c8fea488c07c249d649476ecf1cb"
   integrity sha512-hSbm99MvfbmouoSfSwBkSYGEuGJqTqF4hpSpts9W/zQv/0G2vE1Z4LZ53qncZu98auw+erJY8xJ1HIhSmhZbyw==
 
-sensible-ui@^1.0.7:
-  version "1.0.7"
-  resolved "https://registry.yarnpkg.com/sensible-ui/-/sensible-ui-1.0.7.tgz#0d4359f3a3f2ec662b43ab41e10565c9c64eeb57"
-  integrity sha512-paKIOyBHS1cz1yeiqp2v1UX64NnIY6PTFwhAl6mOlUjhOQI+kuRzYYrPcyY12UyGlsWBaYqVyDtsKgfgPmS3RA==
+sensible-ui@^1.0.9:
+  version "1.0.9"
+  resolved "https://registry.yarnpkg.com/sensible-ui/-/sensible-ui-1.0.9.tgz#5f1aa4df2210da4c65a241284784ea05fae45d41"
+  integrity sha512-KZCpKl8JAZG/Z1wQ2ZmLpVvnBLBjQLq+MXzFXpxj5ziVKrw3/cYLpBV85ADeKQBrTbI0hNnVd8KKZvJB7OHhSQ==
   dependencies:
     react-with-native-env "^0.0.3"
     sensible-core "^1.0.7"

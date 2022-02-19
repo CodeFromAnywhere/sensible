@@ -19,7 +19,7 @@ const Home: NextPage = () => {
         },
       ]);
   return (
-    <div className="flex items-center flex-1">
+    <div className="flex flex-col items-center flex-1">
       <Head>
         <title>Sensible Docs</title>
         <meta name="description" content="Sensible Docs" />
@@ -27,7 +27,7 @@ const Home: NextPage = () => {
       </Head>
       <h1
         className={
-          "text-5xl mb-10 w-full flex items-center bg-gray-200 px-6 lg:px-40 h-[16vh]"
+          "text-5xl mb-10 w-full flex items-center bg-grayish px-6 lg:px-40 h-[16vh]"
         }
       >
         Sensible Docs
@@ -36,23 +36,26 @@ const Home: NextPage = () => {
         {sites.map((site, index) => {
           return (
             <div
+              onClick={() => router.push(`/${encodeURIComponent(site.apiUrl)}`)}
               key={`site${index}`}
-              className="flex flex-row items-center justify-between w-full p-4 border rounded-sm hover:bg-gray-200"
+              className="flex flex-row items-center justify-between w-full p-4 border rounded-sm hover:bg-grayish"
             >
-              <p
-                onClick={() =>
-                  router.push(`/${encodeURIComponent(site.apiUrl)}`)
-                }
-              >
+              <p>
                 {site.appName
                   ? `${site.appName} (${site.apiUrl})`
                   : site.apiUrl}
               </p>
 
-              {site.domain ? (
-                <a href={site.domain} target="_blank" rel="noreferrer">
+              {site.domain || true ? (
+                <p
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    window.open(site.domain, "_blank")?.focus();
+                  }}
+                  className="hover:bg-blueish rounded-full p-2"
+                >
                   <Svg src={BiWorldIcon} className="w-8 h-8" />
-                </a>
+                </p>
               ) : null}
             </div>
           );
@@ -60,9 +63,7 @@ const Home: NextPage = () => {
       </main>
 
       <footer
-        className={
-          "bg-gray-200 h-[16vh] items-center flex px-6 lg:px-40 w-full"
-        }
+        className={"bg-grayish h-[16vh] items-center flex px-6 lg:px-40 w-full"}
       >
         <a
           href="https://codefromanywhere.com"

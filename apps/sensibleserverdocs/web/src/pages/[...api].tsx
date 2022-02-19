@@ -1,44 +1,31 @@
 import type { NextPage } from "next";
-import Head from "next/head";
 import { ActivityIndicator } from "react-with-native";
-import { useRouter } from "next/router";
 import { useQuery } from "react-query";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import useStore from "../store";
-import { getDefinition, Docs, getDocs, isDocs, DocsResult } from "../util";
-import Endpoint from "../components/Endpoint";
-
+import {
+  getDefinition,
+  getDocs,
+  isDocs,
+  DocsResult,
+  getFirstEnum,
+  isEndpoint,
+  notEmpty,
+} from "../util";
 import "react-toastify/dist/ReactToastify.css";
 import Header from "../components/Header";
 import Model from "../components/Model";
 import SideBar from "../components/sidebar/SideBar";
+import { Section } from "../components/sidebar/Menu";
+import { useSiteParams } from "../hooks/useSiteParams";
+import Search from "../components/Search";
+import { useScrollTo } from "../hooks/useScrollTo";
 
 const hasError = (docs: any) => docs.data?.error;
 const Home: NextPage = () => {
-  const router = useRouter();
-  const { api, search } = router.query;
-  const searchString = search
-    ? Array.isArray(search)
-      ? search.join("/")
-      : search
-    : "";
-  const setSearch = (s: string) => {
-    router.push(
-      {
-        pathname: router.pathname,
-        query: {
-          api,
-          search: s,
-        },
-      },
-      undefined,
-      { shallow: true }
-    );
-  };
-
+  const { apiUrl, locationString } = useSiteParams();
+  const scrollTo = useScrollTo();
   const [recentSites, setRecentSites] = useStore("recentSites");
-  const apiString = api ? (Array.isArray(api) ? api.join("/") : api) : null;
-  const apiUrl = apiString ? decodeURIComponent(apiString) : null;
 
   const docs = useQuery<DocsResult, string>(
     ["docs", apiUrl],
@@ -78,12 +65,11 @@ const Home: NextPage = () => {
 
   useEffect(() => {
     const dataIsDocs = isDocs(docs.data);
-    const hash = window.location.hash.substring(1);
-    console.log({ hash, dataChanged: true, dataIsDocs });
-    if (dataIsDocs) {
-      document.getElementById(hash)?.scrollIntoView({ behavior: "smooth" });
+    console.log({ locationString, dataChanged: true, dataIsDocs });
+    if (dataIsDocs && locationString) {
+      scrollTo(locationString);
     }
-  }, [docs.data]);
+  }, [docs.data, locationString]);
 
   useEffect(() => {
     if (apiUrl && !recentSites.find((x) => x.apiUrl === apiUrl)) {
@@ -117,8 +103,6 @@ const Home: NextPage = () => {
             const definitions = schema[modelKey];
             return (
               <Model
-                apiUrl={apiUrl}
-                searchString={searchString}
                 modelKey={modelKey}
                 key={`${modelKey}model`}
                 definitions={definitions}
@@ -130,47 +114,85 @@ const Home: NextPage = () => {
     );
   };
 
-  const schema = getDocs(docs.data)?.schema;
+  const schema = getDocs(docs)?.schema;
+
   const modelKeys = schema ? Object.keys(schema) : [];
+
   const sections = modelKeys.map((modelKey) => {
     const model = schema?.[modelKey];
 
-    return {
-      title: "Test",
-      sections: [],
+    const endpointSections = model?.endpoints
+      ? Object.keys(model.endpoints)
+          .map((endpointKey) => {
+            const definition = getDefinition(model?.endpoints?.[endpointKey]);
+
+            const path = getFirstEnum(definition, "path");
+            const method = getFirstEnum(definition, "method");
+
+            return isEndpoint(definition)
+              ? {
+                  title: endpointKey,
+                  key: `${modelKey}.${endpointKey}`,
+                  href: `${method}:${path}`,
+                }
+              : null;
+          })
+          .filter(notEmpty)
+      : [];
+
+    const typeSections = model?.types
+      ? Object.keys(model.types).map((typeKey) => {
+          return {
+            title: typeKey,
+            key: `${modelKey}.${typeKey}`,
+            href: typeKey,
+          };
+        })
+      : [];
+
+    const modelSections: Section = {
+      key: modelKey,
+      title: modelKey,
+      sections: [
+        {
+          title: "Endpoints",
+          sections: endpointSections,
+          key: `${modelKey}.Endpoints`,
+        },
+        {
+          title: "Types",
+          sections: typeSections,
+          key: `${modelKey}.Types`,
+        },
+      ],
     };
-    // return model.endpoints? Object.keys(model.endpoints): []
+    return modelSections;
   });
   return (
     <div className="flex flex-col items-center flex-1">
-      <main className="p-4 px-6 lg:px-40 box-border w-full min-h-[90vh]">
+      <div className="h-[10vh] w-full">
         <Header constants={constants} />
-        <div className="relative flex w-full">
+      </div>
+      <main className="w-full h-[80vh] relative flex">
+        <div className="overflow-y-scroll">
           <SideBar sections={sections} />
+        </div>
 
-          <div className="flex-1 w-full">
-            {!!getDocs(docs)?.schema ? (
-              <input
-                value={searchString}
-                onChange={(e) => setSearch(e.target.value)}
-                className="w-full p-4 mt-4 text-xl border rounded-md"
-                placeholder="Search endpoints, models &amp; types..."
-              />
-            ) : null}
+        <div className="flex-1 w-full overflow-y-scroll px-8">
+          {/* {!!getDocs(docs)?.schema ? <Search /> : null} */}
 
-            {hasError(docs) ? <p>{docs.data?.response}</p> : null}
-            {docs.isLoading ? (
-              <div>
-                <p>Fetching the newest docs</p>
-                <ActivityIndicator className="w-4 h-4" />
-              </div>
-            ) : null}
-            {renderModelObject()}
-          </div>
+          {hasError(docs) ? <p>{docs.data?.response}</p> : null}
+          {docs.isLoading ? (
+            <div>
+              <p>Fetching the newest docs</p>
+              <ActivityIndicator className="w-4 h-4" />
+            </div>
+          ) : null}
+          {renderModelObject()}
         </div>
       </main>
 
-      <footer className={"flex flex-1"}>
+      <footer className={"flex h-[10vh] items-center "}>
         <a
           href="https://codefromanywhere.com"
           target="_blank"
@@ -178,6 +200,9 @@ const Home: NextPage = () => {
         >
           Powered by Code From Anywhere
         </a>
+        <span className="animate-spin-slow cursor-pointer hover:animate-spin text-3xl ml-4">
+          🌍
+        </span>
       </footer>
     </div>
   );

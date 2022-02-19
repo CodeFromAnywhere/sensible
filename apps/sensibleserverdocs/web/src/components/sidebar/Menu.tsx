@@ -1,14 +1,14 @@
 import React from "react";
-import Category from "./Category";
-import MenuItem from "./MenuItem";
 import { useRouter } from "react-with-native-router";
-
-interface MenuProps {
-  sections: Section[];
-}
+import useStore from "../../store";
+import { Svg } from "react-with-native";
+import BsChevronUpIcon from "../../../public/BsChevronUp.svg";
+import { useScrollTo } from "../../hooks/useScrollTo";
+import { useSiteParams } from "../../hooks/useSiteParams";
 
 export type Section = {
   title: string;
+  key: string;
   /**
    * if href is undefined, make this expand/collapse
    */
@@ -16,18 +16,80 @@ export type Section = {
   sections?: Section[];
 };
 
-const Menu = ({ sections }: MenuProps) => {
-  const router = useRouter();
-  const search = (router.query.search || "") as string;
+const Menu = ({
+  sections,
+  stack = [],
+}: {
+  stack?: string[];
+  sections: Section[];
+}) => {
+  const scrollTo = useScrollTo();
+  const { searchString, apiString, api, search, apiUrl, router } =
+    useSiteParams();
+  const [collapsedMenus, setCollapsedMenus] = useStore("collapsedMenus");
 
   return (
-    <ul>
+    <ul className="ml-4 select-none">
       {sections.map((section, index) => {
+        const isCollapsed = apiUrl
+          ? !!collapsedMenus[apiUrl]?.find((x) => x === section.key)
+          : false;
+
+        const toggle = () => {
+          if (apiUrl) {
+            const newCollapsedModels = isCollapsed
+              ? collapsedMenus[apiUrl].filter((x) => x !== section.key)
+              : (collapsedMenus[apiUrl] || []).concat([section.key]);
+
+            setCollapsedMenus({
+              ...collapsedMenus,
+              [apiUrl]: newCollapsedModels,
+            });
+          }
+        };
+
         const hasSections = section.sections && section.sections.length > 0;
+
+        const arrowElement = (
+          <Svg
+            src={BsChevronUpIcon}
+            className={`ml-2 mt-1 w-4 h-4 duration-500 animate-all ${
+              !isCollapsed ? "rotate-180" : ""
+            }`}
+          />
+        );
         return (
           <li key={index}>
-            <a href={section.href}>{section.title}</a>
-            {hasSections ? <Menu sections={section.sections!} /> : null}
+            <div
+              onClick={() => {
+                if (section.href) {
+                  console.log(
+                    "I'm afraid section title is not the model name:",
+                    stack[0]
+                  );
+
+                  scrollTo(section.href, stack[0]);
+                } else {
+                  toggle();
+                }
+              }}
+              className={`cursor-pointer flex justify-between hover:bg-grey-100 p-2 ${
+                stack.length === 0
+                  ? "text-gray-700 mr-2 bg-gray-100 rounded mb-2 font-bold"
+                  : stack.length === 1 && hasSections
+                  ? "text-gray-400 mr-2 mb-2 font-bold hover:text-gray-700"
+                  : "text-gray-500 hover:text-gray-700 hover:underline"
+              }`}
+            >
+              {section.title}
+              {hasSections ? arrowElement : null}
+            </div>
+            {hasSections && !isCollapsed ? (
+              <Menu
+                sections={section.sections!}
+                stack={stack.concat([section.title])}
+              />
+            ) : null}
           </li>
         );
       })}

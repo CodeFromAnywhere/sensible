@@ -12,7 +12,8 @@ export const toQueryString = (query?: any) => {
         Object.entries(query)
           .filter(isValidEntry)
           .map(([key, value]) => {
-            return `${key}=${value}`;
+            const encodedValue = encodeURIComponent(String(value));
+            return `${key}=${encodedValue}`;
           })
           .join("&")
     : "";

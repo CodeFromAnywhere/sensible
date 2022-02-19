@@ -1,21 +1,32 @@
+import { useScrollTo } from "../hooks/useScrollTo";
 import { DefinitionObject, getDefinition, getRefLink } from "../util";
 
 const ObjectInterface = ({
   title,
   properties,
   reference,
+  model,
   required,
 }: {
   title?: string;
   properties: DefinitionObject | undefined;
   reference?: string;
+  model: string;
   required?: string[];
 }) => {
+  const scrollTo = useScrollTo();
   const refLink = getRefLink(reference);
   const refElement = refLink ? (
-    <a className="cursor-pointer" href={`#${refLink}`}>
+    <div
+      className="cursor-pointer"
+      onClick={() => {
+        if (refLink) {
+          scrollTo(refLink, model);
+        }
+      }}
+    >
       {refLink}
-    </a>
+    </div>
   ) : null;
 
   const array = properties ? Object.keys(properties) : [];
@@ -41,9 +52,16 @@ const ObjectInterface = ({
             const isRequired = required?.includes(key);
             const refLink = getRefLink(definition?.$ref);
             const refElement = refLink ? (
-              <a className="cursor-pointer" href={`#${refLink}`}>
+              <div
+                className="cursor-pointer"
+                onClick={() => {
+                  if (refLink) {
+                    scrollTo(refLink, model);
+                  }
+                }}
+              >
                 {refLink}
-              </a>
+              </div>
             ) : null;
             const type = definition?.enum?.length
               ? definition.enum.map((x) => `"${x}"`).join(" | ")

@@ -65,6 +65,18 @@ export const isEndpoint = (
     : false;
 };
 
+export function notEmpty<TValue>(
+  value: TValue | null | undefined
+): value is TValue {
+  return value !== null && value !== undefined;
+}
+
+export const getFirstEnum = (
+  definition: TJS.Definition | null,
+  key: string
+): string | undefined =>
+  getDefinition(definition?.properties?.[key])?.enum?.[0] as string | undefined;
+
 export const getRefLink = (ref?: string) => {
   return ref?.split("/").pop();
 };
