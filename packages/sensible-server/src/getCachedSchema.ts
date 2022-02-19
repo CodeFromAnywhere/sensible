@@ -48,8 +48,18 @@ export const getCachedSchema = (
       guard: isArrayGuard,
     }).flat();
 
-    const endpoints = TJS.generateSchema(endpointsProgram, "*", settings);
-    const types = TJS.generateSchema(typesProgram, "*", settings);
+    const endpoints = TJS.generateSchema(
+      endpointsProgram,
+      "*",
+      settings,
+      typeFiles.endpoints
+    )?.definitions;
+    const types = TJS.generateSchema(
+      typesProgram,
+      "*",
+      settings,
+      typeFiles.types
+    )?.definitions;
 
     return {
       endpoints,

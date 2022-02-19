@@ -69,52 +69,52 @@ export const createMakeEndpoint = <TAllEndpoints extends unknown>(
       const extendedCtx = { ...ctx, body };
 
       const schema = getCachedSchema(interpretableTypes);
-      const { endpointSchemas, endpoints } =
-        getCachedEndpointSchemas<TAllEndpoints>(schema);
+      // const { endpointSchemas, endpoints } =
+      //   getCachedEndpointSchemas<TAllEndpoints>(schema);
 
-      const endpointInterfaceName: string | undefined = endpoints[path];
-      const endpointSchema: TJS.Definition | null | undefined =
-        endpointSchemas[path];
+      // const endpointInterfaceName: string | undefined = endpoints[path];
+      // const endpointSchema: TJS.Definition | null | undefined =
+      //   endpointSchemas[path];
 
-      const bodySchema = getDefinition(endpointSchema?.properties?.body);
-      const responseSchema = getDefinition(
-        endpointSchema?.properties?.response
-      );
+      // const bodySchema = getDefinition(endpointSchema?.properties?.body);
+      // const responseSchema = getDefinition(
+      //   endpointSchema?.properties?.response
+      // );
 
-      const isUserEndpoint = !path.startsWith("sensible/");
+      // const isUserEndpoint = !path.startsWith("sensible/");
 
-      if (isUserEndpoint) {
-        if (!bodySchema || !responseSchema) {
-          return {
-            success: false,
-            response: "Couldn't find bodySchema or repsonseSchema",
-          };
-        }
+      // if (isUserEndpoint) {
+      //   if (!bodySchema || !responseSchema) {
+      //     return {
+      //       success: false,
+      //       response: "Couldn't find bodySchema or repsonseSchema",
+      //     };
+      //   }
 
-        // console.dir(
-        //   { endpointSchema, bodySchema, responseSchema },
-        //   { depth: 999 }
-        // );
+      //   // console.dir(
+      //   //   { endpointSchema, bodySchema, responseSchema },
+      //   //   { depth: 999 }
+      //   // );
 
-        if (!endpointInterfaceName || !schema) {
-          return {
-            response: "Couldn't find schema and/or endpoint interface name",
-            success: false,
-          };
-        }
-        const bodyErrors = typeHasIncorrectInterface(
-          endpointInterfaceName,
-          body,
-          schema
-        );
-        if (bodyErrors) {
-          return {
-            response: "Body is invalid",
-            success: false,
-            errors: !bodySchema ? "Body schema undefined" : bodyErrors,
-          };
-        }
-      }
+      //   if (!endpointInterfaceName || !schema) {
+      //     return {
+      //       response: "Couldn't find schema and/or endpoint interface name",
+      //       success: false,
+      //     };
+      //   }
+      //   const bodyErrors = typeHasIncorrectInterface(
+      //     endpointInterfaceName,
+      //     body,
+      //     schema
+      //   );
+      //   if (bodyErrors) {
+      //     return {
+      //       response: "Body is invalid",
+      //       success: false,
+      //       errors: !bodySchema ? "Body schema undefined" : bodyErrors,
+      //     };
+      //   }
+      // }
 
       let response: any = {
         success: false,
@@ -128,24 +128,24 @@ export const createMakeEndpoint = <TAllEndpoints extends unknown>(
           success: false,
         };
       }
-      // response validation
-      if (isUserEndpoint && endpointInterfaceName && schema) {
-        const responseErrors = typeHasIncorrectInterface(
-          endpointInterfaceName,
-          response,
-          schema
-        );
+      // // response validation
+      // if (isUserEndpoint && endpointInterfaceName && schema) {
+      //   const responseErrors = typeHasIncorrectInterface(
+      //     endpointInterfaceName,
+      //     response,
+      //     schema
+      //   );
 
-        if (responseErrors) {
-          return {
-            response: "Response is invalid",
-            success: false,
-            errors: !responseSchema
-              ? "Response schema undefined"
-              : responseErrors,
-          };
-        }
-      }
+      //   if (responseErrors) {
+      //     return {
+      //       response: "Response is invalid",
+      //       success: false,
+      //       errors: !responseSchema
+      //         ? "Response schema undefined"
+      //         : responseErrors,
+      //     };
+      //   }
+      // }
 
       return response;
     });
