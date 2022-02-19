@@ -11,6 +11,8 @@ import { useState } from "react";
 import BsChevronUpIcon from "../../public/BsChevronUp.svg";
 import BsChevronDownIcon from "../../public/BsChevronDown.svg";
 import useStore from "../store";
+import ObjectComponent from "./ObjectInterface";
+import ObjectInterface from "./ObjectInterface";
 
 const getTypeInterfaceString = ({
   name,
@@ -122,8 +124,32 @@ const Endpoint = ({
   );
 
   const titleElement = (
-    <p className="ml-2 text-lg">
-      /{path} ({id})
+    <p className="ml-2 text-lg" onClick={(e) => e.stopPropagation()}>
+      {path ? (
+        <span
+          className="pr-4"
+          onClick={() => {
+            navigator.clipboard.writeText(path);
+            toast({
+              title: "Copied",
+              body: `${path} copied to clipboard`,
+            });
+          }}
+        >
+          /{path}
+        </span>
+      ) : null}
+      <span
+        onClick={() => {
+          navigator.clipboard.writeText(id);
+          toast({
+            title: "Copied",
+            body: "Copied to clipboard",
+          });
+        }}
+      >
+        ({id})
+      </span>
     </p>
   );
 
@@ -195,13 +221,37 @@ const Endpoint = ({
       }`}
     />
   );
+
+  const body = getDefinition(definition?.properties?.body);
+  const response = getDefinition(definition?.properties?.response);
+
+  const expandedDescriptionElement =
+    description && isExpanded ? <p className="mt-6">{description}</p> : null;
+
+  const bodyElement = (
+    <ObjectInterface
+      title="Body"
+      properties={body?.properties}
+      reference={response?.$ref}
+      required={body?.required}
+    />
+  );
+  const responseElement = (
+    <ObjectInterface
+      title="Response"
+      properties={response?.properties}
+      reference={response?.$ref}
+      required={response?.required}
+    />
+  );
+
   return (
-    <div
-      id={identifier}
-      className="px-4 pb-4 my-4 border rounded-md cursor-pointer"
-      onClick={toggle}
-    >
-      <div className={`flex items-center justify-between mt-4`}>
+    <div id={identifier} className="mb-4 border rounded-md">
+      {/* Endpoint Header */}
+      <div
+        className={`flex items-center justify-between p-4 cursor-pointer`}
+        onClick={toggle}
+      >
         <div className={`flex items-center flex-1`}>
           {iconElement}
           {methodElement}
@@ -214,26 +264,15 @@ const Endpoint = ({
         {arrowElement}
       </div>
 
-      <div className={isExpanded ? "opacity-100" : "opacity-0"}>
+      <div className={`${isExpanded ? "opacity-100" : "opacity-0"}`}>
         <div
           className={`${
             isExpanded ? "max-h-[1920px]" : "max-h-0 h-0"
           } transition-all ease-in overflow-clip duration-1000`}
         >
-          <p>{description}</p>
-
-          {propertyKeys.map((propertyKey) => {
-            const property = getDefinition(
-              definition?.properties?.[propertyKey]
-            );
-            return (
-              <Property
-                key={`${id}_${propertyKey}`}
-                propertyName={propertyKey}
-                property={property}
-              />
-            );
-          })}
+          <div className="mx-4">{expandedDescriptionElement}</div>
+          {bodyElement}
+          {responseElement}
         </div>
       </div>
     </div>

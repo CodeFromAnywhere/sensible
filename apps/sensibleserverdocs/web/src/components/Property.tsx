@@ -1,5 +1,5 @@
 import * as TJS from "typescript-json-schema";
-import ObjectComponent from "./ObjectComponent";
+import ObjectInterface from "./ObjectInterface";
 
 const Property = ({
   property,
@@ -19,7 +19,7 @@ const Property = ({
       property.type
     )
   ) : property?.type === "object" ? (
-    <ObjectComponent properties={property.properties!} />
+    <ObjectInterface properties={property.properties!} />
   ) : (
     `Unknown type: ${property?.type}`
   );

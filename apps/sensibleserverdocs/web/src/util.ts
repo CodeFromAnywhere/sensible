@@ -65,6 +65,9 @@ export const isEndpoint = (
     : false;
 };
 
+export const getRefLink = (ref?: string) => {
+  return ref?.split("/").pop();
+};
 export const isDocs = (docs: any): docs is Docs => {
   return docs?.schema && !!docs?.response && docs?.success ? true : false;
 };
