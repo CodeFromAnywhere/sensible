@@ -1,6 +1,6 @@
 import { useState } from "react";
 import useStore from "../store";
-import { getDefinition } from "../util";
+import { getDefinition, isEndpoint } from "../util";
 import Endpoint from "./Endpoint";
 import { Svg } from "react-with-native";
 import BsChevronUpIcon from "../../public/BsChevronUp.svg";
@@ -17,18 +17,28 @@ const Model = ({
   searchString: string;
 }) => {
   const [collapsedModels, setCollapsedModels] = useStore("collapsedModels");
-  const isCollapsed = collapsedModels.find((x) => x === modelKey);
+  const isCollapsed = apiUrl
+    ? !!collapsedModels[apiUrl]?.find((x) => x === modelKey)
+    : false;
+
+  const toggle = () => {
+    if (apiUrl) {
+      const newCollapsedModels = isCollapsed
+        ? collapsedModels[apiUrl].filter((x) => x !== modelKey)
+        : (collapsedModels[apiUrl] || []).concat([modelKey]);
+
+      setCollapsedModels({
+        ...collapsedModels,
+        [apiUrl]: newCollapsedModels,
+      });
+    }
+  };
 
   return (
     <div>
       <div
-        className="cursor-pointer flex px-4 items-center w-full justify-between pt-10"
-        onClick={() => {
-          const newCollapsedModels = isCollapsed
-            ? collapsedModels.filter((x) => x !== modelKey)
-            : collapsedModels.concat([modelKey]);
-          setCollapsedModels(newCollapsedModels);
-        }}
+        className="flex items-center justify-between w-full px-4 pt-10 cursor-pointer"
+        onClick={toggle}
       >
         <h2 className="text-3xl">{modelKey}</h2>
 
@@ -50,7 +60,8 @@ const Model = ({
             const definition = getDefinition(
               definitions.endpoints?.[endpointKey]
             );
-            return definition && apiUrl ? (
+
+            return definition && apiUrl && isEndpoint(definition) ? (
               <Endpoint
                 apiUrl={apiUrl}
                 search={searchString}

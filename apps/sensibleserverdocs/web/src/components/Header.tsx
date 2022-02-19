@@ -23,7 +23,7 @@ const Header = ({
       <div className="flex flex-row justify-between">
         {constants?.domain ? (
           <a
-            className="bg-gray-300 rounded-full p-2 mr-4"
+            className="p-2 mr-4 bg-gray-300 rounded-full"
             href={constants.domain}
             rel="noreferrer"
             target="_blank"
@@ -34,7 +34,7 @@ const Header = ({
 
         {constants?.email ? (
           <a
-            className="bg-gray-300 rounded-full p-2 mr-4"
+            className="p-2 mr-4 bg-gray-300 rounded-full"
             href={`mailto:${constants.email}`}
             rel="noreferrer"
             target="_blank"

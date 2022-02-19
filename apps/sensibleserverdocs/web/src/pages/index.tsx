@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import useStore from "../store";
 import BiWorldIcon from "../../public/BiWorld.svg";
 import { Svg } from "react-with-native";
+
 const Home: NextPage = () => {
   const router = useRouter();
   const [recentSites, setRecentSites] = useStore("recentSites");
@@ -18,13 +19,12 @@ const Home: NextPage = () => {
         },
       ]);
   return (
-    <div className="flex flex-col flex-1 items-center">
+    <div className="flex items-center flex-1">
       <Head>
         <title>Sensible Docs</title>
         <meta name="description" content="Sensible Docs" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-
       <h1
         className={
           "text-5xl mb-10 w-full flex items-center bg-gray-200 px-6 lg:px-40 h-[16vh]"
@@ -37,7 +37,7 @@ const Home: NextPage = () => {
           return (
             <div
               key={`site${index}`}
-              className="flex flex-row border hover:bg-gray-200 justify-between rounded-sm items-center p-4 w-full"
+              className="flex flex-row items-center justify-between w-full p-4 border rounded-sm hover:bg-gray-200"
             >
               <p
                 onClick={() =>

@@ -1,7 +1,7 @@
 module.exports = {
   content: ["./src/**/*.{js,ts,jsx,tsx}"],
   darkMode: "class",
-  plugins: [require("nightwind")],
+  plugins: [require("nightwind"), require("@tailwindcss/line-clamp")],
   theme: {
     extend: {
       transitionProperty: {

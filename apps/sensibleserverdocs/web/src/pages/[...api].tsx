@@ -5,12 +5,13 @@ import { useRouter } from "next/router";
 import { useQuery } from "react-query";
 import { useEffect, useState } from "react";
 import useStore from "../store";
-import { getDefinition, Docs, getDocs } from "../util";
+import { getDefinition, Docs, getDocs, isDocs, DocsResult } from "../util";
 import Endpoint from "../components/Endpoint";
 
 import "react-toastify/dist/ReactToastify.css";
 import Header from "../components/Header";
 import Model from "../components/Model";
+import SideBar from "../components/sidebar/SideBar";
 
 const hasError = (docs: any) => docs.data?.error;
 const Home: NextPage = () => {
@@ -39,10 +40,7 @@ const Home: NextPage = () => {
   const apiString = api ? (Array.isArray(api) ? api.join("/") : api) : null;
   const apiUrl = apiString ? decodeURIComponent(apiString) : null;
 
-  const docs = useQuery<
-    Docs | { success: false; error: boolean; response: string },
-    string
-  >(
+  const docs = useQuery<DocsResult, string>(
     ["docs", apiUrl],
 
     async () => {
@@ -77,6 +75,15 @@ const Home: NextPage = () => {
     }
   );
   const constants = getDocs(docs)?.constants;
+
+  useEffect(() => {
+    const dataIsDocs = isDocs(docs.data);
+    const hash = window.location.hash.substring(1);
+    console.log({ hash, dataChanged: true, dataIsDocs });
+    if (dataIsDocs) {
+      document.getElementById(hash)?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [docs.data]);
 
   useEffect(() => {
     if (apiUrl && !recentSites.find((x) => x.apiUrl === apiUrl)) {
@@ -123,29 +130,46 @@ const Home: NextPage = () => {
     );
   };
 
+  const schema = getDocs(docs.data)?.schema;
+  const modelKeys = schema ? Object.keys(schema) : [];
+  const sections = modelKeys.map((modelKey) => {
+    const model = schema?.[modelKey];
+
+    return {
+      title: "Test",
+      sections: [],
+    };
+    // return model.endpoints? Object.keys(model.endpoints): []
+  });
   return (
-    <div className="flex flex-col flex-1 items-center">
+    <div className="flex flex-col items-center flex-1">
       <main className="p-4 px-6 lg:px-40 box-border w-full min-h-[90vh]">
         <Header constants={constants} />
+        <div className="relative flex w-full">
+          <SideBar sections={sections} />
 
-        {!!getDocs(docs)?.schema ? (
-          <input
-            value={searchString}
-            onChange={(e) => setSearch(e.target.value)}
-            className="mt-4 border rounded-md p-4 text-xl w-full"
-            placeholder="Search endpoints, models &amp; types..."
-          />
-        ) : null}
+          <div className="flex-1 w-full">
+            {!!getDocs(docs)?.schema ? (
+              <input
+                value={searchString}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full p-4 mt-4 text-xl border rounded-md"
+                placeholder="Search endpoints, models &amp; types..."
+              />
+            ) : null}
 
-        {hasError(docs) ? <p>{docs.data?.response}</p> : null}
-        {docs.isLoading ? (
-          <div>
-            <p>Fetching the newest docs</p>
-            <ActivityIndicator className="w-4 h-4" />
+            {hasError(docs) ? <p>{docs.data?.response}</p> : null}
+            {docs.isLoading ? (
+              <div>
+                <p>Fetching the newest docs</p>
+                <ActivityIndicator className="w-4 h-4" />
+              </div>
+            ) : null}
+            {renderModelObject()}
           </div>
-        ) : null}
-        {renderModelObject()}
+        </div>
       </main>
+
       <footer className={"flex flex-1"}>
         <a
           href="https://codefromanywhere.com"
