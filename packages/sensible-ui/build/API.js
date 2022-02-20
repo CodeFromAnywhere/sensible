@@ -15,7 +15,8 @@ var toQueryString = function (query) {
                 .filter(isValidEntry)
                 .map(function (_a) {
                 var key = _a[0], value = _a[1];
-                return "".concat(key, "=").concat(value);
+                var encodedValue = encodeURIComponent(String(value));
+                return "".concat(key, "=").concat(encodedValue);
             })
                 .join("&")
         : "";

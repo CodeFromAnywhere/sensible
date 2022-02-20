@@ -9,6 +9,12 @@ STAGING_API=https://yourapi2.yourdomain.com
 LOCAL_API=http://localhost:4000
 
  */
+
+const apiEnv = getEnv("API_ENV");
+
+if (!apiEnv) {
+  console.warn("No API_ENV given");
+}
 export const UIConstants = {
-  API_URL: getEnv(getEnv("API_ENV")),
+  API_URL: apiEnv ? getEnv(apiEnv) : undefined,
 };

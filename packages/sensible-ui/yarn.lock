@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-react-with-native-env@^0.0.3:
-  version "0.0.3"
-  resolved "https://registry.yarnpkg.com/react-with-native-env/-/react-with-native-env-0.0.3.tgz#57b0d83ee624c5589f3fba0411c8876f34503de8"
-  integrity sha512-Q2Aqqvmu3djQiH9FCNdAoszi6RUPcLXkelS9geQsaBqS+JQckU4ZTcm+5ZEXBIDcLwlLIev1NJ56eIZRpcT5gg==
+react-with-native-env@^0.0.5:
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/react-with-native-env/-/react-with-native-env-0.0.5.tgz#f9e62ed010c521c17bc39a428785a4131782693e"
+  integrity sha512-Bp7ybzK7pywvYNXPPBAm8YmUFOpfxOAAVGJ/PeFMaxj04jKzM9VWvJDuQ1K4h3eQBGNVoEfIH/NtNCJufx1R1w==
 
 sensible-core@^1.0.7:
   version "1.0.7"
