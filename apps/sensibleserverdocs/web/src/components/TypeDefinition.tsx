@@ -1,239 +1,107 @@
-import * as TJS from "typescript-json-schema";
-import AiOutlineCopyIcon from "../../public/AiOutlineCopy.svg";
-import { Svg } from "react-with-native";
-import { toast } from "react-with-native-notification";
-import "react-toastify/dist/ReactToastify.css";
-import BsCodeIcon from "../../public/BsCode.svg";
-import VscTerminalCmdIcon from "../../public/VscTerminalCmd.svg";
-import { getDefinition } from "../util";
-import BsChevronUpIcon from "../../public/BsChevronUp.svg";
-import useStore from "../store";
-import ObjectInterface from "./ObjectInterface";
-import { useSiteParams } from "../hooks/useSiteParams";
+import { Definition } from "typescript-json-schema";
+import { useScrollTo } from "../hooks/useScrollTo";
+import {
+  DefinitionObject,
+  getDefinition,
+  getRefLink,
+  getType,
+  getTypeDefinitionString,
+} from "../util";
 
-const getTypeInterfaceString = ({
-  name,
-  definition,
-  properties,
-}: {
-  name: string;
-  definition: any;
-  properties: string[];
-}) => {
-  return `interface ${name} {\n\t${properties
-    .map(
-      (key) => `${key}: ${getDefinition(definition?.properties?.[key])?.type}`
-    )
-    .join(`\n\t`)}\n}`;
-};
 const TypeDefinition = ({
+  title,
   definition,
-  id,
+  model,
+  allDefinitions,
 }: {
-  definition: TJS.Definition;
-  id: string;
+  title?: string;
+  model: string;
+  definition: Definition | null;
+  allDefinitions: DefinitionObject;
 }) => {
-  const [expandedTypes, setExpandedTypes] = useStore("expandedTypes");
-  const { urlUrl } = useSiteParams();
+  const reference = definition?.$ref;
+  const refLink = getRefLink(reference);
+  const properties = definition?.properties;
+  const required = definition?.required;
 
-  const getFirstEnum = (key: string): string | undefined =>
-    getDefinition(definition?.properties?.[key])?.enum?.[0] as
-      | string
-      | undefined;
-
-  const method = getFirstEnum("method");
-  const path = getFirstEnum("path");
-  const identifier = `${method}:${path}`;
-
-  const isExpanded = urlUrl
-    ? !!expandedTypes[urlUrl]?.find((x) => x === identifier)
-    : false;
-
-  const toggle = () => {
-    if (urlUrl) {
-      const newExpandedTypes = isExpanded
-        ? expandedTypes[urlUrl].filter((x) => x !== identifier)
-        : (expandedTypes[urlUrl] || []).concat([identifier]);
-
-      setExpandedTypes({
-        ...expandedTypes,
-        [urlUrl]: newExpandedTypes,
-      });
-    }
-  };
-
-  const propertyKeys = definition?.properties
-    ? Object.keys(definition.properties)
-    : [];
-
-  const description = definition?.description;
-
-  const itemsIcon = (definition?.items as any)?.icon;
-  const isPost = method === "POST";
-  const isGet = method === "GET";
-
-  const methodBg = isPost ? "bg-greenish" : "bg-blueish";
-  const methodBgHover = isPost ? "hover:bg-greenish" : "hover:bg-blueish";
-  const iconElement = itemsIcon ? (
-    <p className="text-3xl">{itemsIcon}</p>
-  ) : (
-    <div
-      className={`w-8 h-8 ${methodBg} rounded-full flex items-center justify-center`}
-    >
-      {id.substring(0, 1)}
-    </div>
-  );
-  const methodOptions = isPost ? " -X POST" : "";
-
-  const getBody = definition?.properties; //&&
-  // objectMap(definition?.properties, (value, key) => {
-  //   return bodyInput[name][key];
-  // });
-
-  const bodyOptions = ""; // isPost ? getBody : "";
-
-  const query = ""; //isGet ? toQueryString(getBody) : "";
-
-  /*
- : section === "models"
-      ? getTypeInterfaceString({
-          name,
-          definition,
-          properties,
-        })
-      : section === "other"
-      ? getTypeInterfaceString({
-          name,
-          definition,
-          properties,
-        })
-      : "Invalid section";*/
-
-  const methodElement = (
-    <div
-      className={`ml-2 px-1 py-2 text-xs w-20 flex justify-center rounded-md ${methodBg}`}
-    >
-      {method}
-    </div>
-  );
-
-  const titleElement = (
-    <p className="ml-2 text-lg" onClick={(e) => e.stopPropagation()}>
-      {path ? (
-        <span
-          className="pr-4"
-          onClick={() => {
-            navigator.clipboard.writeText(path);
-            toast({
-              title: "Copied",
-              body: `${path} copied to clipboard`,
-            });
-          }}
-        >
-          /{path}
-        </span>
-      ) : null}
-      <span
-        onClick={() => {
-          navigator.clipboard.writeText(id);
-          toast({
-            title: "Copied",
-            body: "Copied to clipboard",
-          });
-        }}
-      >
-        ({id})
-      </span>
-    </p>
-  );
-
-  const copyCodeElement = (
-    <div
-      className={`cursor-pointer rounded-full p-2 ${methodBgHover}`}
-      onClick={(e) => {
-        e.stopPropagation();
-
-        const code = `api()`;
-
-        navigator.clipboard.writeText(code);
-        toast({
-          title: "Copied",
-          body: `You've copied the code for this endpoint`,
-        });
+  const scrollTo = useScrollTo();
+  const refElement = refLink ? (
+    <span
+      className="cursor-pointer"
+      onClick={() => {
+        if (refLink) {
+          scrollTo(refLink, model);
+        }
       }}
     >
-      <Svg src={BsCodeIcon} className="w-4 h-4" />
-    </div>
-  );
+      {refLink}
+    </span>
+  ) : null;
 
-  const copyCurlElement = (
-    <div
-      className={`cursor-pointer rounded-full p-2 ${methodBgHover}`}
-      onClick={(e) => {
-        e.stopPropagation();
-
-        const fullPath = apiUrl + "/" + getFirstEnum("path") + query;
-        const command = `curl${methodOptions}${bodyOptions} '${fullPath}'`;
-        navigator.clipboard.writeText(command);
-        toast({
-          title: "Copied",
-          body: `You've copied the curl command for this endpoint`,
-        });
-      }}
-    >
-      <Svg src={VscTerminalCmdIcon} className="w-4 h-4" />
-    </div>
-  );
-
-  const descriptionElement =
-    description && !isExpanded ? (
-      <p className="ml-4 text-xs italic line-clamp-2 flex-1">{description}</p>
-    ) : null;
-
-  const arrowElement = (
-    <Svg
-      src={BsChevronUpIcon}
-      className={`ml-2 w-8 h-8 duration-500 animate-all ${
-        isExpanded ? "rotate-180" : ""
-      }`}
-    />
-  );
-
-  const body = getDefinition(definition?.properties?.body);
-  const response = getDefinition(definition?.properties?.response);
-
-  const expandedDescriptionElement =
-    description && isExpanded ? <p className="mt-6">{description}</p> : null;
+  const propertyKeys = properties ? Object.keys(properties) : [];
+  const typeColor = "text-lime-500";
+  const propertyColor = "text-blue-500";
+  const isObject = definition?.type === "object";
 
   return (
-    <div id={identifier} className="mb-4 border rounded-md">
-      {/* Endpoint Header */}
-      <div
-        className={`flex items-center justify-between p-4 cursor-pointer`}
-        onClick={toggle}
-      >
-        <div className={`flex items-center flex-1`}>
-          {iconElement}
-          {methodElement}
-          {titleElement}
-          {descriptionElement}
-        </div>
-        {copyCodeElement}
-        {copyCurlElement}
-        {arrowElement}
-      </div>
+    <span>
+      {title ? (
+        <span>
+          type <span className={typeColor}>{title}</span> =
+        </span>
+      ) : null}
+      {isObject ? (
+        <span>
+          <span>&#123;</span>
+          {propertyKeys.map((key) => {
+            const propertyDefinition = getDefinition(properties?.[key]);
+            const isRequired = required?.includes(key);
+            const refLink = getRefLink(propertyDefinition?.$ref);
+            const refDefinition = refLink
+              ? getDefinition(allDefinitions[refLink])
+              : null;
 
-      <div className={`${isExpanded ? "opacity-100" : "opacity-0"}`}>
-        <div
-          className={`${
-            isExpanded ? "max-h-[1920px]" : "max-h-0 h-0"
-          } transition-all ease-in overflow-clip duration-1000`}
-        >
-          <div className="mx-4">{expandedDescriptionElement}</div>
-          Coming soon....{" "}
-        </div>
-      </div>
-    </div>
+            const title = getTypeDefinitionString({
+              name: refLink || "",
+              definition: refDefinition,
+              allDefinitions,
+              model,
+            });
+
+            const refElement = refLink ? (
+              <span
+                className="cursor-pointer"
+                onClick={() => {
+                  if (refLink) {
+                    scrollTo(refLink, model);
+                  }
+                }}
+                title={title}
+              >
+                {refLink}
+              </span>
+            ) : null;
+
+            const type = getType(propertyDefinition, allDefinitions, model);
+
+            return (
+              <span key={key} className="text-xs">
+                <span className={propertyColor}>{key}</span>
+                {isRequired ? "" : "?"}:{" "}
+                <span className={typeColor}>{refElement || type}</span>
+                {"; "}
+              </span>
+            );
+          })}
+          <span>&#125;</span>
+        </span>
+      ) : refLink ? (
+        <span className={typeColor}>{refElement}</span>
+      ) : (
+        getType(definition, allDefinitions, model)
+      )}
+    </span>
   );
 };
+
 export default TypeDefinition;

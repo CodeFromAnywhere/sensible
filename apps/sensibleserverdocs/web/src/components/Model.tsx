@@ -1,17 +1,27 @@
-import { useState } from "react";
 import useStore from "../store";
-import { getDefinition, isEndpoint } from "../util";
-import Endpoint from "./Endpoint";
-import TypeDefinition from "./TypeDefinition";
+import {
+  DefinitionObject,
+  EndpointExample,
+  getDefinition,
+  isEndpoint,
+  TypeExample,
+} from "../util";
+import EndpointContainer from "./EndpointContainer";
+import TypeDefinitionContainer from "./TypeDefinitionContainer";
 import { Svg } from "react-with-native";
 import BsChevronUpIcon from "../../public/BsChevronUp.svg";
 import { useSiteParams } from "../hooks/useSiteParams";
 
+type SectionKey = "endpoints" | "types";
 const Model = ({
-  definitions,
+  sections,
   modelKey,
 }: {
-  definitions: any;
+  sections: {
+    endpoints?: DefinitionObject | undefined;
+    types?: DefinitionObject | undefined;
+    examples: (EndpointExample | TypeExample)[];
+  };
   modelKey: string;
 }) => {
   const { urlUrl } = useSiteParams();
@@ -56,21 +66,26 @@ const Model = ({
       >
         {[
           {
-            key: "endpoints",
+            key: "endpoints" as SectionKey,
             title: "Endpoints",
             filter: isEndpoint,
-            component: Endpoint,
+            component: EndpointContainer,
           },
-          { key: "types", title: "Types", component: TypeDefinition },
+          {
+            key: "types" as SectionKey,
+            title: "Types",
+            component: TypeDefinitionContainer,
+          },
         ].map((section) => {
+          const definitionObject = sections[section.key];
           return (
             <div key={`${modelKey}.${section.key}`}>
               <h3 className="text-xl p-4 font-semibold">{section.title}</h3>
               <div>
-                {definitions[section.key] &&
-                  Object.keys(definitions[section.key]).map((key) => {
+                {definitionObject &&
+                  Object.keys(definitionObject).map((definitionKey) => {
                     const definition = getDefinition(
-                      definitions[section.key]?.[key]
+                      definitionObject?.[definitionKey]
                     );
 
                     const isValid =
@@ -78,9 +93,11 @@ const Model = ({
 
                     return definition && urlUrl && isValid ? (
                       <section.component
-                        key={`${modelKey}model_${key}${section.key}`}
-                        id={key}
+                        key={`${modelKey}model_${definitionKey}${section.key}`}
+                        model={modelKey}
+                        id={definitionKey}
                         definition={definition}
+                        allDefinitions={definitionObject}
                       />
                     ) : null;
                   })}

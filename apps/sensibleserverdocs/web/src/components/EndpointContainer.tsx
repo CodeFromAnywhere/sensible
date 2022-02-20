@@ -5,18 +5,22 @@ import { toast } from "react-with-native-notification";
 import "react-toastify/dist/ReactToastify.css";
 import BsCodeIcon from "../../public/BsCode.svg";
 import VscTerminalCmdIcon from "../../public/VscTerminalCmd.svg";
-import { getDefinition } from "../util";
+import { DefinitionObject, getDefinition } from "../util";
 import BsChevronUpIcon from "../../public/BsChevronUp.svg";
 import useStore from "../store";
-import ObjectInterface from "./ObjectInterface";
 import { useSiteParams } from "../hooks/useSiteParams";
 import { toQueryString } from "sensible-ui";
+import TypeDefinition from "./TypeDefinition";
 const Endpoint = ({
   definition,
   id,
+  allDefinitions,
+  model,
 }: {
   definition: TJS.Definition;
   id: string;
+  allDefinitions: DefinitionObject;
+  model: string;
 }) => {
   const { urlUrl, searchString, locationString } = useSiteParams();
 
@@ -48,10 +52,6 @@ const Endpoint = ({
     }
   };
 
-  const propertyKeys = definition?.properties
-    ? Object.keys(definition.properties)
-    : [];
-
   const description = definition?.description;
 
   const itemsIcon = (definition?.items as any)?.icon;
@@ -70,30 +70,8 @@ const Endpoint = ({
     </div>
   );
   const methodOptions = isPost ? " -X POST" : "";
-
-  const getBody = definition?.properties; //&&
-  // objectMap(definition?.properties, (value, key) => {
-  //   return bodyInput[name][key];
-  // });
-
   const bodyOptions = ""; // isPost ? getBody : "";
-
   const query = ""; //isGet ? toQueryString(getBody) : "";
-
-  /*
- : section === "models"
-      ? getTypeInterfaceString({
-          name,
-          definition,
-          properties,
-        })
-      : section === "other"
-      ? getTypeInterfaceString({
-          name,
-          definition,
-          properties,
-        })
-      : "Invalid section";*/
 
   const methodElement = (
     <div
@@ -104,32 +82,9 @@ const Endpoint = ({
   );
 
   const titleElement = (
-    <p className="ml-2 text-lg" onClick={(e) => e.stopPropagation()}>
-      {path ? (
-        <span
-          className="pr-4"
-          onClick={() => {
-            navigator.clipboard.writeText(path);
-            toast({
-              title: "Copied",
-              body: `${path} copied to clipboard`,
-            });
-          }}
-        >
-          /{path}
-        </span>
-      ) : null}
-      <span
-        onClick={() => {
-          navigator.clipboard.writeText(id);
-          toast({
-            title: "Copied",
-            body: "Copied to clipboard",
-          });
-        }}
-      >
-        ({id})
-      </span>
+    <p className="ml-2 text-lg">
+      {path ? <span className="pr-4">/{path}</span> : null}
+      <span>({id})</span>
     </p>
   );
 
@@ -185,7 +140,7 @@ const Endpoint = ({
       onClick={(e) => {
         e.stopPropagation();
 
-        const fullPath = apiUrl + "/" + getFirstEnum("path") + query;
+        const fullPath = urlUrl + "/" + getFirstEnum("path") + query;
         const command = `curl${methodOptions}${bodyOptions} '${fullPath}'`;
         navigator.clipboard.writeText(command);
         toast({
@@ -219,22 +174,26 @@ const Endpoint = ({
     description && isExpanded ? <p className="mt-6">{description}</p> : null;
 
   const bodyElement = (
-    <ObjectInterface
-      // model={model}
-      title="Body"
-      properties={body?.properties}
-      reference={response?.$ref}
-      required={body?.required}
-    />
+    <div className={"my-4"}>
+      <TypeDefinition
+        model={model}
+        definition={body}
+        key={`${identifier}body`}
+        title="Body"
+        allDefinitions={allDefinitions}
+      />
+    </div>
   );
   const responseElement = (
-    <ObjectInterface
-      //model={model}
-      title="Response"
-      properties={response?.properties}
-      reference={response?.$ref}
-      required={response?.required}
-    />
+    <div>
+      <TypeDefinition
+        key={`${identifier}response`}
+        model={model}
+        title="Response"
+        definition={response}
+        allDefinitions={allDefinitions}
+      />
+    </div>
   );
 
   const isSelected = locationString === identifier;
@@ -268,9 +227,11 @@ const Endpoint = ({
             isExpanded ? "max-h-[1920px]" : "max-h-0 h-0"
           } transition-all ease-in overflow-clip duration-1000`}
         >
-          <div className="mx-4">{expandedDescriptionElement}</div>
-          {bodyElement}
-          {responseElement}
+          <div className="mx-4 mb-4">
+            {expandedDescriptionElement}
+            {bodyElement}
+            {responseElement}
+          </div>
         </div>
       </div>
     </div>

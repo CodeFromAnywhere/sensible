@@ -1,21 +1,11 @@
 import type { NextPage } from "next";
 import { ActivityIndicator } from "react-with-native";
-import { useQuery } from "react-query";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import useStore from "../store";
-import {
-  getDefinition,
-  getDocs,
-  isDocs,
-  DocsResult,
-  getFirstEnum,
-  isEndpoint,
-  notEmpty,
-} from "../util";
+import { getDocs, isDocs } from "../util";
 import "react-toastify/dist/ReactToastify.css";
 import Model from "../components/Model";
 import SideBar from "../components/sidebar/SideBar";
-import { Section } from "../components/sidebar/Menu";
 import { useSiteParams } from "../hooks/useSiteParams";
 import { useScrollTo } from "../hooks/useScrollTo";
 import { Layout } from "../components/Layout";
@@ -34,7 +24,7 @@ const Home: NextPage = () => {
     if (dataIsDocs && locationString) {
       scrollTo(locationString);
     }
-  }, [docs.data, locationString]);
+  }, [docs.dataUpdatedAt, locationString]);
 
   useEffect(() => {
     if (urlUrl && !recentSites.find((x) => x.apiUrl === urlUrl)) {
@@ -64,12 +54,12 @@ const Home: NextPage = () => {
       schema && (
         <div>
           {Object.keys(schema).map((modelKey) => {
-            const definitions = schema[modelKey];
+            const sections = schema[modelKey];
             return (
               <Model
                 modelKey={modelKey}
                 key={`${modelKey}model`}
-                definitions={definitions}
+                sections={sections}
               />
             );
           })}

@@ -62,13 +62,14 @@ const Menu = ({
         );
         const filteredSections = section.sections?.find((x) => {
           const hasSubSections = !!x.sections?.length;
-
           return hasSubSections;
         })
           ? section.sections
-          : section.sections?.filter((x) =>
+          : section.sections
+          ? section.sections.filter((x) =>
               x.title.toLowerCase().includes(searchString.toLowerCase())
-            );
+            )
+          : [];
 
         return (
           <li key={index}>

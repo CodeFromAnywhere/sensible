@@ -11,7 +11,6 @@ const Home: NextPage = () => {
   const [recentSites, setRecentSites] = useStore("recentSites");
   const { theme, setTheme } = useTheme();
   const isDark = theme === "dark";
-  console.log(`isDark:${isDark}`);
   const sites = recentSites.find((x) => x.apiUrl === "http://localhost:4000")
     ? recentSites
     : recentSites.concat([
