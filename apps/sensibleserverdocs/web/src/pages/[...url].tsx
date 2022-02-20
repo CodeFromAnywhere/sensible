@@ -1,7 +1,7 @@
 import type { NextPage } from "next";
 import { ActivityIndicator } from "react-with-native";
 import { useQuery } from "react-query";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import useStore from "../store";
 import {
   getDefinition,
@@ -28,10 +28,9 @@ const Home: NextPage = () => {
   const [recentSites, setRecentSites] = useStore("recentSites");
   const docs = useDocsQuery();
   const constants = getDocs(docs)?.constants;
-
+  const [showMenuMobile, setShowMenuMobile] = useStore("showMenuMobile");
   useEffect(() => {
     const dataIsDocs = isDocs(docs.data);
-    console.log({ locationString, dataChanged: true, dataIsDocs });
     if (dataIsDocs && locationString) {
       scrollTo(locationString);
     }
@@ -79,67 +78,21 @@ const Home: NextPage = () => {
     );
   };
 
-  const schema = getDocs(docs)?.schema;
-
-  const modelKeys = schema ? Object.keys(schema) : [];
-
-  const sections = modelKeys.map((modelKey) => {
-    const model = schema?.[modelKey];
-
-    const endpointSections = model?.endpoints
-      ? Object.keys(model.endpoints)
-          .map((endpointKey) => {
-            const definition = getDefinition(model?.endpoints?.[endpointKey]);
-
-            const path = getFirstEnum(definition, "path");
-            const method = getFirstEnum(definition, "method");
-
-            return isEndpoint(definition)
-              ? {
-                  title: endpointKey,
-                  key: `${modelKey}.${endpointKey}`,
-                  href: `${method}:${path}`,
-                }
-              : null;
-          })
-          .filter(notEmpty)
-      : [];
-
-    const typeSections = model?.types
-      ? Object.keys(model.types).map((typeKey) => {
-          return {
-            title: typeKey,
-            key: `${modelKey}.${typeKey}`,
-            href: typeKey,
-          };
-        })
-      : [];
-
-    const modelSections: Section = {
-      key: modelKey,
-      title: modelKey,
-      sections: [
-        {
-          title: "Endpoints",
-          sections: endpointSections,
-          key: `${modelKey}.Endpoints`,
-        },
-        {
-          title: "Types",
-          sections: typeSections,
-          key: `${modelKey}.Types`,
-        },
-      ],
-    };
-    return modelSections;
-  });
   return (
-    <Layout constants={constants}>
-      <div className="overflow-y-scroll">
-        <SideBar sections={sections} />
+    <Layout>
+      <div
+        className={`lg:w-80 lg:block w-full overflow-y-scroll ${
+          showMenuMobile ? "block" : "hidden"
+        }`}
+      >
+        <SideBar />
       </div>
 
-      <div className="flex-1 w-full overflow-y-scroll px-8">
+      <div
+        className={`flex-1 w-full overflow-y-scroll px-8 ${
+          showMenuMobile ? "hidden" : "block"
+        } lg:block`}
+      >
         {/* {!!getDocs(docs)?.schema ? <Search /> : null} */}
 
         {hasError(docs) ? <p>{docs.data?.response}</p> : null}

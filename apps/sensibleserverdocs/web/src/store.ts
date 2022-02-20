@@ -13,6 +13,7 @@ type StoreType = {
   collapsedModels: { [key: ApiUrl]: string[] };
   collapsedMenus: { [keuy: ApiUrl]: string[] };
   expandedTypes: { [key: ApiUrl]: string[] };
+  showMenuMobile: boolean;
 };
 
 export const initialValues: StoreType = {
@@ -21,6 +22,7 @@ export const initialValues: StoreType = {
   collapsedModels: {},
   collapsedMenus: {},
   expandedTypes: {},
+  showMenuMobile: false,
 };
 
 export const StoreProvider = createStoreProvider({

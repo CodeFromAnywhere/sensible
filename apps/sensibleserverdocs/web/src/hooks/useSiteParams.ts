@@ -17,6 +17,21 @@ export const useSiteParams = () => {
   const urlString = url ? (Array.isArray(url) ? url.join("/") : url) : null;
   const urlUrl = urlString ? decodeURIComponent(urlString) : null;
 
+  const setSearch = (s: string) => {
+    router.push(
+      {
+        pathname: router.pathname,
+        query: {
+          url,
+          location,
+          search: s,
+        },
+      },
+      undefined,
+      { shallow: true }
+    );
+  };
+
   return {
     location,
     locationString,
@@ -26,5 +41,6 @@ export const useSiteParams = () => {
     searchString,
     search,
     router,
+    setSearch,
   };
 };

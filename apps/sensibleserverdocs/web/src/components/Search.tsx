@@ -2,41 +2,28 @@ import { Svg } from "react-with-native";
 import { useSiteParams } from "../hooks/useSiteParams";
 import CgSearchIcon from "../../public/CgSearch.svg";
 import BsSlashSquareIcon from "../../public/BsSlashSquare.svg";
+import FaRegWindowCloseIcon from "../../public/FaRegWindowClose.svg";
 import { useEffect, useRef, useState } from "react";
 
 const Search = () => {
   const [focusIcon, setFocusIcon] = useState(true);
-  const { router, location, url, searchString } = useSiteParams();
-
+  const { searchString, setSearch } = useSiteParams();
+  const hasSearchEntered = searchString.length > 0;
   const inputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
+  const focusListener = (event: KeyboardEvent) => {
     const inputElement = document.getElementById("searchbar");
-
-    document.addEventListener("keydown", (event) => {
-      if (event.key === "/") {
-        if (document.activeElement !== inputElement) {
-          inputRef.current?.focus();
-          event.preventDefault();
-          setFocusIcon(false);
-        }
-      }
-    });
-  }, []);
-  const setSearch = (s: string) => {
-    router.push(
-      {
-        pathname: router.pathname,
-        query: {
-          url,
-          location,
-          search: s,
-        },
-      },
-      undefined,
-      { shallow: true }
-    );
+    if (event.key === "/" && document.activeElement !== inputElement) {
+      inputRef.current?.focus();
+      event.preventDefault();
+      setFocusIcon(false);
+    }
   };
+
+  useEffect(() => {
+    document.addEventListener("keydown", focusListener);
+    return () => document.removeEventListener("keydown", focusListener);
+  }, []);
 
   return (
     <div className="flex flex-row px-4 ml-4 mr-2 my-4 items-center rounded-md bg-gray-200 hover:bg-gray-100">
@@ -46,14 +33,22 @@ const Search = () => {
         ref={inputRef}
         value={searchString}
         onChange={(e) => setSearch(e.target.value)}
-        onFocus={() => setFocusIcon(true)}
+        onFocus={() => setFocusIcon(false)}
+        onBlur={() => setFocusIcon(true)}
         className="w-full p-3 text-md bg-transparent focus:outline-none"
         placeholder="Search..."
       />
-      <Svg
-        src={BsSlashSquareIcon}
-        className={`w-5 h-5 ${focusIcon ? "block" : "hide"}`}
-      />
+      {focusIcon || hasSearchEntered ? (
+        <div
+          className={hasSearchEntered ? "cursor-pointer" : undefined}
+          onClick={() => setSearch("")}
+        >
+          <Svg
+            src={hasSearchEntered ? FaRegWindowCloseIcon : BsSlashSquareIcon}
+            className={`w-5 h-5 block`}
+          />
+        </div>
+      ) : null}
     </div>
   );
 };

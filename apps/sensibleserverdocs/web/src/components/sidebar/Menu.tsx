@@ -24,8 +24,11 @@ const Menu = ({
   sections: Section[];
 }) => {
   const scrollTo = useScrollTo();
+  const [showMenuMobile, setShowMenuMobile] = useStore("showMenuMobile");
   const { urlUrl } = useSiteParams();
   const [collapsedMenus, setCollapsedMenus] = useStore("collapsedMenus");
+  const { searchString } = useSiteParams();
+  const isSearching = searchString.length > 0;
 
   return (
     <ul className="ml-4 select-none">
@@ -57,17 +60,25 @@ const Menu = ({
             }`}
           />
         );
+        const filteredSections = section.sections?.find((x) => {
+          const hasSubSections = !!x.sections?.length;
+
+          return hasSubSections;
+        })
+          ? section.sections
+          : section.sections?.filter((x) =>
+              x.title.toLowerCase().includes(searchString.toLowerCase())
+            );
+
         return (
           <li key={index}>
             <div
               onClick={() => {
                 if (section.href) {
-                  console.log(
-                    "I'm afraid section title is not the model name:",
-                    stack[0]
-                  );
-
                   scrollTo(section.href, stack[0]);
+                  if (showMenuMobile) {
+                    setShowMenuMobile(false);
+                  }
                 } else {
                   toggle();
                 }
@@ -80,12 +91,19 @@ const Menu = ({
                   : "text-gray-500 hover:text-gray-700 hover:underline"
               }`}
             >
-              {section.title}
+              <div className="flex">
+                {section.title}
+                {isSearching && hasSections && isCollapsed ? (
+                  <div className="ml-3 bg-gray-200 rounded-full w-6 h-6 text-xs flex items-center justify-center">
+                    {filteredSections.length}
+                  </div>
+                ) : null}
+              </div>
               {hasSections ? arrowElement : null}
             </div>
             {hasSections && !isCollapsed ? (
               <Menu
-                sections={section.sections!}
+                sections={filteredSections}
                 stack={stack.concat([section.title])}
               />
             ) : null}
