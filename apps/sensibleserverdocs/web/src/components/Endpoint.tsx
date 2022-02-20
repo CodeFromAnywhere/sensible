@@ -18,7 +18,7 @@ const Endpoint = ({
   definition: TJS.Definition;
   id: string;
 }) => {
-  const { apiUrl, searchString, locationString } = useSiteParams();
+  const { urlUrl, searchString, locationString } = useSiteParams();
 
   const getFirstEnum = (key: string): string | undefined =>
     getDefinition(definition?.properties?.[key])?.enum?.[0] as
@@ -31,19 +31,19 @@ const Endpoint = ({
 
   const [expandedTypes, setExpandedTypes] = useStore("expandedTypes");
 
-  const isExpanded = apiUrl
-    ? !!expandedTypes[apiUrl]?.find((x) => x === identifier)
+  const isExpanded = urlUrl
+    ? !!expandedTypes[urlUrl]?.find((x) => x === identifier)
     : false;
 
   const toggle = () => {
-    if (apiUrl) {
+    if (urlUrl) {
       const newExpandedTypes = isExpanded
-        ? expandedTypes[apiUrl].filter((x) => x !== identifier)
-        : (expandedTypes[apiUrl] || []).concat([identifier]);
+        ? expandedTypes[urlUrl].filter((x) => x !== identifier)
+        : (expandedTypes[urlUrl] || []).concat([identifier]);
 
       setExpandedTypes({
         ...expandedTypes,
-        [apiUrl]: newExpandedTypes,
+        [urlUrl]: newExpandedTypes,
       });
     }
   };

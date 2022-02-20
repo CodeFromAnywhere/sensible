@@ -2,7 +2,7 @@ import { useRouter } from "react-with-native-router";
 
 export const useSiteParams = () => {
   const router = useRouter();
-  const { api, search, location } = router.query;
+  const { url, search, location } = router.query;
   const searchString = search
     ? Array.isArray(search)
       ? search.join("/")
@@ -14,16 +14,16 @@ export const useSiteParams = () => {
       : location
     : "";
 
-  const apiString = api ? (Array.isArray(api) ? api.join("/") : api) : null;
-  const apiUrl = apiString ? decodeURIComponent(apiString) : null;
+  const urlString = url ? (Array.isArray(url) ? url.join("/") : url) : null;
+  const urlUrl = urlString ? decodeURIComponent(urlString) : null;
 
   return {
     location,
     locationString,
-    apiUrl,
-    apiString,
+    url,
+    urlString,
+    urlUrl,
     searchString,
-    api,
     search,
     router,
   };

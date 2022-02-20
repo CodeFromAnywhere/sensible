@@ -13,54 +13,20 @@ import {
   notEmpty,
 } from "../util";
 import "react-toastify/dist/ReactToastify.css";
-import Header from "../components/Header";
 import Model from "../components/Model";
 import SideBar from "../components/sidebar/SideBar";
 import { Section } from "../components/sidebar/Menu";
 import { useSiteParams } from "../hooks/useSiteParams";
-import Search from "../components/Search";
 import { useScrollTo } from "../hooks/useScrollTo";
+import { Layout } from "../components/Layout";
+import { useDocsQuery } from "../hooks/useDocsQuery";
 
 const hasError = (docs: any) => docs.data?.error;
 const Home: NextPage = () => {
-  const { apiUrl, locationString } = useSiteParams();
+  const { urlUrl, locationString } = useSiteParams();
   const scrollTo = useScrollTo();
   const [recentSites, setRecentSites] = useStore("recentSites");
-
-  const docs = useQuery<DocsResult, string>(
-    ["docs", apiUrl],
-
-    async () => {
-      const url = apiUrl && `${apiUrl}/sensible/docs`;
-
-      if (url) {
-        return fetch(url, {
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          },
-        })
-          .then((response) => response.json())
-          .then((response) => {
-            return response;
-          })
-          .catch((error) => {
-            console.warn(error);
-            return {
-              success: false,
-              error: true,
-              response: "The API didn't resolve: " + error, //error + error.status +
-            };
-          });
-      } else {
-        throw new Error("Couldn't find api string");
-      }
-    },
-
-    {
-      enabled: !!apiUrl,
-    }
-  );
+  const docs = useDocsQuery();
   const constants = getDocs(docs)?.constants;
 
   useEffect(() => {
@@ -72,11 +38,11 @@ const Home: NextPage = () => {
   }, [docs.data, locationString]);
 
   useEffect(() => {
-    if (apiUrl && !recentSites.find((x) => x.apiUrl === apiUrl)) {
+    if (urlUrl && !recentSites.find((x) => x.apiUrl === urlUrl)) {
       setRecentSites(
         recentSites.concat([
           {
-            apiUrl,
+            apiUrl: urlUrl,
             appName: constants?.appName,
             domain: constants?.domain,
             email: constants?.email,
@@ -87,11 +53,10 @@ const Home: NextPage = () => {
   }, []);
 
   useEffect(() => {
-    if (apiUrl) {
-      console.log("REFETCHING");
+    if (urlUrl) {
       docs.refetch();
     }
-  }, [apiUrl]);
+  }, [urlUrl]);
 
   const renderModelObject = () => {
     const schema = getDocs(docs)?.schema;
@@ -169,42 +134,24 @@ const Home: NextPage = () => {
     return modelSections;
   });
   return (
-    <div className="flex flex-col items-center flex-1">
-      <div className="h-[10vh] w-full">
-        <Header constants={constants} />
+    <Layout constants={constants}>
+      <div className="overflow-y-scroll">
+        <SideBar sections={sections} />
       </div>
-      <main className="w-full h-[80vh] relative flex">
-        <div className="overflow-y-scroll">
-          <SideBar sections={sections} />
-        </div>
 
-        <div className="flex-1 w-full overflow-y-scroll px-8">
-          {/* {!!getDocs(docs)?.schema ? <Search /> : null} */}
+      <div className="flex-1 w-full overflow-y-scroll px-8">
+        {/* {!!getDocs(docs)?.schema ? <Search /> : null} */}
 
-          {hasError(docs) ? <p>{docs.data?.response}</p> : null}
-          {docs.isLoading ? (
-            <div>
-              <p>Fetching the newest docs</p>
-              <ActivityIndicator className="w-4 h-4" />
-            </div>
-          ) : null}
-          {renderModelObject()}
-        </div>
-      </main>
-
-      <footer className={"flex h-[10vh] items-center "}>
-        <a
-          href="https://codefromanywhere.com"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by Code From Anywhere
-        </a>
-        <span className="animate-spin-slow cursor-pointer hover:animate-spin text-3xl ml-4">
-          🌍
-        </span>
-      </footer>
-    </div>
+        {hasError(docs) ? <p>{docs.data?.response}</p> : null}
+        {docs.isLoading ? (
+          <div>
+            <p>Fetching the newest docs</p>
+            <ActivityIndicator className="w-4 h-4" />
+          </div>
+        ) : null}
+        {renderModelObject()}
+      </div>
+    </Layout>
   );
 };
 

@@ -24,26 +24,25 @@ const Menu = ({
   sections: Section[];
 }) => {
   const scrollTo = useScrollTo();
-  const { searchString, apiString, api, search, apiUrl, router } =
-    useSiteParams();
+  const { urlUrl } = useSiteParams();
   const [collapsedMenus, setCollapsedMenus] = useStore("collapsedMenus");
 
   return (
     <ul className="ml-4 select-none">
       {sections.map((section, index) => {
-        const isCollapsed = apiUrl
-          ? !!collapsedMenus[apiUrl]?.find((x) => x === section.key)
+        const isCollapsed = urlUrl
+          ? !!collapsedMenus[urlUrl]?.find((x) => x === section.key)
           : false;
 
         const toggle = () => {
-          if (apiUrl) {
+          if (urlUrl) {
             const newCollapsedModels = isCollapsed
-              ? collapsedMenus[apiUrl].filter((x) => x !== section.key)
-              : (collapsedMenus[apiUrl] || []).concat([section.key]);
+              ? collapsedMenus[urlUrl].filter((x) => x !== section.key)
+              : (collapsedMenus[urlUrl] || []).concat([section.key]);
 
             setCollapsedMenus({
               ...collapsedMenus,
-              [apiUrl]: newCollapsedModels,
+              [urlUrl]: newCollapsedModels,
             });
           }
         };

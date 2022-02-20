@@ -1,14 +1,15 @@
 import Head from "next/head";
-import Image from "next/image";
+import Link from "next/link";
+import { useDocsQuery } from "../hooks/useDocsQuery";
 import { useSiteParams } from "../hooks/useSiteParams";
+import { getDocs } from "../util";
 import DarkModeToggle from "./DarkModeToggle";
 
-const Header = ({
-  constants,
-}: {
-  constants: { [key: string]: any } | undefined;
-}) => {
-  const { apiUrl } = useSiteParams();
+const Header = () => {
+  const { urlUrl } = useSiteParams();
+  const docs = useDocsQuery();
+  const constants = getDocs(docs)?.constants;
+
   const title = (
     <div className="ml-4">
       <h1 className="text-xl font-bold">
@@ -31,6 +32,11 @@ const Header = ({
 
   const description =
     "Sensible is the fastest way to make an app. Check it out!";
+
+  const imageBase = urlUrl ? urlUrl : "";
+  const imageUrl = imageBase + "/logo.png";
+
+  console.log(`imageUrl${imageUrl}`);
   return (
     <div className="w-full px-4 border-b border-gray-100">
       <Head>
@@ -42,17 +48,32 @@ const Header = ({
       <div className={"flex flex-row items-center justify-between p-3"}>
         <div className="flex">
           {/* eslint-disable-next-line */}
-          <img width={30} src={apiUrl + "/logo.png"} alt="Logo" />
+          <img
+            width={30}
+            src={imageUrl}
+            alt="Logo"
+            className={"hover:animate-ping"}
+          />
           {title}
         </div>
         <div className="flex flex-row">
-          <a
-            className="py-2 px-3 mr-4 bg-gray-100 rounded-md font-semibold"
-            href={"#"}
-            rel="noreferrer"
-          >
-            Docs
-          </a>
+          {!constants ? (
+            <a
+              className="py-2 px-3 mr-4 hover:bg-gray-100 rounded-md font-semibold"
+              href={"https://sensibleframework.co"}
+              rel="noreferrer"
+              target="_blank"
+            >
+              Home
+            </a>
+          ) : null}
+
+          <Link passHref href={"/"}>
+            <div className="py-2 px-3 mr-4 bg-gray-100 rounded-md font-semibold cursor-pointer">
+              Docs
+            </div>
+          </Link>
+
           {constants?.domain ? (
             <a
               className="py-2 px-3 mr-4 hover:bg-gray-100 rounded-md font-semibold"

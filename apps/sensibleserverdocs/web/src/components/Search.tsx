@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 
 const Search = () => {
   const [focusIcon, setFocusIcon] = useState(true);
-  const { router, api, searchString } = useSiteParams();
+  const { router, location, url, searchString } = useSiteParams();
 
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -28,7 +28,8 @@ const Search = () => {
       {
         pathname: router.pathname,
         query: {
-          api,
+          url,
+          location,
           search: s,
         },
       },

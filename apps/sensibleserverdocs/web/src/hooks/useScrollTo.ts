@@ -4,7 +4,7 @@ import { useSiteParams } from "./useSiteParams";
 
 export const useScrollTo = () => {
   const router = useRouter();
-  const { apiString, searchString, apiUrl } = useSiteParams();
+  const { url, urlUrl, search } = useSiteParams();
   const [expandedTypes, setExpandedTypes] = useStore("expandedTypes");
   const [collapsedModels, setCollapsedModels] = useStore("collapsedModels");
 
@@ -12,8 +12,8 @@ export const useScrollTo = () => {
     router.push(
       {
         query: {
-          api: apiString,
-          search: searchString,
+          url,
+          search,
           location,
         },
       },
@@ -25,27 +25,27 @@ export const useScrollTo = () => {
       document.getElementById(location)?.scrollIntoView({ behavior: "smooth" });
     }, 50);
 
-    if (apiUrl) {
-      const newExpandedTypes = (expandedTypes[apiUrl] || []).concat([location]);
+    if (urlUrl) {
+      const newExpandedTypes = (expandedTypes[urlUrl] || []).concat([location]);
       setExpandedTypes({
         ...expandedTypes,
-        [apiUrl]: newExpandedTypes,
+        [urlUrl]: newExpandedTypes,
       });
 
       if (model) {
-        const newCollapsedModels = (collapsedModels[apiUrl] || []).filter(
+        const newCollapsedModels = (collapsedModels[urlUrl] || []).filter(
           (x) => x !== model
         );
 
         setCollapsedModels({
           ...expandedTypes,
-          [apiUrl]: newCollapsedModels,
+          [urlUrl]: newCollapsedModels,
         });
       } else {
         //if we don't know the model, let's just show all models, just in case.
         setCollapsedModels({
           ...expandedTypes,
-          [apiUrl]: [],
+          [urlUrl]: [],
         });
       }
     }

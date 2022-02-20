@@ -8,11 +8,7 @@ const DarkModeToggle = ({ className }: { className?: string }) => {
 
   const toggle = () => {
     nightwind.beforeTransition();
-    if (theme !== "dark") {
-      setTheme("dark");
-    } else {
-      setTheme("light");
-    }
+    setTheme(theme === "dark" ? "light" : "dark");
   };
 
   const isDark = theme === "dark";
@@ -29,7 +25,7 @@ const DarkModeToggle = ({ className }: { className?: string }) => {
             onChange={toggle}
           />
           <div
-            className={`block h-8 rounded-full w-14 transition duration-700 ease-in-out border-2 border-gray-300 bg-gray-100}`}
+            className={`block h-8 rounded-full w-14 transition duration-700 ease-in-out border-2 border-gray-300 bg-gray-100`}
           >
             <div className="flex justify-between m-1.5">
               <Image src="/moon.svg" width={15} height={15} alt="dark" />

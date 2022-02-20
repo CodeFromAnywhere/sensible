@@ -14,21 +14,21 @@ const Model = ({
   definitions: any;
   modelKey: string;
 }) => {
-  const { apiUrl } = useSiteParams();
+  const { urlUrl } = useSiteParams();
   const [collapsedModels, setCollapsedModels] = useStore("collapsedModels");
-  const isCollapsed = apiUrl
-    ? !!collapsedModels[apiUrl]?.find((x) => x === modelKey)
+  const isCollapsed = urlUrl
+    ? !!collapsedModels[urlUrl]?.find((x) => x === modelKey)
     : false;
 
   const toggle = () => {
-    if (apiUrl) {
+    if (urlUrl) {
       const newCollapsedModels = isCollapsed
-        ? collapsedModels[apiUrl].filter((x) => x !== modelKey)
-        : (collapsedModels[apiUrl] || []).concat([modelKey]);
+        ? collapsedModels[urlUrl].filter((x) => x !== modelKey)
+        : (collapsedModels[urlUrl] || []).concat([modelKey]);
 
       setCollapsedModels({
         ...collapsedModels,
-        [apiUrl]: newCollapsedModels,
+        [urlUrl]: newCollapsedModels,
       });
     }
   };
@@ -76,7 +76,7 @@ const Model = ({
                     const isValid =
                       !section.filter || section.filter(definition);
 
-                    return definition && apiUrl && isValid ? (
+                    return definition && urlUrl && isValid ? (
                       <section.component
                         key={`${modelKey}model_${key}${section.key}`}
                         id={key}
