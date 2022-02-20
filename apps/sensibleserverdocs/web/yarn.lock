@@ -3183,11 +3183,6 @@ react-with-native-date-input@^1.0.13:
   resolved "https://registry.yarnpkg.com/react-with-native-date-input/-/react-with-native-date-input-1.0.13.tgz#6b915da47c33446aa14bbfd320e4b014020ed40d"
   integrity sha512-8szAYjvIg1pb4O5mY/lf3nA80fZ3Hz7xPtDPQmSzDoSOM+i3qcFX4BiEAIhbNeCcii5c31Nfmk8g3XCuttWXJw==
 
-react-with-native-env@^0.0.3:
-  version "0.0.3"
-  resolved "https://registry.yarnpkg.com/react-with-native-env/-/react-with-native-env-0.0.3.tgz#57b0d83ee624c5589f3fba0411c8876f34503de8"
-  integrity sha512-Q2Aqqvmu3djQiH9FCNdAoszi6RUPcLXkelS9geQsaBqS+JQckU4ZTcm+5ZEXBIDcLwlLIev1NJ56eIZRpcT5gg==
-
 react-with-native-form@^1.0.98:
   version "1.0.98"
   resolved "https://registry.yarnpkg.com/react-with-native-form/-/react-with-native-form-1.0.98.tgz#d49374b06563fd80079980b1dec3ffc0cde74e99"
@@ -3429,19 +3424,6 @@ sensible-core@^1.0.16:
   version "1.0.16"
   resolved "https://registry.yarnpkg.com/sensible-core/-/sensible-core-1.0.16.tgz#58d0e1c59be636f0e014f98feaef61690fd155b2"
   integrity sha512-b+8j85DNKmr4DqbrjV3aq+Kvn/wb58r3oUZxjm1Y5YhLR/ipnPAYCfWdTKTpTPZLsp/7SXmFjqi9AVB03UoC3w==
-
-sensible-core@^1.0.7:
-  version "1.0.12"
-  resolved "https://registry.yarnpkg.com/sensible-core/-/sensible-core-1.0.12.tgz#55f126792469c8fea488c07c249d649476ecf1cb"
-  integrity sha512-hSbm99MvfbmouoSfSwBkSYGEuGJqTqF4hpSpts9W/zQv/0G2vE1Z4LZ53qncZu98auw+erJY8xJ1HIhSmhZbyw==
-
-sensible-ui@^1.0.9:
-  version "1.0.9"
-  resolved "https://registry.yarnpkg.com/sensible-ui/-/sensible-ui-1.0.9.tgz#5f1aa4df2210da4c65a241284784ea05fae45d41"
-  integrity sha512-KZCpKl8JAZG/Z1wQ2ZmLpVvnBLBjQLq+MXzFXpxj5ziVKrw3/cYLpBV85ADeKQBrTbI0hNnVd8KKZvJB7OHhSQ==
-  dependencies:
-    react-with-native-env "^0.0.3"
-    sensible-core "^1.0.7"
 
 shebang-command@^2.0.0:
   version "2.0.0"

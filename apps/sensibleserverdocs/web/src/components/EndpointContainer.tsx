@@ -5,11 +5,11 @@ import { toast } from "react-with-native-notification";
 import "react-toastify/dist/ReactToastify.css";
 import BsCodeIcon from "../../public/BsCode.svg";
 import VscTerminalCmdIcon from "../../public/VscTerminalCmd.svg";
-import { DefinitionObject, getDefinition } from "../util";
+import { DefinitionObject, getDefinition, toQueryString } from "../util";
 import BsChevronUpIcon from "../../public/BsChevronUp.svg";
 import useStore from "../store";
 import { useSiteParams } from "../hooks/useSiteParams";
-import { toQueryString } from "sensible-ui";
+
 import TypeDefinition from "./TypeDefinition";
 const Endpoint = ({
   definition,

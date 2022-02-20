@@ -66,6 +66,24 @@ export const isEndpoint = (
     : false;
 };
 
+const isValidEntry = ([_, value]: [key: string, value: any]) =>
+  value !== undefined && value !== "" && value !== null;
+
+export const toQueryString = (query?: any) => {
+  const hasQuery =
+    query && Object.entries(query)?.filter(isValidEntry).length > 0;
+  return hasQuery
+    ? "?" +
+        Object.entries(query)
+          .filter(isValidEntry)
+          .map(([key, value]) => {
+            const encodedValue = encodeURIComponent(String(value));
+            return `${key}=${encodedValue}`;
+          })
+          .join("&")
+    : "";
+};
+
 export function notEmpty<TValue>(
   value: TValue | null | undefined
 ): value is TValue {
