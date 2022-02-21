@@ -15,7 +15,11 @@ export const useSiteParams = () => {
     : "";
 
   const urlString = url ? (Array.isArray(url) ? url.join("/") : url) : null;
-  const urlUrl = urlString ? decodeURIComponent(urlString) : null;
+  const decodedUrlString = urlString ? decodeURIComponent(urlString) : null;
+
+  const urlUrl = decodedUrlString?.startsWith("localhost")
+    ? `http://${decodedUrlString}`
+    : `https://${decodedUrlString}`;
 
   const setSearch = (s: string) => {
     router.push(

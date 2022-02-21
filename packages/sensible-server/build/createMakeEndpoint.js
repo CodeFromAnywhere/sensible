@@ -6,7 +6,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.createMakeEndpoint = exports.typeHasIncorrectInterface = exports.ajv = void 0;
 const server_1 = __importDefault(require("server"));
 const getCachedSchema_1 = require("./getCachedSchema");
-const getCachedEndpointSchemas_1 = require("./getCachedEndpointSchemas");
 const ajv_1 = __importDefault(require("ajv"));
 exports.ajv = new ajv_1.default({
     allErrors: true,
@@ -40,38 +39,46 @@ const createMakeEndpoint = (interpretableTypes) => {
             const body = method === "POST" ? ctx.data : ctx.query;
             const extendedCtx = { ...ctx, body };
             const schema = (0, getCachedSchema_1.getCachedSchema)(interpretableTypes);
-            const { endpointSchemas, endpoints } = (0, getCachedEndpointSchemas_1.getCachedEndpointSchemas)(schema);
-            const endpointInterfaceName = endpoints[path];
-            const endpointSchema = endpointSchemas[path];
-            const bodySchema = getDefinition(endpointSchema?.properties?.body);
-            const responseSchema = getDefinition(endpointSchema?.properties?.response);
-            const isUserEndpoint = !path.startsWith("sensible/");
-            if (isUserEndpoint) {
-                if (!bodySchema || !responseSchema) {
-                    return {
-                        success: false,
-                        response: "Couldn't find bodySchema or repsonseSchema",
-                    };
-                }
-                // console.dir(
-                //   { endpointSchema, bodySchema, responseSchema },
-                //   { depth: 999 }
-                // );
-                if (!endpointInterfaceName || !schema) {
-                    return {
-                        response: "Couldn't find schema and/or endpoint interface name",
-                        success: false,
-                    };
-                }
-                const bodyErrors = (0, exports.typeHasIncorrectInterface)(endpointInterfaceName, body, schema);
-                if (bodyErrors) {
-                    return {
-                        response: "Body is invalid",
-                        success: false,
-                        errors: !bodySchema ? "Body schema undefined" : bodyErrors,
-                    };
-                }
-            }
+            // const { endpointSchemas, endpoints } =
+            //   getCachedEndpointSchemas<TAllEndpoints>(schema);
+            // const endpointInterfaceName: string | undefined = endpoints[path];
+            // const endpointSchema: TJS.Definition | null | undefined =
+            //   endpointSchemas[path];
+            // const bodySchema = getDefinition(endpointSchema?.properties?.body);
+            // const responseSchema = getDefinition(
+            //   endpointSchema?.properties?.response
+            // );
+            // const isUserEndpoint = !path.startsWith("sensible/");
+            // if (isUserEndpoint) {
+            //   if (!bodySchema || !responseSchema) {
+            //     return {
+            //       success: false,
+            //       response: "Couldn't find bodySchema or repsonseSchema",
+            //     };
+            //   }
+            //   // console.dir(
+            //   //   { endpointSchema, bodySchema, responseSchema },
+            //   //   { depth: 999 }
+            //   // );
+            //   if (!endpointInterfaceName || !schema) {
+            //     return {
+            //       response: "Couldn't find schema and/or endpoint interface name",
+            //       success: false,
+            //     };
+            //   }
+            //   const bodyErrors = typeHasIncorrectInterface(
+            //     endpointInterfaceName,
+            //     body,
+            //     schema
+            //   );
+            //   if (bodyErrors) {
+            //     return {
+            //       response: "Body is invalid",
+            //       success: false,
+            //       errors: !bodySchema ? "Body schema undefined" : bodyErrors,
+            //     };
+            //   }
+            // }
             let response = {
                 success: false,
                 response: "Couldn't update response",
@@ -85,19 +92,23 @@ const createMakeEndpoint = (interpretableTypes) => {
                     success: false,
                 };
             }
-            // response validation
-            if (isUserEndpoint && endpointInterfaceName && schema) {
-                const responseErrors = (0, exports.typeHasIncorrectInterface)(endpointInterfaceName, response, schema);
-                if (responseErrors) {
-                    return {
-                        response: "Response is invalid",
-                        success: false,
-                        errors: !responseSchema
-                            ? "Response schema undefined"
-                            : responseErrors,
-                    };
-                }
-            }
+            // // response validation
+            // if (isUserEndpoint && endpointInterfaceName && schema) {
+            //   const responseErrors = typeHasIncorrectInterface(
+            //     endpointInterfaceName,
+            //     response,
+            //     schema
+            //   );
+            //   if (responseErrors) {
+            //     return {
+            //       response: "Response is invalid",
+            //       success: false,
+            //       errors: !responseSchema
+            //         ? "Response schema undefined"
+            //         : responseErrors,
+            //     };
+            //   }
+            // }
             return response;
         });
     };

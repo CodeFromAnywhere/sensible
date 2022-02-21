@@ -15,7 +15,7 @@ export declare type FolderPath = {
     path: Path;
 };
 export declare type InterpretableTypes = {
-    [key in RootModel | AllEndpointsModel | string]: {
+    [key in RootModel | string]: {
         endpoints: Path[];
         types: Path[];
         examples: Path[];
@@ -34,10 +34,13 @@ export declare type TypeExample = {
     typeInterfaceName: string;
     value: any;
 };
+export declare type DefinitionObject = {
+    [key: string]: TJS.DefinitionOrBoolean;
+};
 export declare type ModelSchemaObject = {
-    [key: string | RootModel | AllEndpointsModel]: {
-        endpoints: TJS.Definition | null;
-        types: TJS.Definition | null;
+    [key: string | RootModel]: {
+        endpoints?: DefinitionObject;
+        types?: DefinitionObject;
         examples: (EndpointExample | TypeExample)[];
     };
 };

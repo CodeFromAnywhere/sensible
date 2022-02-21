@@ -32,6 +32,7 @@ export const getCachedSchema = (
     allowUmdGlobalAccess: false,
     skipDefaultLibCheck: true,
     skipLibCheck: true,
+    allowJs: true,
   };
 
   const schema = objectMap(typeFilesObject, (typeFiles) => {
@@ -40,7 +41,7 @@ export const getCachedSchema = (
       compilerOptions
     );
     const typesProgram = TJS.getProgramFromFiles(
-      typeFiles.endpoints,
+      typeFiles.types,
       compilerOptions
     );
     const examples: (EndpointExample | TypeExample)[] = importFromFiles({

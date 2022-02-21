@@ -45,13 +45,13 @@ const getCachedSchema = (typeFilesObject) => {
     };
     const schema = (0, sensible_core_1.objectMap)(typeFilesObject, (typeFiles) => {
         const endpointsProgram = TJS.getProgramFromFiles(typeFiles.endpoints, compilerOptions);
-        const typesProgram = TJS.getProgramFromFiles(typeFiles.endpoints, compilerOptions);
+        const typesProgram = TJS.getProgramFromFiles(typeFiles.types, compilerOptions);
         const examples = (0, _1.importFromFiles)({
             files: typeFiles.examples,
             guard: _1.isArrayGuard,
         }).flat();
-        const endpoints = TJS.generateSchema(endpointsProgram, "*", settings);
-        const types = TJS.generateSchema(typesProgram, "*", settings);
+        const endpoints = TJS.generateSchema(endpointsProgram, "*", settings, typeFiles.endpoints)?.definitions;
+        const types = TJS.generateSchema(typesProgram, "*", settings, typeFiles.types)?.definitions;
         return {
             endpoints,
             types,

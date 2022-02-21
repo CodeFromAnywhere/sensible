@@ -20,7 +20,7 @@ const getCachedEndpointSchemas = (schema) => {
     const firstKey = Object.keys(schema)[0];
     const firstModel = schema[firstKey];
     const firstModelEndpoints = firstModel.endpoints;
-    const AllEndpointsSchema = getDefinition(firstModelEndpoints?.definitions?.AllEndpoints);
+    const AllEndpointsSchema = getDefinition(firstModelEndpoints?.AllEndpoints);
     if (!AllEndpointsSchema || !AllEndpointsSchema.properties) {
         throw new Error("Couldn't find AllEndpoints interface");
     }

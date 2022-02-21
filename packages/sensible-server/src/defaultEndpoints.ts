@@ -75,11 +75,9 @@ export const makeDefaultEndpoints = (
   return makeDocsEndpoints(makeEndpoint, interpretableTypes, constants).concat([
     //redirect anything that doesn't work to the docs
     get("*", (ctx) => {
-      const origin = encodeURIComponent(
-        `${ctx.req.protocol}://${ctx.req.headers.host}`
+      return redirect(
+        `https://docs.sensibleframework.co/${ctx.req.headers.host || ""}`
       );
-
-      return redirect(`https://docs.sensibleframework.co/${origin}`);
     }),
   ]);
 };
