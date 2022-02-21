@@ -42,6 +42,7 @@ const getCachedSchema = (typeFilesObject) => {
         allowUmdGlobalAccess: false,
         skipDefaultLibCheck: true,
         skipLibCheck: true,
+        allowJs: true,
     };
     const schema = (0, sensible_core_1.objectMap)(typeFilesObject, (typeFiles) => {
         const endpointsProgram = TJS.getProgramFromFiles(typeFiles.endpoints, compilerOptions);

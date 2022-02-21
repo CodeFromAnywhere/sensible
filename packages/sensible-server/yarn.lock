@@ -1530,6 +1530,11 @@ sensible-core@^1.0.23:
   resolved "https://registry.yarnpkg.com/sensible-core/-/sensible-core-1.0.23.tgz#5e6bbb4373f2e2d63456931bec2ee2ec2483c1f0"
   integrity sha512-Ovz/bHuscTwvnvgfMLfwocvn/nX9pHkbEg+giVY3wPdj/k1d5WXFIyAleFjmwj5PXGgrmFA4MgajwSXUNT3SaA==
 
+sensible-docs@^0.0.3:
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/sensible-docs/-/sensible-docs-0.0.3.tgz#0d4e097be258eb5c9bb80c2d0d6533e7a0da0366"
+  integrity sha512-zknV6b3dzKIRGs/GmbxjSCxGYtKwFMjoTX2UftcI2m7xqhSAS2Ov+fs+aebJFxfpcLADNiO+lvm2qKnRGltIpg==
+
 sequelize-pool@^7.1.0:
   version "7.1.0"
   resolved "https://registry.yarnpkg.com/sequelize-pool/-/sequelize-pool-7.1.0.tgz#210b391af4002762f823188fd6ecfc7413020768"

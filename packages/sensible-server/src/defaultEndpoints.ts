@@ -7,7 +7,7 @@ import {
   DocsEndpoint,
 } from "./defaultEndpointTypes";
 import server from "server";
-import { redirect } from "server/reply";
+import { redirect, render } from "server/reply";
 import { InterpretableTypes, Path, ServerEndpoint } from "./types";
 
 // const getTypesFromSchema = (

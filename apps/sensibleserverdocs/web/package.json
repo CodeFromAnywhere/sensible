@@ -1,11 +1,14 @@
 {
-  "name": "lalala",
+  "name": "sensible-docs",
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build && next export",
+    "build": "next build",
+    "export": "next build && next export",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "initpub": "npm publish --access public",
+    "pub": "npm version patch --force && npm publish"
   },
   "dependencies": {
     "@badrap/bar-of-progress": "^0.1.2",
