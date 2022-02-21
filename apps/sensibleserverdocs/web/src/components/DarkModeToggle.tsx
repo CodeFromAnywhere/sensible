@@ -1,5 +1,5 @@
-import Image from "next/image";
-import useStore from "../store";
+// import Image from "next/image";
+// import useStore from "../store";
 import nightwind from "nightwind/helper";
 import { useTheme } from "next-themes";
 
@@ -28,8 +28,8 @@ const DarkModeToggle = ({ className }: { className?: string }) => {
             className={`block h-8 rounded-full w-14 transition duration-700 ease-in-out border-2 border-gray-300 bg-gray-100`}
           >
             <div className="flex justify-between m-1.5">
-              <Image src="/moon.svg" width={15} height={15} alt="dark" />
-              <Image src="/sun.svg" width={15} height={15} alt="light" />
+              {/* <Image src="/moon.svg" width={15} height={15} alt="dark" />
+              <Image src="/sun.svg" width={15} height={15} alt="light" /> */}
             </div>
           </div>
           <div
