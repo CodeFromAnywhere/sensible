@@ -1,3 +1,5 @@
+import * as TJS from "typescript-json-schema";
+
 export interface Link {
   label: string;
   url: string;
@@ -45,8 +47,18 @@ export type API<TAllEndpoints extends unknown> = <
     : never
 >;
 
+/**
+ * whenever something fails, this is the recommended response.
+ * Whenever something succeeds, you can either return this or success:true + some data
+ */
 export interface DefaultResponse {
+  /**
+   * a boolean indicating whether the intended action succeeded
+   */
   success: boolean;
+  /**
+   * A message indicating the reason of failure (optionally this can be shown to the user)
+   */
   response: string;
 }
 

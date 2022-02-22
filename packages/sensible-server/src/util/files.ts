@@ -1,7 +1,6 @@
 import path from "path";
 import fs from "fs";
-import { mergeObjectsArray } from "sensible-core";
-import { FolderPath, Path } from ".";
+import { FolderPath, mergeObjectsArray, Path } from "sensible-core";
 
 export const isArrayGuard = (moduleExports: any) =>
   typeof moduleExports === "object" && Array.isArray(moduleExports);

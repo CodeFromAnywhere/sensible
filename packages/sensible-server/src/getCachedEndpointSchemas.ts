@@ -1,6 +1,5 @@
 import * as TJS from "typescript-json-schema";
-import { objectMap } from "sensible-core";
-import { ModelSchemaObject } from ".";
+import { objectMap, ModelSchemaObject } from "sensible-core";
 const getDefinition = (
   definitionOrBooleanOrUndefined: TJS.DefinitionOrBoolean | undefined
 ) => {

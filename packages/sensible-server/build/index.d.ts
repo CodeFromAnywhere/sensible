@@ -1,10 +1,12 @@
 import { Context } from "./server";
-import { makeDocsEndpoints, makeDefaultEndpoints } from "./defaultEndpoints";
-export * from "./defaultEndpointTypes";
+import { makeDefaultEndpoints } from "./defaultEndpoints";
+import { makeDocsEndpoints } from "./makeDocsEndpoints";
 export { Context };
 export * from "./DefaultModel";
-export * from "./sequelize.util";
-export * from "./files.util";
+export * from "./util/files";
+export * from "./util/findAllMd";
+export * from "./util/parseMd";
+export * from "./util/sequelize";
 export * from "./types";
 export * from "./createMakeEndpoint";
 export { makeDefaultEndpoints, makeDocsEndpoints };

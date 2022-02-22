@@ -1,4 +1,4 @@
-import { Md, Path } from ".";
+import { Md, Path } from "sensible-core";
 import fs from "fs";
 import matter from "gray-matter";
 

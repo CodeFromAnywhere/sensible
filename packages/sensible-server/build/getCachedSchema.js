@@ -22,7 +22,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getCachedSchema = void 0;
 const sensible_core_1 = require("sensible-core");
 const TJS = __importStar(require("typescript-json-schema"));
-const _1 = require(".");
+const files_1 = require("./util/files");
 //just generate the schema once every server restart because there can't be any changes without the server restarting.
 let cachedSchema = null;
 const getCachedSchema = (typeFilesObject) => {
@@ -47,13 +47,13 @@ const getCachedSchema = (typeFilesObject) => {
     const schema = (0, sensible_core_1.objectMap)(typeFilesObject, (typeFiles) => {
         const endpointsProgram = TJS.getProgramFromFiles(typeFiles.endpoints, compilerOptions);
         const typesProgram = TJS.getProgramFromFiles(typeFiles.types, compilerOptions);
-        const typeExamples = (0, _1.importFromFiles)({
+        const typeExamples = (0, files_1.importFromFiles)({
             files: typeFiles.typeExamples,
-            guard: _1.isArrayGuard,
+            guard: files_1.isArrayGuard,
         }).flat();
-        const endpointExamples = (0, _1.importFromFiles)({
+        const endpointExamples = (0, files_1.importFromFiles)({
             files: typeFiles.endpointExamples,
-            guard: _1.isArrayGuard,
+            guard: files_1.isArrayGuard,
         }).flat();
         const endpoints = TJS.generateSchema(endpointsProgram, "*", settings, typeFiles.endpoints)?.definitions;
         const types = TJS.generateSchema(typesProgram, "*", settings, typeFiles.types)?.definitions;

@@ -5,7 +5,7 @@ import { getCachedEndpointSchemas } from "./getCachedEndpointSchemas";
 import { ServerEndpoint } from "./types";
 import * as TJS from "typescript-json-schema";
 import Ajv from "ajv";
-import { InterpretableTypes } from ".";
+import { InterpretableTypes } from "sensible-core";
 
 export type Keys<TObject> = Extract<keyof TObject, string>;
 

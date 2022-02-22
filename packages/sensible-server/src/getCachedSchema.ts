@@ -2,12 +2,11 @@ import { objectMap } from "sensible-core";
 import * as TJS from "typescript-json-schema";
 import {
   EndpointExample,
-  isArrayGuard,
   ModelSchemaObject,
   TypeExample,
   InterpretableTypes,
-  importFromFiles,
-} from ".";
+} from "sensible-core";
+import { importFromFiles, isArrayGuard } from "./util/files";
 
 //just generate the schema once every server restart because there can't be any changes without the server restarting.
 let cachedSchema: ModelSchemaObject | null = null;

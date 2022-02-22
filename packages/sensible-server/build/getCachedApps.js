@@ -10,7 +10,7 @@ const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const sensible_core_1 = require("sensible-core");
 const getCachedFrontend_1 = require("./getCachedFrontend");
-const findAllMd_1 = require("./findAllMd");
+const findAllMd_1 = require("./util/findAllMd");
 /**
  * parse a md file to all the needed info
  * @param mdFilePath path to a md file

@@ -8,15 +8,15 @@ import {
   PackageInfoObject,
   Path,
   ProjectType,
-} from ".";
-import { App } from "./defaultEndpointTypes";
+  App,
+} from "sensible-core";
 import { getCachedCrons } from "./getCachedCrons";
 import { getCachedSchema } from "./getCachedSchema";
 import fs from "fs";
 import path from "path";
 import { notEmpty } from "sensible-core";
 import { getCachedFrontend } from "./getCachedFrontend";
-import { findAllMd } from "./findAllMd";
+import { findAllMd } from "./util/findAllMd";
 /**
  * parse a md file to all the needed info
  * @param mdFilePath path to a md file

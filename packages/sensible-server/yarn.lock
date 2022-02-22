@@ -1580,10 +1580,12 @@ send@0.17.2:
     range-parser "~1.2.1"
     statuses "~1.5.0"
 
-sensible-core@^1.0.27:
-  version "1.0.27"
-  resolved "https://registry.yarnpkg.com/sensible-core/-/sensible-core-1.0.27.tgz#922970e6eb0e3fb714df4be3088bf9d9c903e2c0"
-  integrity sha512-v9Cge83PxgJSCcmAcqoWxpATEae0rBpAYgKBzb6eWg+B+sjM33VRfL8t4lqcWzEajlehP6ld0Zkr5SS0AO8Q+Q==
+sensible-core@^1.0.29:
+  version "1.0.29"
+  resolved "https://registry.yarnpkg.com/sensible-core/-/sensible-core-1.0.29.tgz#8d722a5676a11c0730e7a9dfff578b147502ef9d"
+  integrity sha512-EuRQo+zTLaqcwjcGZhszffXgDnwpQk9oZ3V7r9+Lw0nbDL+CVGFDY0nQkVJDBcfigZ1AqTRvtJaHcZSG3NLV0A==
+  dependencies:
+    typescript-json-schema "^0.53.0"
 
 sensible-docs@^0.0.3:
   version "0.0.3"
