@@ -3,7 +3,7 @@ export interface Link {
   url: string;
 }
 
-export interface PublicConstants {
+export interface PublicConstantsType {
   appName: string;
   email: string;
   /**

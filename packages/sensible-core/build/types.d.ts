@@ -2,7 +2,7 @@ export interface Link {
     label: string;
     url: string;
 }
-export interface PublicConstants {
+export interface PublicConstantsType {
     appName: string;
     email: string;
     /**
