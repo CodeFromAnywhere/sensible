@@ -1,12 +1,12 @@
-import { Dependency, InterpretableTypes, ModelSchemaObject, PackageInfo, PackageInfoObject, Path, ProjectType } from ".";
+import { Dependency, PackageInfo, PackageInfoObject, Path } from ".";
 import { App } from "./defaultEndpointTypes";
 /**
  * parse a md file to all the needed info
  * @param mdFilePath path to a md file
  * @returns Md
  */
-export declare const getAppType: (projectType: ProjectType, folder: string) => "server" | "frontend" | "core" | null;
-export declare const getDependencies: (dependencies: PackageInfoObject | undefined, folderPath: string) => Dependency[];
+export declare const getAppType: (projectType: ProjectType, folder: string) => "frontend" | "server" | "core" | null;
+export declare const getDependencies: (dependencies: PackageInfoObject | undefined, folderPath: string) => any[];
 export declare const getRepo: (repository: string | {
     [key: string]: string | undefined;
 } | undefined) => string | undefined;

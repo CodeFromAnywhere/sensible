@@ -1,1 +1,1 @@
-{"version":3,"file":"parseMd.d.ts","sourceRoot":"","sources":["../src/parseMd.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,EAAE,EAAE,IAAI,EAAE,MAAM,GAAG,CAAC;AAI7B,eAAO,MAAM,OAAO,eAAgB,IAAI,KAAG,EAkB1C,CAAC"}
+{"version":3,"file":"parseMd.d.ts","sourceRoot":"","sources":["../src/parseMd.ts"],"names":[],"mappings":"AAIA,eAAO,MAAM,OAAO,0BAkBnB,CAAC"}

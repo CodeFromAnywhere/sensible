@@ -21,22 +21,7 @@ export type DefinitionObject = {
   [key: string]: TJS.DefinitionOrBoolean;
 };
 
-export type RootModel = "root";
-
-export type ModelSchemaObject = {
-  [key: string | RootModel]: {
-    endpoints?: DefinitionObject;
-    types?: DefinitionObject;
-    examples: (EndpointExample | TypeExample)[];
-  };
-};
-
-export type Docs = {
-  constants: { [key: string]: any };
-  schema?: ModelSchemaObject;
-  success: boolean;
-  response: string;
-};
+export type Docs = DocsEndpoint["response"];
 
 export type EndpointDefinition = TJS.Definition & {
   properties: {
