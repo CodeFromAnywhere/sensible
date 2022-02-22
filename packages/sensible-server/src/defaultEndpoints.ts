@@ -13,7 +13,7 @@ import { InterpretableTypes, ServerEndpoint } from "./types";
 import { ModelSchemaObject, Path } from ".";
 import { getCachedApps } from "./getCachedApps";
 import { getCachedCrons } from "./getCachedCrons";
-import { Link, SensibleConstants } from "sensible-core";
+import { Link, PublicConstantsType } from "sensible-core";
 import { findAllMd } from "./findAllMd";
 // const getTypesFromSchema = (
 //   schema: TJS.Definition | null,
@@ -40,7 +40,7 @@ export const makeDocsEndpoints = (
   basePath: Path,
   appPaths: Path[],
   interpretableTypes: InterpretableTypes,
-  constants: SensibleConstants
+  constants: PublicConstantsType
 ) => {
   const docsEndpoint: ServerEndpoint<DocsEndpoint> = async (ctx) => {
     ctx.res.header("Access-Control-Allow-Origin", "*");
@@ -85,7 +85,7 @@ export const makeDocsEndpoints = (
         ]
       : [];
 
-    const extendedConstants: SensibleConstants = {
+    const extendedConstants: PublicConstantsType = {
       ...constants,
       links: (constants.links || []).concat(githubLinks),
     };
@@ -120,7 +120,7 @@ export const makeDefaultEndpoints = (
   basePath: Path,
   appPaths: Path[],
   interpretableTypes: InterpretableTypes,
-  constants: SensibleConstants
+  constants: PublicConstantsType
 ) => {
   const makeEndpoint = createMakeEndpoint<AllDefaultEndpoints>(
     interpretableTypes //.concat(defaultEndpointsTypeFiles)

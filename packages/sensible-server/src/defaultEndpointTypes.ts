@@ -1,4 +1,4 @@
-import { Endpoint, SensibleConstants } from "sensible-core";
+import { Endpoint, PublicConstantsType } from "sensible-core";
 import { ModelSchemaObject } from ".";
 
 export type FileOrFolder = string;
@@ -65,7 +65,7 @@ export interface DocsEndpoint extends Endpoint {
   response:
     | { response: string; success: false }
     | {
-        constants: SensibleConstants;
+        constants: PublicConstantsType;
         apps: App[];
         md: Md[];
         success: true;
