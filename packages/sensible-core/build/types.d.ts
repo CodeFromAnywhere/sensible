@@ -2,11 +2,14 @@ export interface Link {
     label: string;
     url: string;
 }
-export interface SensibleConstants {
+export interface PublicConstants {
     appName: string;
     email: string;
+    /**
+     * can probably remove this and declare this in the homepage of package.json of the actual frontend
+     */
     domain: string;
-    links: Link[];
+    links?: Link[];
 }
 export declare type Endpoint = {
     /**
