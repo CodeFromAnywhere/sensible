@@ -1,4 +1,3 @@
-import { UIConstants } from "./UIConstants";
 import { API } from "sensible-core";
 
 const isValidEntry = ([_, value]: [key: string, value: any]) =>
@@ -20,11 +19,13 @@ export const toQueryString = (query?: any) => {
 };
 //NB: doesn't work in node.
 
-export const makeApi = <TAllEndpoints extends unknown>() => {
+type Config = {
+  apiUrl: string;
+};
+
+export const makeApi = <TAllEndpoints extends unknown>(config: Config) => {
   const api: API<TAllEndpoints> = (endpoint, method, body, options) => {
-    const url = `${
-      options?.isExternal ? "" : `${UIConstants.API_URL}/`
-    }${endpoint}`;
+    const url = `${options?.isExternal ? "" : `${config.apiUrl}/`}${endpoint}`;
 
     const fullUrl = method === "GET" ? url + toQueryString(body) : url;
     // console.log({ fullUrl });

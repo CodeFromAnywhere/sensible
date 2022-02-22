@@ -2,12 +2,15 @@ export type HomogeneousObject<T> = {
   [key: string]: T;
 };
 
-export type PackageInfoObject = HomogeneousObject<string>;
-
 export type Command = {
   command: string;
   what: string;
 };
+
+export type PackageInfoObject = {
+  [key: string]: string;
+};
+
 export type PackageInfo = {
   path: string;
   name?: string;

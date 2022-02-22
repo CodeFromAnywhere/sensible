@@ -47,8 +47,12 @@ const getCachedSchema = (typeFilesObject) => {
     const schema = (0, sensible_core_1.objectMap)(typeFilesObject, (typeFiles) => {
         const endpointsProgram = TJS.getProgramFromFiles(typeFiles.endpoints, compilerOptions);
         const typesProgram = TJS.getProgramFromFiles(typeFiles.types, compilerOptions);
-        const examples = (0, _1.importFromFiles)({
-            files: typeFiles.examples,
+        const typeExamples = (0, _1.importFromFiles)({
+            files: typeFiles.typeExamples,
+            guard: _1.isArrayGuard,
+        }).flat();
+        const endpointExamples = (0, _1.importFromFiles)({
+            files: typeFiles.endpointExamples,
             guard: _1.isArrayGuard,
         }).flat();
         const endpoints = TJS.generateSchema(endpointsProgram, "*", settings, typeFiles.endpoints)?.definitions;
@@ -56,7 +60,8 @@ const getCachedSchema = (typeFilesObject) => {
         return {
             endpoints,
             types,
-            examples,
+            typeExamples,
+            endpointExamples,
         };
     });
     cachedSchema = schema;

@@ -1,3 +1,13 @@
+export interface Link {
+    label: string;
+    url: string;
+}
+export interface SensibleConstants {
+    appName: string;
+    email: string;
+    domain: string;
+    links: Link[];
+}
 export declare type Endpoint = {
     /**
      * api path to endpoint (can contain '/')

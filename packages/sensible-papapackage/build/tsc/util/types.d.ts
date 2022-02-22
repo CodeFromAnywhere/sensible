@@ -1,10 +1,12 @@
 export declare type HomogeneousObject<T> = {
     [key: string]: T;
 };
-export declare type PackageInfoObject = HomogeneousObject<string>;
 export declare type Command = {
     command: string;
     what: string;
+};
+export declare type PackageInfoObject = {
+    [key: string]: string;
 };
 export declare type PackageInfo = {
     path: string;

@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.importFromFiles = exports.withoutExtension = exports.findFilesRecursively = exports.findFiles = exports.isArrayGuard = void 0;
+exports.importFromFiles = exports.getExtension = exports.withoutExtension = exports.findFilesRecursively = exports.findFiles = exports.isArrayGuard = void 0;
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
 const sensible_core_1 = require("sensible-core");
@@ -23,11 +23,11 @@ const findFiles = (slug, basePath) => {
     });
 };
 exports.findFiles = findFiles;
-const findFilesRecursively = ({ match, basePath, relativePath, onlyInSubFolders, }) => {
+const findFilesRecursively = ({ match, basePath, relativePath, onlyInSubFolders, onlyInCurrentFolder, }) => {
     const location = relativePath ? path_1.default.join(basePath, relativePath) : basePath;
     const contents = fs_1.default.readdirSync(location, { withFileTypes: true });
     return contents.reduce((all, fileOrFolder) => {
-        if (fileOrFolder.isDirectory()) {
+        if (fileOrFolder.isDirectory() && !onlyInCurrentFolder) {
             const folder = fileOrFolder;
             const thisFolder = (0, exports.findFilesRecursively)({
                 basePath,
@@ -43,7 +43,7 @@ const findFilesRecursively = ({ match, basePath, relativePath, onlyInSubFolders,
         else if (!onlyInSubFolders) {
             const file = fileOrFolder;
             const filePath = path_1.default.join(location, file.name);
-            const allWithMatchedFile = match((0, exports.withoutExtension)(file.name))
+            const allWithMatchedFile = match((0, exports.withoutExtension)(file.name), (0, exports.getExtension)(file.name))
                 ? all.concat([{ relativeFolder: relativePath, path: filePath }])
                 : all;
             return allWithMatchedFile;
@@ -58,6 +58,11 @@ const withoutExtension = (fileName) => {
     return pieces.join(".");
 };
 exports.withoutExtension = withoutExtension;
+const getExtension = (fileName) => {
+    const pieces = fileName.split(".");
+    return pieces.pop();
+};
+exports.getExtension = getExtension;
 const importFromFiles = ({ files, importStrategy = "default", list, guard, }) => {
     return files
         .map((filePath) => {

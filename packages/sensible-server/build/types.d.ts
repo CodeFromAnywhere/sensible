@@ -18,7 +18,8 @@ export declare type InterpretableTypes = {
     [key in RootModel | string]: {
         endpoints: Path[];
         types: Path[];
-        examples: Path[];
+        endpointExamples: Path[];
+        typeExamples: Path[];
     };
 };
 export declare type Method = "GET" | "POST";
@@ -41,7 +42,8 @@ export declare type ModelSchemaObject = {
     [key: string | RootModel]: {
         endpoints?: DefinitionObject;
         types?: DefinitionObject;
-        examples: (EndpointExample | TypeExample)[];
+        typeExamples: TypeExample[];
+        endpointExamples: EndpointExample[];
     };
 };
 //# sourceMappingURL=types.d.ts.map

@@ -17,7 +17,8 @@ export type InterpretableTypes = {
   [key in RootModel | string]: {
     endpoints: Path[];
     types: Path[];
-    examples: Path[];
+    endpointExamples: Path[];
+    typeExamples: Path[];
   };
 };
 
@@ -45,6 +46,7 @@ export type ModelSchemaObject = {
   [key: string | RootModel]: {
     endpoints?: DefinitionObject;
     types?: DefinitionObject;
-    examples: (EndpointExample | TypeExample)[];
+    typeExamples: TypeExample[];
+    endpointExamples: EndpointExample[];
   };
 };

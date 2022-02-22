@@ -1,6 +1,6 @@
 {
   "name": "sensible-core",
-  "version": "1.0.23",
+  "version": "1.0.25",
   "description": "All types and util functions used in any sensible project",
   "main": "build/index.js",
   "source": "src/index.ts",

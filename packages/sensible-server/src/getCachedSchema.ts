@@ -44,8 +44,13 @@ export const getCachedSchema = (
       typeFiles.types,
       compilerOptions
     );
-    const examples: (EndpointExample | TypeExample)[] = importFromFiles({
-      files: typeFiles.examples,
+    const typeExamples: TypeExample[] = importFromFiles({
+      files: typeFiles.typeExamples,
+      guard: isArrayGuard,
+    }).flat();
+
+    const endpointExamples: EndpointExample[] = importFromFiles({
+      files: typeFiles.endpointExamples,
       guard: isArrayGuard,
     }).flat();
 
@@ -65,7 +70,8 @@ export const getCachedSchema = (
     return {
       endpoints,
       types,
-      examples,
+      typeExamples,
+      endpointExamples,
     };
   });
 
