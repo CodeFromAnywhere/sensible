@@ -21,6 +21,24 @@ This will setup the sensible framework with all node modules installed, a few ex
   <img src="./assets/sensible-meme.png" width="300" />
 </p>
 
+## Features
+
+Define endpoints (and other type interfaces) in a central place
+
+![define](./assets/define-gif.gif)
+
+Write your endpoint with complete typesafety
+
+![makeEndpoint](./assets/makeEndpoint-gif.gif)
+
+Call your endpoint with complete type-safety and autocompletion (no boilerplate needed!)
+
+![api](./assets/api-gif.gif)
+
+If you need more help, just look in the auto-generated docs!
+
+![docs](./assets/docs-gif.gif)
+
 ## Future ideas
 
 With sensible, you just need to specify the name of the app, hit enter, and you'll be live within seconds.

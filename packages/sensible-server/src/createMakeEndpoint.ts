@@ -6,6 +6,7 @@ import { ServerEndpoint } from "./types";
 import * as TJS from "typescript-json-schema";
 import Ajv from "ajv";
 import { InterpretableTypes } from "sensible-core";
+import { Context } from "./server.types";
 
 export type Keys<TObject> = Extract<keyof TObject, string>;
 
@@ -46,26 +47,29 @@ const getDefinition = (
     : null;
 };
 
-export const createMakeEndpoint = <TAllEndpoints extends unknown>(
+// ServerEndpoint<
+//   TAllEndpoints[TEndpoint] extends Endpoint
+//     ? TAllEndpoints[TEndpoint]
+//     : never
+export const createMakeEndpoint = <
+  TAllEndpoints extends { [key in Keys<TAllEndpoints>]: Endpoint }
+>(
   interpretableTypes: InterpretableTypes
 ) => {
-  return <TEndpoint extends Keys<TAllEndpoints>>(
+  const makeEndpoint = <TEndpoint extends Keys<TAllEndpoints>>(
     path: TEndpoint,
-    method: TAllEndpoints[TEndpoint] extends Endpoint
-      ? TAllEndpoints[TEndpoint]["method"]
-      : never,
-    endpoint: ServerEndpoint<
-      TAllEndpoints[TEndpoint] extends Endpoint
-        ? TAllEndpoints[TEndpoint]
-        : never
-    >
+    method: TAllEndpoints[TEndpoint]["method"],
+    endpoint: (
+      ctx: Context & {
+        body: TAllEndpoints[TEndpoint]["body"];
+      }
+    ) => Promise<TAllEndpoints[TEndpoint]["response"]>
   ) => {
     const callMethod = method === "GET" ? "get" : "post";
 
     return server.router[callMethod](`/${path}`, async (ctx) => {
-      const body: TAllEndpoints[TEndpoint] extends Endpoint
-        ? TAllEndpoints[TEndpoint]["body"]
-        : never = method === "POST" ? ctx.data : ctx.query;
+      const body: TAllEndpoints[TEndpoint]["body"] =
+        method === "POST" ? ctx.data : ctx.query;
       const extendedCtx = { ...ctx, body };
 
       const schema = getCachedSchema(interpretableTypes);
@@ -116,18 +120,18 @@ export const createMakeEndpoint = <TAllEndpoints extends unknown>(
       //   }
       // }
 
-      let response: any = {
-        success: false,
-        response: "Couldn't update response",
-      };
-      try {
-        response = await endpoint(extendedCtx);
-      } catch (e) {
-        return {
-          response: e,
-          success: false,
-        };
-      }
+      // let response: DefaultResponse = {
+      //   success: false,
+      //   response: "Couldn't update response",
+      // };
+      // try {
+      const response = await endpoint(extendedCtx);
+      // } catch (e) {
+      //   return {
+      //     response: e,
+      //     success: false,
+      //   };
+      // }
       // // response validation
       // if (isUserEndpoint && endpointInterfaceName && schema) {
       //   const responseErrors = typeHasIncorrectInterface(
@@ -150,4 +154,6 @@ export const createMakeEndpoint = <TAllEndpoints extends unknown>(
       return response;
     });
   };
+
+  return makeEndpoint;
 };

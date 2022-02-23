@@ -1,4 +1,4 @@
-import { Context } from "./server";
+import { Context } from "./server.types";
 import { Endpoint } from "sensible-core";
 
 export type WithDataValues<TModel> = TModel & { dataValues: TModel };

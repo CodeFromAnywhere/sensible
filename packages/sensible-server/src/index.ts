@@ -1,4 +1,4 @@
-import { Context } from "./server";
+import { Context } from "./server.types";
 import { makeDefaultEndpoints } from "./defaultEndpoints";
 import { makeDocsEndpoints } from "./makeDocsEndpoints";
 export { Context };
