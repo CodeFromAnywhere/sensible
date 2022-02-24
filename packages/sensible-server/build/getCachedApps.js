@@ -21,7 +21,7 @@ const getAppType = (projectType, folder) => {
         ? "frontend"
         : ["express", "server"].includes(projectType)
             ? "server"
-            : folder.startsWith("sensible-core-")
+            : folder === "core"
                 ? "core"
                 : null;
 };
