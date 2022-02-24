@@ -38,6 +38,10 @@ export const typeHasIncorrectInterface = (
   return !isValid; //always false
 };
 
+interface ExtendedContext<TBody extends object> extends Context {
+  body: TBody;
+}
+
 const getDefinition = (
   definitionOrBooleanOrUndefined: TJS.DefinitionOrBoolean | undefined
 ) => {
@@ -60,9 +64,7 @@ export const createMakeEndpoint = <
     path: TEndpoint,
     method: TAllEndpoints[TEndpoint]["method"],
     endpoint: (
-      ctx: Context & {
-        body: TAllEndpoints[TEndpoint]["body"];
-      }
+      ctx: ExtendedContext<TAllEndpoints[TEndpoint]["body"]>
     ) => Promise<TAllEndpoints[TEndpoint]["response"]>
   ) => {
     const callMethod = method === "GET" ? "get" : "post";
@@ -70,7 +72,10 @@ export const createMakeEndpoint = <
     return server.router[callMethod](`/${path}`, async (ctx) => {
       const body: TAllEndpoints[TEndpoint]["body"] =
         method === "POST" ? ctx.data : ctx.query;
-      const extendedCtx = { ...ctx, body };
+      const extendedCtx: ExtendedContext<TAllEndpoints[TEndpoint]["body"]> = {
+        ...ctx,
+        body,
+      };
 
       const schema = getCachedSchema(interpretableTypes);
       // const { endpointSchemas, endpoints } =

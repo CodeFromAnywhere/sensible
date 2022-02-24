@@ -41,7 +41,10 @@ const createMakeEndpoint = (interpretableTypes) => {
         const callMethod = method === "GET" ? "get" : "post";
         return server_1.default.router[callMethod](`/${path}`, async (ctx) => {
             const body = method === "POST" ? ctx.data : ctx.query;
-            const extendedCtx = { ...ctx, body };
+            const extendedCtx = {
+                ...ctx,
+                body,
+            };
             const schema = (0, getCachedSchema_1.getCachedSchema)(interpretableTypes);
             // const { endpointSchemas, endpoints } =
             //   getCachedEndpointSchemas<TAllEndpoints>(schema);

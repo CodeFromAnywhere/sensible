@@ -6,7 +6,9 @@ import { Context } from "./server.types";
 export declare type Keys<TObject> = Extract<keyof TObject, string>;
 export declare const ajv: Ajv;
 export declare const typeHasIncorrectInterface: (typeName: string, data: any, schema: TJS.Definition) => false | string;
-export declare const createMakeEndpoint: <TAllEndpoints extends { [key in Extract<keyof TAllEndpoints, string>]: Endpoint; }>(interpretableTypes: InterpretableTypes) => <TEndpoint extends Extract<keyof TAllEndpoints, string>>(path: TEndpoint, method: TAllEndpoints[TEndpoint]["method"], endpoint: (ctx: Context & {
-    body: TAllEndpoints[TEndpoint]["body"];
-}) => Promise<TAllEndpoints[TEndpoint]["response"]>) => import("server/typings/common").Middleware;
+interface ExtendedContext<TBody extends object> extends Context {
+    body: TBody;
+}
+export declare const createMakeEndpoint: <TAllEndpoints extends { [key in Extract<keyof TAllEndpoints, string>]: Endpoint; }>(interpretableTypes: InterpretableTypes) => <TEndpoint extends Extract<keyof TAllEndpoints, string>>(path: TEndpoint, method: TAllEndpoints[TEndpoint]["method"], endpoint: (ctx: ExtendedContext<TAllEndpoints[TEndpoint]["body"]>) => Promise<TAllEndpoints[TEndpoint]["response"]>) => import("server/typings/common").Middleware;
+export {};
 //# sourceMappingURL=createMakeEndpoint.d.ts.map
