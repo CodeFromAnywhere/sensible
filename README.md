@@ -2,11 +2,9 @@
 <a href="https://www.sensibleframework.co" target="_blank">
 <img src="./assets/icon.png" width="250" /><br />
 www.sensibleframework.co
-</a>
+</a></p>
 
-<a href="https://www.youtube.com/watch?v=tL1tcWEgQNo">Demo</a>
-
-</p>
+<p align="center"><a href="https://www.youtube.com/watch?v=tL1tcWEgQNo">Demo</a></p>
 
 # The fastest way to build an app
 
