@@ -3,6 +3,23 @@ import { API } from "sensible-core";
 const isValidEntry = ([_, value]: [key: string, value: any]) =>
   value !== undefined && value !== "" && value !== null;
 
+export const bodyFromQueryString = (
+  /**
+   * format: x=x&y=y&z=z
+   */
+  query?: string
+): { [key: string]: string } | undefined => {
+  const kv = query
+    ?.split("&")
+    ?.map((x) => ({ [x.split("=")[0]]: x.split("=")[1] }));
+
+  const all = kv?.reduce((object, current) => {
+    return { ...object, ...current };
+  }, {});
+
+  return all;
+};
+
 export const toQueryString = (query?: any) => {
   const hasQuery =
     query && Object.entries(query)?.filter(isValidEntry).length > 0;
