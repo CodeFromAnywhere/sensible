@@ -1,6 +1,6 @@
 {
   "name": "sensible-ui",
-  "version": "1.0.16",
+  "version": "1.0.17",
   "description": "Sensible UI contains all utility functions and stuff to setup a Sensible project",
   "main": "build/index.js",
   "source": "src/index.ts",
@@ -13,5 +13,8 @@
   "license": "ISC",
   "dependencies": {
     "sensible-core": "^1.0.7"
+  },
+  "devDependencies": {
+    "typescript": "^4.5.5"
   }
 }
