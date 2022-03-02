@@ -1,14 +1,17 @@
-import { DefaultResponse, Endpoint } from "sensible-core";
+import { Endpoint, Path } from "sensible-core";
 import server from "server";
 import { getCachedSchema } from "./getCachedSchema";
-import { getCachedEndpointSchemas } from "./getCachedEndpointSchemas";
-import { ServerEndpoint } from "./types";
 import * as TJS from "typescript-json-schema";
 import Ajv from "ajv";
 import { InterpretableTypes } from "sensible-core";
-import { Context } from "./server.types";
-
-export type Keys<TObject> = Extract<keyof TObject, string>;
+import { Middleware } from "server/typings/common";
+import {
+  CreateMakeEndpointType,
+  EndpointFunctionType,
+  ExtendedContext,
+  Keys,
+  MakeEndpointType,
+} from ".";
 
 export const ajv = new Ajv({
   allErrors: true,
@@ -38,38 +41,22 @@ export const typeHasIncorrectInterface = (
   return !isValid; //always false
 };
 
-interface ExtendedContext<TBody extends object> extends Context {
-  body: TBody;
-}
-
-const getDefinition = (
-  definitionOrBooleanOrUndefined: TJS.DefinitionOrBoolean | undefined
-) => {
-  const type = typeof definitionOrBooleanOrUndefined;
-  return typeof definitionOrBooleanOrUndefined === "object"
-    ? definitionOrBooleanOrUndefined
-    : null;
-};
-
-// ServerEndpoint<
-//   TAllEndpoints[TEndpoint] extends Endpoint
-//     ? TAllEndpoints[TEndpoint]
-//     : never
-export const createMakeEndpoint = <
+export const createMakeEndpoint: CreateMakeEndpointType = <
   TAllEndpoints extends { [key in Keys<TAllEndpoints>]: Endpoint }
 >(
-  interpretableTypes: InterpretableTypes
+  interpretableTypes: InterpretableTypes,
+  schemasFolderPath: Path
 ) => {
-  const makeEndpoint = <TEndpoint extends Keys<TAllEndpoints>>(
+  const makeEndpoint: MakeEndpointType<TAllEndpoints> = <
+    TEndpoint extends Keys<TAllEndpoints>
+  >(
     path: TEndpoint,
     method: TAllEndpoints[TEndpoint]["method"],
-    endpoint: (
-      ctx: ExtendedContext<TAllEndpoints[TEndpoint]["body"]>
-    ) => Promise<TAllEndpoints[TEndpoint]["response"]>
-  ) => {
+    endpoint: EndpointFunctionType<TEndpoint, TAllEndpoints>
+  ): Middleware => {
     const callMethod = method === "GET" ? "get" : "post";
 
-    return server.router[callMethod](`/${path}`, async (ctx) => {
+    const middleware = server.router[callMethod](`/${path}`, async (ctx) => {
       const body: TAllEndpoints[TEndpoint]["body"] =
         method === "POST" ? ctx.data : ctx.query;
       const extendedCtx: ExtendedContext<TAllEndpoints[TEndpoint]["body"]> = {
@@ -77,7 +64,7 @@ export const createMakeEndpoint = <
         body,
       };
 
-      const schema = getCachedSchema(interpretableTypes);
+      const schema = getCachedSchema(interpretableTypes, schemasFolderPath);
       // const { endpointSchemas, endpoints } =
       //   getCachedEndpointSchemas<TAllEndpoints>(schema);
 
@@ -96,7 +83,7 @@ export const createMakeEndpoint = <
       //   if (!bodySchema || !responseSchema) {
       //     return {
       //       success: false,
-      //       response: "Couldn't find bodySchema or repsonseSchema",
+      //       response: "Couldn't find bodySchema or responseSchema",
       //     };
       //   }
 
@@ -158,6 +145,8 @@ export const createMakeEndpoint = <
 
       return response;
     });
+
+    return middleware;
   };
 
   return makeEndpoint;

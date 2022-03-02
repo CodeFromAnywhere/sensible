@@ -2,13 +2,8 @@ import React from "react";
 import Menu, { Section } from "./Menu";
 import Search from "../Search";
 import { useDocsQuery } from "../../hooks/useDocsQuery";
-import {
-  getDefinition,
-  getDocs,
-  getFirstEnum,
-  isEndpoint,
-  notEmpty,
-} from "../../util";
+import { getDocs, getFirstEnum, isEndpoint, notEmpty } from "../../util";
+import { getDefinition } from "sensible-core";
 
 const SideBar = () => {
   const docs = useDocsQuery();

@@ -1,6 +1,6 @@
 import * as TJS from "typescript-json-schema";
 import TypeDefinition from "./components/TypeDefinition";
-
+import { DocsEndpoint, getDefinition } from "sensible-core";
 export type Method = "GET" | "POST";
 
 export type EndpointExample = {
@@ -90,14 +90,6 @@ export const isDocs = (docs: any): docs is Docs => {
 
 export const getDocs = (docsQuery: any): Docs | null => {
   return isDocs(docsQuery?.data) ? docsQuery.data : null;
-};
-
-export const getDefinition = (
-  definitionOrBooleanOrUndefined: TJS.DefinitionOrBoolean | undefined
-) => {
-  return typeof definitionOrBooleanOrUndefined === "object"
-    ? definitionOrBooleanOrUndefined
-    : null;
 };
 
 type ArrayType = {

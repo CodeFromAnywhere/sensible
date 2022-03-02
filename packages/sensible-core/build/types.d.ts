@@ -85,18 +85,17 @@ export declare type ModelSchemaObject = {
         endpointExamples: EndpointExample[];
     };
 };
+export declare type DocResponse = {
+    response?: string;
+    constants?: PublicConstantsType;
+    apps?: App[];
+    md?: Md[];
+    success: boolean;
+};
 export interface DocsEndpoint extends Endpoint {
     method: "GET";
     body: {};
-    response: {
-        response: string;
-        success: false;
-    } | {
-        constants: PublicConstantsType;
-        apps: App[];
-        md: Md[];
-        success: true;
-    };
+    response: DocResponse;
 }
 export interface Cron {
     interval: string;

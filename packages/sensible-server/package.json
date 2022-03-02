@@ -1,6 +1,6 @@
 {
   "name": "sensible-server",
-  "version": "1.0.64",
+  "version": "1.0.72",
   "description": "Sensible Server Stuff",
   "main": "build/index.js",
   "source": "src/index.ts",
@@ -15,7 +15,7 @@
     "ajv": "^8.10.0",
     "gray-matter": "^4.0.3",
     "reflect-metadata": "^0.1.13",
-    "sensible-core": "^1.0.29",
+    "sensible-core": "^1.0.41",
     "sensible-docs": "^0.0.3",
     "sequelize": "^6.16.1",
     "sequelize-typescript": "^2.1.3",

@@ -34,7 +34,7 @@
     "react-with-native-text-input": "^1.0.39",
     "react-with-native-textarea-input": "^1.1.10",
     "react-with-native-toggle-input": "^1.0.39",
-    "sensible-core": "^1.0.27",
+    "sensible-core": "^1.0.40",
     "typescript-json-schema": "^0.53.0"
   },
   "devDependencies": {

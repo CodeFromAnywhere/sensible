@@ -1,13 +1,5 @@
 import * as TJS from "typescript-json-schema";
-import { objectMap, ModelSchemaObject } from "sensible-core";
-const getDefinition = (
-  definitionOrBooleanOrUndefined: TJS.DefinitionOrBoolean | undefined
-) => {
-  const type = typeof definitionOrBooleanOrUndefined;
-  return typeof definitionOrBooleanOrUndefined === "object"
-    ? definitionOrBooleanOrUndefined
-    : null;
-};
+import { objectMap, ModelSchemaObject, getDefinition } from "sensible-core";
 
 const isDefinition = (
   maybeDefinition: TJS.DefinitionOrBoolean | undefined

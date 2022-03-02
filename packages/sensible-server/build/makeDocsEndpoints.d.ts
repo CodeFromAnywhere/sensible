@@ -1,4 +1,5 @@
-import { InterpretableTypes, Path } from "sensible-core";
+import { Endpoint, InterpretableTypes, Path } from "sensible-core";
 import { PublicConstantsType } from "sensible-core";
-export declare const makeDocsEndpoints: (makeEndpoint: any, basePath: Path, appPaths: Path[], interpretableTypes: InterpretableTypes, constants: PublicConstantsType) => any[];
+import { MakeEndpointType } from ".";
+export declare const makeDocsEndpoints: <TAllDefaultEndpoints extends { [key in Extract<keyof TAllDefaultEndpoints, string>]: Endpoint; }>(makeEndpoint: MakeEndpointType<TAllDefaultEndpoints>, basePath: Path, appPaths: Path[], interpretableTypes: InterpretableTypes, constants: PublicConstantsType, schemasFolderPath: Path) => import("server/typings/common").Middleware[];
 //# sourceMappingURL=makeDocsEndpoints.d.ts.map

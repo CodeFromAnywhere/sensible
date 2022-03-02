@@ -1,9 +1,14 @@
 export declare function onlyUnique<T extends unknown>(value: T, index: number, self: T[]): boolean;
+/** general purpose function that maps over an array and only returns it as part of the mapped array if the result is truthy */
+export declare const mapOrRemove: <T extends unknown, U extends unknown>(array: T[], mapFn: (item: T) => U | null) => U[];
 export declare function objectMap<T extends {
     [key: string]: T[string];
-}, U extends unknown>(object: T, mapFn: (value: T[string], key?: string) => U): {
+}, U extends unknown>(object: T, mapFn: (value: T[string], key: string) => U): {
     [key: string]: U;
 };
+/**
+ * Removes empty values (null or undefined) from your arrays in a type-safe way
+ */
 export declare function notEmpty<TValue>(value: TValue | null | undefined): value is TValue;
 export declare function uuid(): string;
 /**
@@ -15,7 +20,10 @@ export declare function uuid(): string;
  * (value of enummm: { a: "a", b: "b", c: "c" })
  */
 export declare const createEnum: <T extends readonly string[]>(array: T) => { [K in T[number]]: K; };
-export declare function earthDistance(lat1: number, long1: number, lat2: number, long2: number, response?: string): number;
+/**
+ * returns the distance between two places (not very precise but it's very efficient)
+ */
+export declare function earthDistance(lat1: number, long1: number, lat2: number, long2: number, response?: "m" | "km"): number;
 export declare function slugify(string: string): string;
 export declare const mergeObjectsArray: (objectsArray: object[]) => {
     [key: string]: any;

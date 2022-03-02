@@ -11,11 +11,23 @@ var __assign = (this && this.__assign) || function () {
     return __assign.apply(this, arguments);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.shuffleArray = exports.generatePassword = exports.makeArrayString = exports.isEmail = exports.mergeObjectsArray = exports.slugify = exports.earthDistance = exports.createEnum = exports.uuid = exports.notEmpty = exports.objectMap = exports.onlyUnique = void 0;
+exports.shuffleArray = exports.generatePassword = exports.makeArrayString = exports.isEmail = exports.mergeObjectsArray = exports.slugify = exports.earthDistance = exports.createEnum = exports.uuid = exports.notEmpty = exports.objectMap = exports.mapOrRemove = exports.onlyUnique = void 0;
 function onlyUnique(value, index, self) {
     return self.findIndex(function (_, i) { return i === index; }) === index;
 }
 exports.onlyUnique = onlyUnique;
+/** general purpose function that maps over an array and only returns it as part of the mapped array if the result is truthy */
+var mapOrRemove = function (array, mapFn) {
+    var initialReturnArray = [];
+    return array.reduce(function (all, item) {
+        var mappedItem = mapFn(item);
+        if (mappedItem) {
+            all.push(mappedItem);
+        }
+        return all;
+    }, initialReturnArray);
+};
+exports.mapOrRemove = mapOrRemove;
 function objectMap(object, mapFn) {
     return Object.keys(object).reduce(function (result, key) {
         result[key] = mapFn(object[key], key);
@@ -23,6 +35,9 @@ function objectMap(object, mapFn) {
     }, {});
 }
 exports.objectMap = objectMap;
+/**
+ * Removes empty values (null or undefined) from your arrays in a type-safe way
+ */
 function notEmpty(value) {
     return value !== null && value !== undefined;
 }
@@ -49,6 +64,9 @@ var createEnum = function (array) {
     }, {});
 };
 exports.createEnum = createEnum;
+/**
+ * returns the distance between two places (not very precise but it's very efficient)
+ */
 function earthDistance(lat1, long1, lat2, long2, response) {
     var m = Math.PI / 180;
     lat1 = lat1 * m;
@@ -59,7 +77,7 @@ function earthDistance(lat1, long1, lat2, long2, response) {
     var x = (long2 - long1) * Math.cos((lat1 + lat2) / 2);
     var y = lat2 - lat1;
     var d = Math.sqrt(x * x + y * y) * R;
-    return response === "m" ? Math.round(d / 10) * 10 : Math.round(d / 1000); //in kilometers!
+    return response === "m" ? Math.round(d / 10) * 10 : Math.round(d / 1000);
 }
 exports.earthDistance = earthDistance;
 function slugify(string) {

@@ -3420,10 +3420,12 @@ semver@^7.3.5:
   dependencies:
     lru-cache "^6.0.0"
 
-sensible-core@^1.0.27:
-  version "1.0.27"
-  resolved "https://registry.yarnpkg.com/sensible-core/-/sensible-core-1.0.27.tgz#922970e6eb0e3fb714df4be3088bf9d9c903e2c0"
-  integrity sha512-v9Cge83PxgJSCcmAcqoWxpATEae0rBpAYgKBzb6eWg+B+sjM33VRfL8t4lqcWzEajlehP6ld0Zkr5SS0AO8Q+Q==
+sensible-core@^1.0.40:
+  version "1.0.40"
+  resolved "https://registry.yarnpkg.com/sensible-core/-/sensible-core-1.0.40.tgz#1f8afce73b49df13914b0ed4e34a4a9013806382"
+  integrity sha512-B0A11TVYVU/W2P3Y3PpuYoUUa91giEELugnx9yfNsvTCKV5MEEAokqJsLZkFp9SI6ffoo3ECloHgIA7jjLJYlg==
+  dependencies:
+    typescript-json-schema "^0.53.0"
 
 shebang-command@^2.0.0:
   version "2.0.0"

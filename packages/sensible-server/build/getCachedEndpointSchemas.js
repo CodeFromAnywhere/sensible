@@ -2,12 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getCachedEndpointSchemas = void 0;
 const sensible_core_1 = require("sensible-core");
-const getDefinition = (definitionOrBooleanOrUndefined) => {
-    const type = typeof definitionOrBooleanOrUndefined;
-    return typeof definitionOrBooleanOrUndefined === "object"
-        ? definitionOrBooleanOrUndefined
-        : null;
-};
 const isDefinition = (maybeDefinition) => {
     return typeof maybeDefinition === "object";
 };
@@ -20,7 +14,7 @@ const getCachedEndpointSchemas = (schema) => {
     const firstKey = Object.keys(schema)[0];
     const firstModel = schema[firstKey];
     const firstModelEndpoints = firstModel.endpoints;
-    const AllEndpointsSchema = getDefinition(firstModelEndpoints?.AllEndpoints);
+    const AllEndpointsSchema = (0, sensible_core_1.getDefinition)(firstModelEndpoints?.AllEndpoints);
     if (!AllEndpointsSchema || !AllEndpointsSchema.properties) {
         throw new Error("Couldn't find AllEndpoints interface");
     }
@@ -31,7 +25,7 @@ const getCachedEndpointSchemas = (schema) => {
     });
     const endpointSchemas = (0, sensible_core_1.objectMap)(endpoints, (interfaceName) => {
         if (interfaceName) {
-            return getDefinition(firstModelEndpoints?.definitions?.[interfaceName]);
+            return (0, sensible_core_1.getDefinition)(firstModelEndpoints?.definitions?.[interfaceName]);
         }
     });
     const response = { endpointSchemas, endpoints };

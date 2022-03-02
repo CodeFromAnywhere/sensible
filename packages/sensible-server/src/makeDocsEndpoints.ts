@@ -1,17 +1,27 @@
-import { App, DocsEndpoint, InterpretableTypes, Path } from "sensible-core";
+import {
+  App,
+  DocResponse,
+  DocsEndpoint,
+  Endpoint,
+  InterpretableTypes,
+  Path,
+} from "sensible-core";
 
 import { ServerEndpoint } from "./types";
 import { getCachedApps } from "./getCachedApps";
 import { Link, PublicConstantsType } from "sensible-core";
 import { findAllMd } from "./util/findAllMd";
+import { Keys, MakeEndpointType } from ".";
 
-export const makeDocsEndpoints = (
-  //TODO: type this
-  makeEndpoint: any,
+export const makeDocsEndpoints = <
+  TAllDefaultEndpoints extends { [key in Keys<TAllDefaultEndpoints>]: Endpoint }
+>(
+  makeEndpoint: MakeEndpointType<TAllDefaultEndpoints>,
   basePath: Path,
   appPaths: Path[],
   interpretableTypes: InterpretableTypes,
-  constants: PublicConstantsType
+  constants: PublicConstantsType,
+  schemasFolderPath: Path
 ) => {
   const docsEndpoint: ServerEndpoint<DocsEndpoint> = async (ctx) => {
     ctx.res.header("Access-Control-Allow-Origin", "*");
@@ -19,7 +29,7 @@ export const makeDocsEndpoints = (
 
     let apps: App[] = [];
     try {
-      apps = getCachedApps(appPaths, interpretableTypes);
+      apps = getCachedApps(appPaths, interpretableTypes, schemasFolderPath);
     } catch (e) {
       console.warn(e);
       return { success: false, response: "Couldn't get apps" };
@@ -63,22 +73,31 @@ export const makeDocsEndpoints = (
 
     const md = findAllMd(basePath, true);
 
-    return {
+    const response: DocResponse = {
       success: true,
       constants: extendedConstants,
       apps,
       md,
     };
+    return response;
   };
 
   return [
-    makeEndpoint("sensible/docs", "GET", docsEndpoint),
+    makeEndpoint(
+      "sensible/docs" as Keys<TAllDefaultEndpoints>,
+      "GET",
+      docsEndpoint
+    ),
 
-    makeEndpoint("sensible/recent", "GET", async (ctx) => {
-      ctx.res.header("Access-Control-Allow-Origin", "*");
-      ctx.res.header("Access-Control-Allow-Headers", "X-Requested-With");
+    makeEndpoint(
+      "sensible/recent" as Keys<TAllDefaultEndpoints>,
+      "GET",
+      async (ctx) => {
+        ctx.res.header("Access-Control-Allow-Origin", "*");
+        ctx.res.header("Access-Control-Allow-Headers", "X-Requested-With");
 
-      return { success: false, response: "Not implemented yet", recent: [] };
-    }),
+        return { success: false, response: "Not implemented yet", recent: [] };
+      }
+    ),
   ];
 };

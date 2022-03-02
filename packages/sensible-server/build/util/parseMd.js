@@ -6,6 +6,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.parseMd = void 0;
 const fs_1 = __importDefault(require("fs"));
 const gray_matter_1 = __importDefault(require("gray-matter"));
+/**
+ * parse a md file to all the needed info
+ * @param mdFilePath path to a md file
+ * @returns Md
+ */
 const parseMd = (mdFilePath) => {
     const fileContents = fs_1.default.readFileSync(mdFilePath, "utf8");
     const fileStats = fs_1.default.statSync(mdFilePath);

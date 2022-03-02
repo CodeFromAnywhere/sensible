@@ -6,12 +6,28 @@ export function onlyUnique<T extends unknown>(
   return self.findIndex((_, i) => i === index) === index;
 }
 
+/** general purpose function that maps over an array and only returns it as part of the mapped array if the result is truthy */
+export const mapOrRemove = <T extends unknown, U extends unknown>(
+  array: T[],
+  mapFn: (item: T) => U | null
+): U[] => {
+  const initialReturnArray: any[] = [];
+
+  return array.reduce((all, item) => {
+    const mappedItem = mapFn(item);
+    if (mappedItem) {
+      all.push(mappedItem);
+    }
+    return all;
+  }, initialReturnArray);
+};
+
 export function objectMap<
   T extends { [key: string]: T[string] },
   U extends unknown
 >(
   object: T,
-  mapFn: (value: T[string], key?: string) => U
+  mapFn: (value: T[string], key: string) => U
 ): { [key: string]: U } {
   return Object.keys(object).reduce(function (result, key) {
     result[key] = mapFn(object[key], key);
@@ -19,6 +35,9 @@ export function objectMap<
   }, {} as any);
 }
 
+/**
+ * Removes empty values (null or undefined) from your arrays in a type-safe way
+ */
 export function notEmpty<TValue>(
   value: TValue | null | undefined
 ): value is TValue {
@@ -48,12 +67,15 @@ export const createEnum = <T extends readonly string[]>(
     return { ...previous, [current]: current };
   }, {} as any);
 
+/**
+ * returns the distance between two places (not very precise but it's very efficient)
+ */
 export function earthDistance(
   lat1: number,
   long1: number,
   lat2: number,
   long2: number,
-  response?: string
+  response?: "m" | "km"
 ) {
   const m = Math.PI / 180;
 
@@ -69,7 +91,7 @@ export function earthDistance(
 
   var d = Math.sqrt(x * x + y * y) * R;
 
-  return response === "m" ? Math.round(d / 10) * 10 : Math.round(d / 1000); //in kilometers!
+  return response === "m" ? Math.round(d / 10) * 10 : Math.round(d / 1000);
 }
 
 export function slugify(string: string) {

@@ -26,26 +26,16 @@ const typeHasIncorrectInterface = (typeName, data, schema) => {
     return !isValid; //always false
 };
 exports.typeHasIncorrectInterface = typeHasIncorrectInterface;
-const getDefinition = (definitionOrBooleanOrUndefined) => {
-    const type = typeof definitionOrBooleanOrUndefined;
-    return typeof definitionOrBooleanOrUndefined === "object"
-        ? definitionOrBooleanOrUndefined
-        : null;
-};
-// ServerEndpoint<
-//   TAllEndpoints[TEndpoint] extends Endpoint
-//     ? TAllEndpoints[TEndpoint]
-//     : never
-const createMakeEndpoint = (interpretableTypes) => {
+const createMakeEndpoint = (interpretableTypes, schemasFolderPath) => {
     const makeEndpoint = (path, method, endpoint) => {
         const callMethod = method === "GET" ? "get" : "post";
-        return server_1.default.router[callMethod](`/${path}`, async (ctx) => {
+        const middleware = server_1.default.router[callMethod](`/${path}`, async (ctx) => {
             const body = method === "POST" ? ctx.data : ctx.query;
             const extendedCtx = {
                 ...ctx,
                 body,
             };
-            const schema = (0, getCachedSchema_1.getCachedSchema)(interpretableTypes);
+            const schema = (0, getCachedSchema_1.getCachedSchema)(interpretableTypes, schemasFolderPath);
             // const { endpointSchemas, endpoints } =
             //   getCachedEndpointSchemas<TAllEndpoints>(schema);
             // const endpointInterfaceName: string | undefined = endpoints[path];
@@ -60,7 +50,7 @@ const createMakeEndpoint = (interpretableTypes) => {
             //   if (!bodySchema || !responseSchema) {
             //     return {
             //       success: false,
-            //       response: "Couldn't find bodySchema or repsonseSchema",
+            //       response: "Couldn't find bodySchema or responseSchema",
             //     };
             //   }
             //   // console.dir(
@@ -117,6 +107,7 @@ const createMakeEndpoint = (interpretableTypes) => {
             // }
             return response;
         });
+        return middleware;
     };
     return makeEndpoint;
 };

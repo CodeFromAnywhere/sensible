@@ -26,27 +26,27 @@ Add this package.json in your project root directory
     },
     "packageManager": "pnpm@6.32.1"
   }
- ``` 
+```
 
- Create a turbo.json with this in your project root directory:
+Create a turbo.json with this in your project root directory:
 
- ```
- {
-  "pipeline": {
-    "build": {
-      "dependsOn": ["^build"],
-      "outputs": ["dist/**", ".next/**"]
-    },
-    "lint": {
-      "outputs": []
-    },
-    "dev": {
-      "cache": false
-    }
-  }
+```
+{
+ "pipeline": {
+   "build": {
+     "dependsOn": ["^build"],
+     "outputs": ["dist/**", ".next/**"]
+   },
+   "lint": {
+     "outputs": []
+   },
+   "dev": {
+     "cache": false
+   }
+ }
 }
 ```
 
 Add the following dependencies to your apps and packages, where needed: core, ui
 And the following to devDependencies: config, tsconfig
-With version "*"
+With version `"workspace:*"`

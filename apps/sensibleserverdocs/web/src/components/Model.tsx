@@ -2,7 +2,6 @@ import useStore from "../store";
 import {
   DefinitionObject,
   EndpointExample,
-  getDefinition,
   isEndpoint,
   TypeExample,
 } from "../util";
@@ -11,6 +10,7 @@ import TypeDefinitionContainer from "./TypeDefinitionContainer";
 import { Svg } from "react-with-native";
 import BsChevronUpIcon from "../../public/BsChevronUp.svg";
 import { useSiteParams } from "../hooks/useSiteParams";
+import { getDefinition } from "sensible-core";
 
 type SectionKey = "endpoints" | "types";
 const Model = ({

@@ -3,15 +3,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.makeDocsEndpoints = void 0;
 const getCachedApps_1 = require("./getCachedApps");
 const findAllMd_1 = require("./util/findAllMd");
-const makeDocsEndpoints = (
-//TODO: type this
-makeEndpoint, basePath, appPaths, interpretableTypes, constants) => {
+const makeDocsEndpoints = (makeEndpoint, basePath, appPaths, interpretableTypes, constants, schemasFolderPath) => {
     const docsEndpoint = async (ctx) => {
         ctx.res.header("Access-Control-Allow-Origin", "*");
         ctx.res.header("Access-Control-Allow-Headers", "X-Requested-With");
         let apps = [];
         try {
-            apps = (0, getCachedApps_1.getCachedApps)(appPaths, interpretableTypes);
+            apps = (0, getCachedApps_1.getCachedApps)(appPaths, interpretableTypes, schemasFolderPath);
         }
         catch (e) {
             console.warn(e);
@@ -50,12 +48,13 @@ makeEndpoint, basePath, appPaths, interpretableTypes, constants) => {
             links: (constants.links || []).concat(githubLinks),
         };
         const md = (0, findAllMd_1.findAllMd)(basePath, true);
-        return {
+        const response = {
             success: true,
             constants: extendedConstants,
             apps,
             md,
         };
+        return response;
     };
     return [
         makeEndpoint("sensible/docs", "GET", docsEndpoint),

@@ -4,7 +4,7 @@ import {
   InterpretableTypes,
   Path,
 } from "sensible-core";
-
+import path from "path";
 import server from "server";
 import { redirect } from "server/reply";
 import { PublicConstantsType } from "sensible-core";
@@ -20,8 +20,11 @@ export const makeDefaultEndpoints = (
   interpretableTypes: InterpretableTypes,
   constants: PublicConstantsType
 ) => {
+  const schemasFolderPath: Path = path.join(basePath, "..", "schemas");
+
   const makeEndpoint = createMakeEndpoint<AllDefaultEndpoints>(
-    interpretableTypes //.concat(defaultEndpointsTypeFiles)
+    interpretableTypes, //.concat(defaultEndpointsTypeFiles)
+    schemasFolderPath
   );
 
   // for now we only have doc-endpoints. Don't know what needs to be there more actually, but let's see.
@@ -30,7 +33,8 @@ export const makeDefaultEndpoints = (
     basePath,
     appPaths,
     interpretableTypes,
-    constants
+    constants,
+    schemasFolderPath
   ).concat([
     //redirect anything that doesn't work to the docs
     get("*", (ctx) => {

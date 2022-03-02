@@ -2,6 +2,11 @@ import { Md, Path } from "sensible-core";
 import fs from "fs";
 import matter from "gray-matter";
 
+/**
+ * parse a md file to all the needed info
+ * @param mdFilePath path to a md file
+ * @returns Md
+ */
 export const parseMd = (mdFilePath: Path): Md => {
   const fileContents = fs.readFileSync(mdFilePath, "utf8");
   const fileStats = fs.statSync(mdFilePath);

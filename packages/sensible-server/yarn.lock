@@ -1580,10 +1580,10 @@ send@0.17.2:
     range-parser "~1.2.1"
     statuses "~1.5.0"
 
-sensible-core@^1.0.29:
-  version "1.0.29"
-  resolved "https://registry.yarnpkg.com/sensible-core/-/sensible-core-1.0.29.tgz#8d722a5676a11c0730e7a9dfff578b147502ef9d"
-  integrity sha512-EuRQo+zTLaqcwjcGZhszffXgDnwpQk9oZ3V7r9+Lw0nbDL+CVGFDY0nQkVJDBcfigZ1AqTRvtJaHcZSG3NLV0A==
+sensible-core@^1.0.41:
+  version "1.0.41"
+  resolved "https://registry.yarnpkg.com/sensible-core/-/sensible-core-1.0.41.tgz#dddb03cae73d9543f837926dc45bdb3a7f3ab205"
+  integrity sha512-a1bdUQxFTwjgpdgdZBpF0tRc1rkLB9Oic2o0Y0enjWrpLB/uE84qqJuJxTiMdc3pi/zYrNOxvQs3EahL5QbJcA==
   dependencies:
     typescript-json-schema "^0.53.0"
 
@@ -1591,21 +1591,6 @@ sensible-docs@^0.0.3:
   version "0.0.3"
   resolved "https://registry.yarnpkg.com/sensible-docs/-/sensible-docs-0.0.3.tgz#0d4e097be258eb5c9bb80c2d0d6533e7a0da0366"
   integrity sha512-zknV6b3dzKIRGs/GmbxjSCxGYtKwFMjoTX2UftcI2m7xqhSAS2Ov+fs+aebJFxfpcLADNiO+lvm2qKnRGltIpg==
-
-sensible-server@^1.0.55:
-  version "1.0.55"
-  resolved "https://registry.yarnpkg.com/sensible-server/-/sensible-server-1.0.55.tgz#25f3d283188efa18dfa03865141d587732791e58"
-  integrity sha512-mNlYonzCmQT/uS3e+r332xv7GNXA2s3RoxwVc6UwM0dOpc0UwMeS+xsadMdaXJKPRmhDGIS4VjLM1ESdLsv1aQ==
-  dependencies:
-    ajv "^8.10.0"
-    gray-matter "^4.0.3"
-    reflect-metadata "^0.1.13"
-    sensible-core "^1.0.29"
-    sensible-docs "^0.0.3"
-    sequelize "^6.16.1"
-    sequelize-typescript "^2.1.3"
-    server "^1.0.37"
-    typescript-json-schema "^0.53.0"
 
 sequelize-pool@^7.1.0:
   version "7.1.0"
