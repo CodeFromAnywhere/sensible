@@ -78,7 +78,7 @@ export const generateOrRequireSchema = (
 
     const schemaString = JSON.stringify(schema);
     fs.writeFile(schemaFilePath, schemaString, () => {
-      console.log("written the file", schemaFilePath);
+      //console.log("written the file", schemaFilePath);
     });
 
     return schema;

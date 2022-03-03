@@ -1,6 +1,6 @@
 {
   "name": "sensible-server",
-  "version": "1.0.72",
+  "version": "1.0.73",
   "description": "Sensible Server Stuff",
   "main": "build/index.js",
   "source": "src/index.ts",

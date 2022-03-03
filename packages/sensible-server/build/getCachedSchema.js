@@ -79,7 +79,7 @@ const generateOrRequireSchema = (
         }
         const schemaString = JSON.stringify(schema);
         fs_1.default.writeFile(schemaFilePath, schemaString, () => {
-            console.log("written the file", schemaFilePath);
+            //console.log("written the file", schemaFilePath);
         });
         return schema;
     }
