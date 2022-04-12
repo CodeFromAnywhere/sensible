@@ -8,7 +8,7 @@ import { execSync } from "child_process";
 import colors from "colors";
 let LATEST_EVENT_INFO;
 const COMMANDS = [
-    { key: "^c", info: "Quit" },
+    { key: "^c", info: "Quitoooo" },
     { key: "f", info: "Show files that have been found" },
     { key: "l", info: "List and copy the watchlist and linklist" },
     { key: "i", info: "Get information" },
@@ -102,7 +102,10 @@ export const getSrcDestsPairs = (argv, status) => {
     status.render();
     //step 4: get all dependencies of all packages
     const depList = packages.reduce(getDependenciesList, []);
+    const pathy = path.join(process.cwd(), "deps.json");
     const allDependencies = unique(depList, String);
+    console.log("woww deplist", allDependencies.length, pathy);
+    fs.writeFileSync(pathy, JSON.stringify(allDependencies));
     //step 5: search for packages that are included in all dependencies and only keep their highest version
     const dependencyPackages = packages.filter((p) => p.name && allDependencies.includes(p.name));
     if (debug) {

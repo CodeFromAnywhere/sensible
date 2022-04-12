@@ -1,5 +1,8 @@
 # Converting to Sensible Monorepo
 
+Put the apps (app, web, server, etc.) in the "apps" folder.
+Also create a packages folder in which you create a core folder and ui folder.
+
 Add this package.json in your project root directory
 
 ```{
@@ -49,4 +52,4 @@ Create a turbo.json with this in your project root directory:
 
 Add the following dependencies to your apps and packages, where needed: core, ui
 And the following to devDependencies: config, tsconfig
-With version `"workspace:*"`
+With version `"*"`
