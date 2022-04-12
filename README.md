@@ -1,6 +1,6 @@
 <p align="center">
 <a href="https://www.sensibleframework.co" target="_blank">
-<img src="./assets/icon.png" width="250" /><br />
+<img src="./assets/icon2.png" width="250" /><br />
 www.sensibleframework.co
 </a></p>
 
@@ -19,26 +19,26 @@ Curious? Just run `yarn create sensible-app APPNAME` and see the magic, or [chec
 This will setup the sensible framework with all node modules installed, a few example models/endpoints and plugable integration. It will also open up VSCode in the correct folder, running the expo packager, next.js site, server, and papapackage, so you can start coding.
 
 <p align="center">
-  <img src="./assets/sensible-meme.png" width="300" />
+  <img src="./assets/sensible-meme2.png" width="300" />
 </p>
 
 ## Features
 
 Define endpoints (and other type interfaces) in a central place
 
-![define](./assets/define-gif.gif)
+![define](./assets/define-gif2.gif)
 
 Write your endpoint with complete typesafety
 
-![makeEndpoint](./assets/makeEndpoint-gif.gif)
+![makeEndpoint](./assets/makeEndpoint-gif2.gif)
 
 Call your endpoint with complete type-safety and autocompletion (no boilerplate needed!)
 
-![api](./assets/api-gif.gif)
+![api](./assets/api-gif2.gif)
 
 If you need more help, just look in the auto-generated docs!
 
-![docs](./assets/docs-gif.gif)
+![docs](./assets/docs-gif2.gif)
 
 ## Future ideas
 
