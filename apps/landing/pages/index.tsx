@@ -20,30 +20,16 @@ const Home: NextPage = () => {
           The <b>Typescript</b> Framework For <b>Effective</b> Teams
         </h1>
 
-        <p className={styles.description}>
-          We&apos;re not going to explain Sensible, we&apos;re still too busy
-          developing it. Join us, and make a PR!
-        </p>
+        <p className={styles.description}>yarn create sensible-app</p>
 
-        <div className={styles.grid}>
-          <a
-            href="https://github.com/Code-From-Anywhere/sensible"
-            className={styles.card}
-          >
-            <h2>GitHub &rarr;</h2>
-            <p>Find Documentation, guides, and the code here...</p>
-          </a>
-
-          <a
-            href="https://github.com/Code-From-Anywhere/sensible/tree/main/docs/examples.md"
-            className={styles.card}
-          >
-            <h2>Examples &rarr;</h2>
-            <p>
-              Discover other projects using Sensible and see what it looks like.
-            </p>
-          </a>
-        </div>
+        <a href="https://github.com/Code-From-Anywhere/sensible">
+          <Image
+            src={"/github.png"}
+            width={150}
+            height={150}
+            alt="Go to GitHub"
+          />
+        </a>
       </main>
 
       <footer className={styles.footer}>

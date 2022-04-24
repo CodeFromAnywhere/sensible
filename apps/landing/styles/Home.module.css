@@ -55,6 +55,19 @@
     font-size: 4rem;
   }
 }
+
+@media only screen and (max-width: 600px) {
+  .title {
+    font-size: 2rem;
+  }
+}
+
+@media only screen and (min-width: 1024px) {
+  .title {
+    max-width: 70%;
+  }
+}
+
 .title,
 .description {
   text-align: center;
@@ -64,6 +77,7 @@
   margin: 4rem 0;
   line-height: 1.5;
   font-size: 1.5rem;
+  font-style: italic;
 }
 
 .code {
