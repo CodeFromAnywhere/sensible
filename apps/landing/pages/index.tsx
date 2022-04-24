@@ -21,8 +21,8 @@ const Home: NextPage = () => {
         </h1>
 
         <p className={styles.description}>
-          We're not going to explain Sensible, we're still too busy developing
-          it. Join us, and make a PR!
+          We&apos;re not going to explain Sensible, we&apos;re still too busy
+          developing it. Join us, and make a PR!
         </p>
 
         <div className={styles.grid}>
