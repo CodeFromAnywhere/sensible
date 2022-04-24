@@ -4,8 +4,6 @@
 www.sensibleframework.co
 </a></p>
 
-<p align="center"><a href="https://www.youtube.com/watch?v=tL1tcWEgQNo">Demo</a></p>
-
 # The fastest way to build an app
 
 **The Shared Full Stack Typescript Framework** With strict conventions and the newest typescript and code sharing possibilities, we were able to create the most advanced typescript framework ever and boost the productivity of hundreds of development teams, maybe even by a factor of 10 or more if you compare it to the industry standard.
@@ -14,7 +12,7 @@ www.sensibleframework.co
 
 Sensible's mission is to boost the productivity of 100.000+ Software Developers, making it as easy as possible to build a high-quality full-stack mobile/desktop app/website.
 
-Curious? Just run `yarn create sensible-app APPNAME` and see the magic, or [check out this demo](https://www.sensibleframework.co/demo)
+Curious? Just run `yarn create sensible-app APPNAME` and see the magic, or [check out this demo](https://www.youtube.com/watch?v=tL1tcWEgQNo)
 
 This will setup the sensible framework with all node modules installed, a few example models/endpoints and plugable integration. It will also open up VSCode in the correct folder, running the expo packager, next.js site, server, and papapackage, so you can start coding.
 
@@ -81,4 +79,9 @@ If you want to create multiple apps at once, just specify `yarn create sensible-
 - Full-stack code-sharing
 - Full-stack auto-completion using Typescript
 - KISS
-- ...?
+- Maximise learnability
+
+# Useful links
+
+- [docs](/docs)
+- [packages](/packages)
