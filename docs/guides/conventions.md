@@ -1,6 +1,6 @@
 # Conventions Code From Anywhere
 
-- component/class folders and filenames should be PascalCase, all other folders kebab-case
+- component/class folders and filenames should be PascalCase, all other folders kebab-case. `.md`-files should also be kebab-case.
 
 - variables should be camelCase
 

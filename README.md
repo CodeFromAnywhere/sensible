@@ -22,7 +22,7 @@ This will setup the sensible framework with all node modules installed, a few ex
   <img src="./assets/sensible-meme2.png" width="300" />
 </p>
 
-## Features
+## How does it work?
 
 Define endpoints (and other type interfaces) in a central place
 
@@ -73,3 +73,12 @@ If you want to create multiple apps at once, just specify `yarn create sensible-
 - On creating a sensible app, suggest, buy, and setup a domain for you
 - On creating a sensible app, if not installed, install papapackage, then run it in your new folder
 - Option to automatically publish to npm, github, vercel and expo
+
+# The Core Sensible Philosophy
+
+- Codebase introspection
+- Documentation generation
+- Full-stack code-sharing
+- Full-stack auto-completion using Typescript
+- KISS
+- ...?

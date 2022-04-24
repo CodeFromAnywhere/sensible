@@ -6,7 +6,7 @@ Also create a packages folder in which you create a core folder and ui folder.
 Add this package.json in your project root directory
 
 ```{
-    "name": "coworksurf-monorepo",
+    "name": "yourproject-monorepo",
     "version": "0.0.0",
     "private": true,
     "workspaces": [
