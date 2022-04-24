@@ -35,7 +35,7 @@ const Home: NextPage = () => {
           </a>
 
           <a
-            href="https://github.com/Code-From-Anywhere/sensible/tree/main/docs/examples"
+            href="https://github.com/Code-From-Anywhere/sensible/tree/main/docs/examples.md"
             className={styles.card}
           >
             <h2>Examples &rarr;</h2>
