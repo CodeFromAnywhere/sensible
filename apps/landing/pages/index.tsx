@@ -16,6 +16,10 @@ const Home: NextPage = () => {
       </Head>
 
       <main className={styles.main}>
+        {/* <div className={styles.header}>
+          
+        </div> */}
+
         <h1 className={styles.title}>
           The <b>Typescript</b> Framework For <b>Effective</b> Teams
         </h1>
@@ -33,13 +37,17 @@ const Home: NextPage = () => {
       </main>
 
       <footer className={styles.footer}>
-        <a
-          href="https://codefromanywhere.com"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by Code From Anywhere
-        </a>
+        <Image src={"/icon.png"} width={50} height={50} alt="Sensible Logo" />
+        <p style={{ marginLeft: 20 }}>
+          Sensible is Powered by{" "}
+          <a
+            href="https://codefromanywhere.com"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Code From Anywhere
+          </a>
+        </p>
       </footer>
     </div>
   );
