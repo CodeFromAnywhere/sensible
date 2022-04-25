@@ -38,40 +38,6 @@ If you need more help, just look in the auto-generated docs!
 
 ![docs](./assets/docs-gif2.gif)
 
-## Future ideas
-
-With sensible, you just need to specify the name of the app, hit enter, and you'll be live within seconds.
-
-Optionally, you can add these flags:
-
-To specify a logo:
-`--logo /path/to/logo.png`
-
-To specify a domain:
-`--domain domainname.tld`
-
-To also fetch all sensible open source packages and core dependencies (mainly react-with-native-\*) and add them to your workspace:
-`--dev`
-
-To specify a packagenames for your common packages:
-`--packages @orgname` or `--packages your-common-package-name your-frontend-package-name`
-
-If you're feeling lucky and want sensible AI to pick you a nice logo and domain, add:
-`--lucky`
-
-If you want to create multiple apps at once, just specify `yarn create sensible-app APPNAME1 APPNAME2 APPNAME3`. This will assume you're feeling lucky ;).
-
-- faster sensible scripts: create-sensible-app update with cached node_modules
-- more boilerplates: electron, chrome extension, vscode extension
-- cli to add certain features to your app/website such as cms, webview, etc.
-- sensible examples section on the site fetching all sensible-core-_ and sensible-ui-_ from npm
-- migration guide + cli upgrade command to upgrade the framework version
-- make it possible not to have to run any command but just click "Create A New Project" from the homepage, so no-coders can get started as well using plugable-cms from the start.
-- On creating a sensible app, suggest a logo for you
-- On creating a sensible app, suggest, buy, and setup a domain for you
-- On creating a sensible app, if not installed, install papapackage, then run it in your new folder
-- Option to automatically publish to npm, github, vercel and expo
-
 # The Core Sensible Philosophy
 
 - Codebase introspection
