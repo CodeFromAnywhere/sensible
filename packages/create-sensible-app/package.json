@@ -1,36 +1,15 @@
 {
   "name": "create-sensible-app",
-  "version": "1.0.3",
-  "description": "This is the main package that installs everything for you",
+  "version": "1.0.4",
+  "description": "",
   "main": "build/index.js",
   "source": "src/index.ts",
-  "bin": {
-    "create-sensible-app": "./build/index.js"
-  },
   "scripts": {
-    "initpub": "npm publish --access public",
     "pub": "npm version patch --force && npm publish",
+    "dev": "tsc -w",
     "build": "tsc"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Code-From-Anywhere/sensible.git"
-  },
-  "keywords": [
-    "full",
-    "stack",
-    "shared",
-    "typescript",
-    "app",
-    "cli"
-  ],
-  "author": "Wijnand Karsens <sensible@karsens.com>",
+  "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/Code-From-Anywhere/sensible/issues"
-  },
-  "homepage": "https://github.com/Code-From-Anywhere/sensible#readme",
-  "devDependencies": {
-    "@types/node": "^17.0.18"
-  }
+  "dependencies": {}
 }

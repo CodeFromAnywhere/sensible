@@ -1,1 +1,0 @@
-# create the expo project from here

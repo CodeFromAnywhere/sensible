@@ -1,4 +1,6 @@
 #!/bin/bash
+
+echo "$1"
 SITE_NAME=$1
 [ -z "$SITE_NAME" ] && echo "Please provide a sitename" && read SITE_NAME
 
@@ -6,7 +8,7 @@ SITE_NAME=$1
 DB_PASS=$(date +%s | sha256sum | base64 | head -c 32)
 
 # this is ignored, 
-source ./env.sh
+# source ./env.sh
 
 GIT_REPO=$GIT_ORG_OR_USERNAME/$SITE_NAME.git
 
@@ -14,7 +16,7 @@ GIT_REPO=$GIT_ORG_OR_USERNAME/$SITE_NAME.git
 # ./new-sensible-project/logo.sh $SITE_NAME
 # ./new-sensible-project/domain.sh $SITE_NAME
 # ./new-sensible-project/make-git-repo.sh $GIT_REPO
-./new-sensible-project/init.sh $SITE_NAME #initiates the folder structure
+./assets/init.sh $SITE_NAME #initiates the folder structure
 # ./new-sensible-project/ship.sh $GIT_REPO
 
 # start developing:
