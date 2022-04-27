@@ -43,6 +43,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var readline_1 = __importDefault(require("readline"));
 var path_1 = __importDefault(require("path"));
+var child_process_1 = require("child_process");
 function slugify(string) {
     var a = "àáâäæãåāăąçćčđďèéêëēėęěğǵḧîïíīįìıİłḿñńǹňôöòóœøōõőṕŕřßśšşșťțûüùúūǘůűųẃẍÿýžźż·/_,:;";
     var b = "aaaaaaaaaacccddeeeeeeeegghiiiiiiiilmnnnnoooooooooprrsssssttuuuuuuuuuwxyyzzz------";
@@ -79,54 +80,148 @@ var getName = function () { return __awaiter(void 0, void 0, void 0, function ()
             })];
     });
 }); };
+var isDebug = function () {
+    return process.argv.includes("--debug");
+};
+var getSpawnCommandsReducer = function (dir, debug) {
+    return function (previous, command) { return __awaiter(void 0, void 0, void 0, function () {
+        var interval;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, previous];
+                case 1:
+                    _a.sent();
+                    // this can be used to test if the commands really are excecuted sequentially with the right parameters.
+                    // return new Promise<void>((resolve) => {
+                    //   setTimeout(() => {
+                    //     resolve(console.log(`extecuted ${command} in ${dir}`));
+                    //   }, 1000);
+                    // });
+                    process.stdout.write(command.description);
+                    interval = setInterval(function () { return process.stdout.write("."); }, 1000);
+                    return [2 /*return*/, new Promise(function (resolve) {
+                            var messages = [];
+                            (0, child_process_1.spawn)(command.command, {
+                                stdio: debug ? "inherit" : "ignore",
+                                shell: true,
+                                cwd: dir,
+                            })
+                                .addListener("exit", function (code) {
+                                console.clear();
+                                clearInterval(interval);
+                                resolve();
+                            })
+                                //save all output so it can be printed on an error
+                                .on("message", function (message) {
+                                messages.push(message.toString());
+                            })
+                                .on("error", function (err) {
+                                console.log(messages.join("\n"));
+                                throw "The following command failed: \"".concat(command, "\": \"").concat(err, "\"");
+                            });
+                        })];
+            }
+        });
+    }); };
+};
 (function () { return __awaiter(void 0, void 0, void 0, function () {
-    var appName, assetsDir, targetDir, commandsFromFolders;
+    var appName, debug, assetsDir, targetDir, commandsFromFolders;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0: return [4 /*yield*/, getName()];
             case 1:
                 appName = _a.sent();
+                debug = isDebug();
                 assetsDir = path_1.default.resolve(__dirname, "..", "assets");
                 targetDir = process.cwd();
                 commandsFromFolders = [
                     {
                         dir: targetDir,
                         commands: [
-                            "mkdir ".concat(appName),
-                            "cp -R ".concat(assetsDir, "/templates/init/* ").concat(targetDir, "/").concat(appName),
+                            {
+                                command: "mkdir ".concat(appName),
+                                description: "Making folder for your app",
+                            },
+                            {
+                                command: "cp -R ".concat(assetsDir, "/templates/init/* ").concat(targetDir, "/").concat(appName),
+                                description: "Copying sensible template",
+                            },
                         ],
                     },
                     {
-                        dir: "".concat(targetDir, "/").concat(appName),
+                        dir: "".concat(targetDir, "/").concat(appName, "/apps"),
                         commands: [
-                            "yarn create next-app --typescript web",
-                            "npx expo-cli init -t expo-template-blank-typescript app",
-                            "cp -R ".concat(assetsDir, "/templates/app/* ").concat(targetDir, "/").concat(appName, "/app"),
-                            "cp -R ".concat(assetsDir, "/templates/web/* ").concat(targetDir, "/").concat(appName, "/web"),
+                            {
+                                command: "yarn create next-app --typescript web",
+                                description: "Creating next-app",
+                            },
+                            {
+                                command: "npx expo-cli init -t expo-template-blank-typescript app",
+                                description: "Creating expo-app",
+                            },
+                            {
+                                command: "cp -R ".concat(assetsDir, "/templates/web/* ").concat(targetDir, "/").concat(appName, "/apps/web"),
+                                description: "Copying web template",
+                            },
+                            {
+                                command: "cp -R ".concat(assetsDir, "/templates/app/* ").concat(targetDir, "/").concat(appName, "/apps/app"),
+                                description: "Copying app template",
+                            },
                         ],
                     },
                     {
-                        dir: "".concat(targetDir, "/").concat(appName, "/web"),
+                        dir: "".concat(targetDir, "/").concat(appName, "/apps/web"),
                         commands: [
-                            "yarn add react-query react-with-native react-with-native-date-input react-with-native-form react-with-native-number-input react-with-native-password-input react-with-native-phone-input react-with-native-select-input react-with-native-store react-with-native-text-input react-with-native-textarea-input react-with-native-toggle-input react-with-native-notification react-with-native-router next-transpile-linked-modules next-transpile-modules @badrap/bar-of-progress",
-                            "yarn add -D tailwindcss postcss autoprefixer",
-                            "mkdir src",
-                            "mv styles src/styles",
-                            "mv pages src/pages",
-                            "touch src/types.ts",
-                            "touch src/constants.ts",
-                            "npx tailwindcss init -p",
+                            {
+                                command: "yarn add react-query react-with-native react-with-native-date-input react-with-native-form react-with-native-number-input react-with-native-password-input react-with-native-phone-input react-with-native-select-input react-with-native-store react-with-native-text-input react-with-native-textarea-input react-with-native-toggle-input react-with-native-notification react-with-native-router next-transpile-linked-modules next-transpile-modules @badrap/bar-of-progress",
+                                description: "Installing web dependencies",
+                            },
+                            {
+                                command: "yarn add -D tailwindcss postcss autoprefixer",
+                                description: "Installing web devDependencies",
+                            },
+                            { command: "mkdir src", description: "Making src directory" },
+                            {
+                                command: "mv styles src/styles",
+                                description: "Moving some stuff around",
+                            },
+                            {
+                                command: "mv pages src/pages",
+                                description: "Moving some stuff around",
+                            },
+                            { command: "touch src/types.ts", description: "Creating files" },
+                            { command: "touch src/constants.ts", description: "Creating files" },
+                            {
+                                command: "npx tailwindcss init -p",
+                                description: "Installing tailwind",
+                            },
                         ],
                     },
                     {
-                        dir: "".concat(targetDir, "/").concat(appName, "/app"),
+                        dir: "".concat(targetDir, "/").concat(appName, "/apps/app"),
                         commands: [
-                            "yarn add react-query react-with-native react-with-native-date-input react-with-native-form react-with-native-number-input react-with-native-password-input react-with-native-phone-input react-with-native-select-input react-with-native-store react-with-native-text-input react-with-native-textarea-input react-with-native-toggle-input react-with-native-notification react-with-native-router",
+                            {
+                                command: "yarn add react-query react-with-native react-with-native-date-input react-with-native-form react-with-native-number-input react-with-native-password-input react-with-native-phone-input react-with-native-select-input react-with-native-store react-with-native-text-input react-with-native-textarea-input react-with-native-toggle-input react-with-native-notification react-with-native-router",
+                                description: "Installing app dependencies",
+                            },
                             // open vscode
-                            "code ".concat(targetDir, "/").concat(appName),
+                            {
+                                command: "code ".concat(targetDir, "/").concat(appName),
+                                description: "Opening your project",
+                            },
                         ],
                     },
                 ];
+                commandsFromFolders.reduce(function (previous, commandsObject) { return __awaiter(void 0, void 0, void 0, function () {
+                    return __generator(this, function (_a) {
+                        switch (_a.label) {
+                            case 0: return [4 /*yield*/, previous];
+                            case 1:
+                                _a.sent();
+                                return [2 /*return*/, commandsObject.commands.reduce(getSpawnCommandsReducer(commandsObject.dir, debug), Promise.resolve())];
+                        }
+                    });
+                }); }, Promise.resolve());
                 return [2 /*return*/];
         }
     });

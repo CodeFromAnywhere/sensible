@@ -3,7 +3,16 @@
 
 import readline from "readline";
 import path from "path";
+import { spawn } from "child_process";
 
+type Command = {
+  command: string;
+  description: string;
+};
+type CommandsObject = {
+  dir: string;
+  commands: Command[];
+};
 function slugify(string: string) {
   var a =
     "àáâäæãåāăąçćčđďèéêëēėęěğǵḧîïíīįìıİłḿñńǹňôöòóœøōõőṕŕřßśšşșťțûüùúūǘůűųẃẍÿýžźż·/_,:;";
@@ -42,51 +51,145 @@ const getName = async (): Promise<string> => {
   });
 };
 
+const isDebug = () => {
+  return process.argv.includes("--debug");
+};
+
+const getSpawnCommandsReducer =
+  (dir: string, debug: boolean) =>
+  async (previous: Promise<void>, command: Command) => {
+    await previous;
+
+    // this can be used to test if the commands really are excecuted sequentially with the right parameters.
+    // return new Promise<void>((resolve) => {
+    //   setTimeout(() => {
+    //     resolve(console.log(`extecuted ${command} in ${dir}`));
+    //   }, 1000);
+    // });
+
+    process.stdout.write(command.description);
+    const interval = setInterval(() => process.stdout.write("."), 1000);
+    return new Promise<void>((resolve) => {
+      const messages: string[] = [];
+      spawn(command.command, {
+        stdio: debug ? "inherit" : "ignore",
+        shell: true,
+        cwd: dir,
+      })
+        .addListener("exit", (code) => {
+          console.clear();
+          clearInterval(interval);
+          resolve();
+        })
+        //save all output so it can be printed on an error
+        .on("message", (message) => {
+          messages.push(message.toString());
+        })
+        .on("error", (err) => {
+          console.log(messages.join("\n"));
+          throw `The following command failed: "${command}": "${err}"`;
+        });
+    });
+  };
+
 (async () => {
   const appName = await getName();
+  const debug = isDebug();
   const assetsDir = path.resolve(__dirname, "..", `assets`);
   const targetDir = process.cwd();
 
-  const commandsFromFolders = [
+  const commandsFromFolders: CommandsObject[] = [
     {
       dir: targetDir,
       commands: [
-        `mkdir ${appName}`,
-        `cp -R ${assetsDir}/templates/init/* ${targetDir}/${appName}`,
+        {
+          command: `mkdir ${appName}`,
+          description: "Making folder for your app",
+        },
+        {
+          command: `cp -R ${assetsDir}/templates/init/* ${targetDir}/${appName}`,
+          description: "Copying sensible template",
+        },
       ],
     },
 
     {
-      dir: `${targetDir}/${appName}`,
+      dir: `${targetDir}/${appName}/apps`,
       commands: [
-        "yarn create next-app --typescript web",
-        "npx expo-cli init -t expo-template-blank-typescript app",
-        `cp -R ${assetsDir}/templates/app/* ${targetDir}/${appName}/app`,
-        `cp -R ${assetsDir}/templates/web/* ${targetDir}/${appName}/web`,
+        {
+          command: "yarn create next-app --typescript web",
+          description: "Creating next-app",
+        },
+        {
+          command: "npx expo-cli init -t expo-template-blank-typescript app",
+          description: "Creating expo-app",
+        },
+        {
+          command: `cp -R ${assetsDir}/templates/web/* ${targetDir}/${appName}/apps/web`,
+          description: "Copying web template",
+        },
+        {
+          command: `cp -R ${assetsDir}/templates/app/* ${targetDir}/${appName}/apps/app`,
+          description: "Copying app template",
+        },
       ],
     },
 
     {
-      dir: `${targetDir}/${appName}/web`,
+      dir: `${targetDir}/${appName}/apps/web`,
       commands: [
-        "yarn add react-query react-with-native react-with-native-date-input react-with-native-form react-with-native-number-input react-with-native-password-input react-with-native-phone-input react-with-native-select-input react-with-native-store react-with-native-text-input react-with-native-textarea-input react-with-native-toggle-input react-with-native-notification react-with-native-router next-transpile-linked-modules next-transpile-modules @badrap/bar-of-progress",
-        "yarn add -D tailwindcss postcss autoprefixer",
-        "mkdir src",
-        "mv styles src/styles",
-        "mv pages src/pages",
-        "touch src/types.ts",
-        "touch src/constants.ts",
-        "npx tailwindcss init -p",
+        {
+          command:
+            "yarn add react-query react-with-native react-with-native-date-input react-with-native-form react-with-native-number-input react-with-native-password-input react-with-native-phone-input react-with-native-select-input react-with-native-store react-with-native-text-input react-with-native-textarea-input react-with-native-toggle-input react-with-native-notification react-with-native-router next-transpile-linked-modules next-transpile-modules @badrap/bar-of-progress",
+          description: "Installing web dependencies",
+        },
+        {
+          command: "yarn add -D tailwindcss postcss autoprefixer",
+          description: "Installing web devDependencies",
+        },
+        { command: "mkdir src", description: "Making src directory" },
+        {
+          command: "mv styles src/styles",
+          description: "Moving some stuff around",
+        },
+        {
+          command: "mv pages src/pages",
+          description: "Moving some stuff around",
+        },
+        { command: "touch src/types.ts", description: "Creating files" },
+        { command: "touch src/constants.ts", description: "Creating files" },
+        {
+          command: "npx tailwindcss init -p",
+          description: "Installing tailwind",
+        },
       ],
     },
 
     {
-      dir: `${targetDir}/${appName}/app`,
+      dir: `${targetDir}/${appName}/apps/app`,
       commands: [
-        "yarn add react-query react-with-native react-with-native-date-input react-with-native-form react-with-native-number-input react-with-native-password-input react-with-native-phone-input react-with-native-select-input react-with-native-store react-with-native-text-input react-with-native-textarea-input react-with-native-toggle-input react-with-native-notification react-with-native-router",
+        {
+          command:
+            "yarn add react-query react-with-native react-with-native-date-input react-with-native-form react-with-native-number-input react-with-native-password-input react-with-native-phone-input react-with-native-select-input react-with-native-store react-with-native-text-input react-with-native-textarea-input react-with-native-toggle-input react-with-native-notification react-with-native-router",
+          description: "Installing app dependencies",
+        },
         // open vscode
-        `code ${targetDir}/${appName}`,
+        {
+          command: `code ${targetDir}/${appName}`,
+          description: "Opening your project",
+        },
       ],
     },
   ];
+
+  commandsFromFolders.reduce(
+    async (previous: Promise<void>, commandsObject: CommandsObject) => {
+      await previous;
+      return commandsObject.commands.reduce(
+        getSpawnCommandsReducer(commandsObject.dir, debug),
+        Promise.resolve()
+      );
+    },
+    Promise.resolve()
+  );
 })();
