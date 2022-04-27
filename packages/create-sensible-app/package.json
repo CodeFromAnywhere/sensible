@@ -1,15 +1,34 @@
 {
   "name": "create-sensible-app",
-  "version": "1.0.4",
-  "description": "",
+  "version": "1.0.6",
+  "description": "A cli to create a new sensible app for you",
+  "bin": {
+    "create-sensible-app": "./build/index.js"
+  },
   "main": "build/index.js",
   "source": "src/index.ts",
   "scripts": {
+    "initpub": "npm publish --access public",
     "pub": "npm version patch --force && npm publish",
     "dev": "tsc -w",
     "build": "tsc"
   },
-  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Code-From-Anywhere/sensible.git"
+  },
+  "keywords": [
+    "full",
+    "stack",
+    "shared",
+    "typescript",
+    "app",
+    "cli"
+  ],
+  "author": "Wijnand Karsens <sensible@karsens.com>",
   "license": "ISC",
-  "dependencies": {}
+  "bugs": {
+    "url": "https://github.com/Code-From-Anywhere/sensible/issues"
+  },
+  "homepage": "https://github.com/Code-From-Anywhere/sensible#readme"
 }
