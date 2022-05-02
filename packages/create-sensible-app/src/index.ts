@@ -4,10 +4,28 @@
 import readline from "readline";
 import path from "path";
 import { spawn } from "child_process";
+import fs from "fs";
+
+const DEBUG = false;
+const defaultAppName = "makes-sense";
+//test environment should be optional and easy to set up, live should be the default, since we want people to immedeately ship
+const mainBranchName = "live";
+const initialCommitMessage = "🧠 This Makes Sense";
+const includedRepoSlugs = [
+  "Code-From-Anywhere/react-with-native",
+  "Code-From-Anywhere/sensible",
+];
+const hasFlag = (flag: string): boolean => {
+  return process.argv.includes(`--${flag}`);
+};
+
+const isDebug = hasFlag("debug") || DEBUG;
+const isInteractive = hasFlag("interactive");
 
 type Command = {
   command: string;
   description: string;
+  isDisabled?: boolean;
 };
 type CommandsObject = {
   dir: string;
@@ -33,9 +51,16 @@ function slugify(string: string) {
     .replace(/-+$/, ""); // Trim - from end of text
 }
 
-const getName = async (): Promise<string> => {
-  let firstArgument = process.argv[2];
+const getArgumentOrAsk = async (
+  argumentPosition: number,
+  question: string
+): Promise<string> => {
+  let firstArgument = process.argv[argumentPosition + 1];
   if (firstArgument && firstArgument.length > 0) return firstArgument;
+
+  if (!isInteractive) {
+    return "";
+  }
 
   const rl = readline.createInterface({
     input: process.stdin,
@@ -44,15 +69,41 @@ const getName = async (): Promise<string> => {
   });
 
   return new Promise((resolve) => {
-    rl.question("What should your sensible app be called?\n", (name) => {
-      resolve(slugify(name));
+    rl.question(question, (name) => {
+      resolve(name);
       rl.close();
     });
   });
 };
 
-const isDebug = () => {
-  return process.argv.includes("--debug");
+const getName = async (): Promise<string> => {
+  const name = await getArgumentOrAsk(
+    1,
+    `What should your sensible app be called? (default: ${defaultAppName})\n`
+  );
+  const appName = name.length > 0 ? slugify(name) : defaultAppName;
+
+  //making sure we make a folder that doesn't exist yet:
+  let n = 0;
+  let fullAppName = appName;
+  while (fs.existsSync(fullAppName)) {
+    console.log(`Folder ${fullAppName} already exists...`);
+    n++;
+    fullAppName = `${appName}${n}`;
+  }
+  return fullAppName;
+};
+
+const getRemote = async (name: string): Promise<string | null> => {
+  const remote = await getArgumentOrAsk(
+    2,
+    `Where should ${name} be hosted? Provide an URL or a GitHub slug (either "org/repo" or "username/repo")\n`
+  );
+  return remote.length > 0
+    ? remote.includes("https://")
+      ? remote
+      : `https://github.com/${remote}.git`
+    : null;
 };
 
 const getSpawnCommandsReducer =
@@ -67,8 +118,10 @@ const getSpawnCommandsReducer =
     //   }, 1000);
     // });
 
+    //tell the user what is happening, with a dot every second
     process.stdout.write(command.description);
     const interval = setInterval(() => process.stdout.write("."), 1000);
+
     return new Promise<void>((resolve) => {
       const messages: string[] = [];
       spawn(command.command, {
@@ -77,6 +130,7 @@ const getSpawnCommandsReducer =
         cwd: dir,
       })
         .addListener("exit", (code) => {
+          //once done, clear the console
           console.clear();
           clearInterval(interval);
           resolve();
@@ -92,10 +146,19 @@ const getSpawnCommandsReducer =
     });
   };
 
+const checkEnvironmentSetup = () => {
+  console.log(`Please make sure you have \n
+- Node 18
+- code cli
+- VSCode
+- yarn`);
+};
+
 (async () => {
+  await checkEnvironmentSetup();
   const appName = await getName();
-  const debug = isDebug();
-  const assetsDir = path.resolve(__dirname, "..", `assets`);
+  const remote = await getRemote(appName);
+  const sensibleAssetsDir = path.resolve(__dirname, "..", `assets`);
   const targetDir = process.cwd();
 
   const commandsFromFolders: CommandsObject[] = [
@@ -107,7 +170,8 @@ const getSpawnCommandsReducer =
           description: "Making folder for your app",
         },
         {
-          command: `cp -R ${assetsDir}/templates/init/* ${targetDir}/${appName}`,
+          //NB: "*" doesn't match hidden files, so we use "." here
+          command: `cp -R ${sensibleAssetsDir}/templates/init/. ${targetDir}/${appName}`,
           description: "Copying sensible template",
         },
       ],
@@ -125,11 +189,11 @@ const getSpawnCommandsReducer =
           description: "Creating expo-app",
         },
         {
-          command: `cp -R ${assetsDir}/templates/web/* ${targetDir}/${appName}/apps/web`,
+          command: `cp -R ${sensibleAssetsDir}/templates/web/* ${targetDir}/${appName}/apps/web`,
           description: "Copying web template",
         },
         {
-          command: `cp -R ${assetsDir}/templates/app/* ${targetDir}/${appName}/apps/app`,
+          command: `cp -R ${sensibleAssetsDir}/templates/app/* ${targetDir}/${appName}/apps/app`,
           description: "Copying app template",
         },
       ],
@@ -138,6 +202,11 @@ const getSpawnCommandsReducer =
     {
       dir: `${targetDir}/${appName}/apps/web`,
       commands: [
+        {
+          command: "rm -rf .git",
+          description: "Removing git folder",
+        },
+
         {
           command:
             "yarn add react-query react-with-native react-with-native-date-input react-with-native-form react-with-native-number-input react-with-native-password-input react-with-native-phone-input react-with-native-select-input react-with-native-store react-with-native-text-input react-with-native-textarea-input react-with-native-toggle-input react-with-native-notification react-with-native-router next-transpile-linked-modules next-transpile-modules @badrap/bar-of-progress",
@@ -169,14 +238,60 @@ const getSpawnCommandsReducer =
       dir: `${targetDir}/${appName}/apps/app`,
       commands: [
         {
+          command: "rm -rf .git",
+          description: "Removing git folder",
+        },
+        {
           command:
             "yarn add react-query react-with-native react-with-native-date-input react-with-native-form react-with-native-number-input react-with-native-password-input react-with-native-phone-input react-with-native-select-input react-with-native-store react-with-native-text-input react-with-native-textarea-input react-with-native-toggle-input react-with-native-notification react-with-native-router",
           description: "Installing app dependencies",
         },
-        // open vscode
+      ],
+    },
+
+    {
+      // download all third-party dependencies that are tightly integrated and probably still require some bugfixing in v1
+      dir: `${targetDir}/${appName}/third-party`,
+      commands: includedRepoSlugs.map((slug) => ({
+        command: `git clone https://github.com/${slug}.git`,
+        description: `Adding third-party repo: ${slug}`,
+      })),
+    },
+
+    {
+      dir: `${targetDir}/${appName}`,
+      commands: [
         {
           command: `code ${targetDir}/${appName}`,
-          description: "Opening your project",
+          description: "Opening your project in VSCode",
+        },
+
+        {
+          command: `git init`,
+          description: "Initialising a git repo",
+        },
+
+        {
+          command: `git branch -M ${mainBranchName}`,
+          description: "Move to 'live' branch",
+        },
+
+        {
+          command: `git add . && git commit -m "${initialCommitMessage}"`,
+          description: "Creating commit",
+          isDisabled: !remote,
+        },
+
+        {
+          command: `git remote add origin ${remote}`,
+          description: "Adding remote",
+          isDisabled: !remote,
+        },
+
+        {
+          command: `git push -u origin ${mainBranchName}`,
+          description: "Push",
+          isDisabled: !remote,
         },
       ],
     },
@@ -186,7 +301,7 @@ const getSpawnCommandsReducer =
     async (previous: Promise<void>, commandsObject: CommandsObject) => {
       await previous;
       return commandsObject.commands.reduce(
-        getSpawnCommandsReducer(commandsObject.dir, debug),
+        getSpawnCommandsReducer(commandsObject.dir, isDebug),
         Promise.resolve()
       );
     },

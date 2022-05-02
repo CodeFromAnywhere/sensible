@@ -1,1 +1,7 @@
 node_modules/
+third-party/*/
+apps/app/.turbo/
+apps/web/.turbo/
+apps/server/.turbo/
+packages/core/.turbo/
+packages/ui/.turbo/

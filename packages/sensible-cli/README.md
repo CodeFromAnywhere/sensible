@@ -1,5 +1,5 @@
-There are a couple steps involved to create a sensible app:
+Sensible CLI will come later. 
 
-- setup folder structure according to convention template
-- create app for app, web using the cli
-- provide instructions on how to run the app
+It will:
+- Wrap the create-sensible-app as `sensible init`
+- Make all the processes that are defined in docs that programmers encounter to make a full stack app more and more automated.

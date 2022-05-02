@@ -44,6 +44,21 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var readline_1 = __importDefault(require("readline"));
 var path_1 = __importDefault(require("path"));
 var child_process_1 = require("child_process");
+var fs_1 = __importDefault(require("fs"));
+var DEBUG = false;
+var defaultAppName = "makes-sense";
+//test environment should be optional and easy to set up, live should be the default, since we want people to immedeately ship
+var mainBranchName = "live";
+var initialCommitMessage = "🧠 This Makes Sense";
+var includedRepoSlugs = [
+    "Code-From-Anywhere/react-with-native",
+    "Code-From-Anywhere/sensible",
+];
+var hasFlag = function (flag) {
+    return process.argv.includes("--".concat(flag));
+};
+var isDebug = hasFlag("debug") || DEBUG;
+var isInteractive = hasFlag("interactive");
 function slugify(string) {
     var a = "àáâäæãåāăąçćčđďèéêëēėęěğǵḧîïíīįìıİłḿñńǹňôöòóœøōõőṕŕřßśšşșťțûüùúūǘůűųẃẍÿýžźż·/_,:;";
     var b = "aaaaaaaaaacccddeeeeeeeegghiiiiiiiilmnnnnoooooooooprrsssssttuuuuuuuuuwxyyzzz------";
@@ -61,28 +76,62 @@ function slugify(string) {
         .replace(/^-+/, "") // Trim - from start of text
         .replace(/-+$/, ""); // Trim - from end of text
 }
-var getName = function () { return __awaiter(void 0, void 0, void 0, function () {
+var getArgumentOrAsk = function (argumentPosition, question) { return __awaiter(void 0, void 0, void 0, function () {
     var firstArgument, rl;
     return __generator(this, function (_a) {
-        firstArgument = process.argv[2];
+        firstArgument = process.argv[argumentPosition + 1];
         if (firstArgument && firstArgument.length > 0)
             return [2 /*return*/, firstArgument];
+        if (!isInteractive) {
+            return [2 /*return*/, ""];
+        }
         rl = readline_1.default.createInterface({
             input: process.stdin,
             output: process.stdout,
             terminal: false,
         });
         return [2 /*return*/, new Promise(function (resolve) {
-                rl.question("What should your sensible app be called?\n", function (name) {
-                    resolve(slugify(name));
+                rl.question(question, function (name) {
+                    resolve(name);
                     rl.close();
                 });
             })];
     });
 }); };
-var isDebug = function () {
-    return process.argv.includes("--debug");
-};
+var getName = function () { return __awaiter(void 0, void 0, void 0, function () {
+    var name, appName, n, fullAppName;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: return [4 /*yield*/, getArgumentOrAsk(1, "What should your sensible app be called? (default: ".concat(defaultAppName, ")\n"))];
+            case 1:
+                name = _a.sent();
+                appName = name.length > 0 ? slugify(name) : defaultAppName;
+                n = 0;
+                fullAppName = appName;
+                while (fs_1.default.existsSync(fullAppName)) {
+                    console.log("Folder ".concat(fullAppName, " already exists..."));
+                    n++;
+                    fullAppName = "".concat(appName).concat(n);
+                }
+                return [2 /*return*/, fullAppName];
+        }
+    });
+}); };
+var getRemote = function (name) { return __awaiter(void 0, void 0, void 0, function () {
+    var remote;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: return [4 /*yield*/, getArgumentOrAsk(2, "Where should ".concat(name, " be hosted? Provide an URL or a GitHub slug (either \"org/repo\" or \"username/repo\")\n"))];
+            case 1:
+                remote = _a.sent();
+                return [2 /*return*/, remote.length > 0
+                        ? remote.includes("https://")
+                            ? remote
+                            : "https://github.com/".concat(remote, ".git")
+                        : null];
+        }
+    });
+}); };
 var getSpawnCommandsReducer = function (dir, debug) {
     return function (previous, command) { return __awaiter(void 0, void 0, void 0, function () {
         var interval;
@@ -97,6 +146,7 @@ var getSpawnCommandsReducer = function (dir, debug) {
                     //     resolve(console.log(`extecuted ${command} in ${dir}`));
                     //   }, 1000);
                     // });
+                    //tell the user what is happening, with a dot every second
                     process.stdout.write(command.description);
                     interval = setInterval(function () { return process.stdout.write("."); }, 1000);
                     return [2 /*return*/, new Promise(function (resolve) {
@@ -107,6 +157,7 @@ var getSpawnCommandsReducer = function (dir, debug) {
                                 cwd: dir,
                             })
                                 .addListener("exit", function (code) {
+                                //once done, clear the console
                                 console.clear();
                                 clearInterval(interval);
                                 resolve();
@@ -124,15 +175,23 @@ var getSpawnCommandsReducer = function (dir, debug) {
         });
     }); };
 };
+var checkEnvironmentSetup = function () {
+    console.log("Please make sure you have \n\n- Node 18\n- code cli\n- VSCode\n- yarn");
+};
 (function () { return __awaiter(void 0, void 0, void 0, function () {
-    var appName, debug, assetsDir, targetDir, commandsFromFolders;
+    var appName, remote, sensibleAssetsDir, targetDir, commandsFromFolders;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, getName()];
+            case 0: return [4 /*yield*/, checkEnvironmentSetup()];
             case 1:
+                _a.sent();
+                return [4 /*yield*/, getName()];
+            case 2:
                 appName = _a.sent();
-                debug = isDebug();
-                assetsDir = path_1.default.resolve(__dirname, "..", "assets");
+                return [4 /*yield*/, getRemote(appName)];
+            case 3:
+                remote = _a.sent();
+                sensibleAssetsDir = path_1.default.resolve(__dirname, "..", "assets");
                 targetDir = process.cwd();
                 commandsFromFolders = [
                     {
@@ -143,7 +202,8 @@ var getSpawnCommandsReducer = function (dir, debug) {
                                 description: "Making folder for your app",
                             },
                             {
-                                command: "cp -R ".concat(assetsDir, "/templates/init/* ").concat(targetDir, "/").concat(appName),
+                                //NB: "*" doesn't match hidden files, so we use "." here
+                                command: "cp -R ".concat(sensibleAssetsDir, "/templates/init/. ").concat(targetDir, "/").concat(appName),
                                 description: "Copying sensible template",
                             },
                         ],
@@ -160,11 +220,11 @@ var getSpawnCommandsReducer = function (dir, debug) {
                                 description: "Creating expo-app",
                             },
                             {
-                                command: "cp -R ".concat(assetsDir, "/templates/web/* ").concat(targetDir, "/").concat(appName, "/apps/web"),
+                                command: "cp -R ".concat(sensibleAssetsDir, "/templates/web/* ").concat(targetDir, "/").concat(appName, "/apps/web"),
                                 description: "Copying web template",
                             },
                             {
-                                command: "cp -R ".concat(assetsDir, "/templates/app/* ").concat(targetDir, "/").concat(appName, "/apps/app"),
+                                command: "cp -R ".concat(sensibleAssetsDir, "/templates/app/* ").concat(targetDir, "/").concat(appName, "/apps/app"),
                                 description: "Copying app template",
                             },
                         ],
@@ -172,6 +232,10 @@ var getSpawnCommandsReducer = function (dir, debug) {
                     {
                         dir: "".concat(targetDir, "/").concat(appName, "/apps/web"),
                         commands: [
+                            {
+                                command: "rm -rf .git",
+                                description: "Removing git folder",
+                            },
                             {
                                 command: "yarn add react-query react-with-native react-with-native-date-input react-with-native-form react-with-native-number-input react-with-native-password-input react-with-native-phone-input react-with-native-select-input react-with-native-store react-with-native-text-input react-with-native-textarea-input react-with-native-toggle-input react-with-native-notification react-with-native-router next-transpile-linked-modules next-transpile-modules @badrap/bar-of-progress",
                                 description: "Installing web dependencies",
@@ -201,13 +265,52 @@ var getSpawnCommandsReducer = function (dir, debug) {
                         dir: "".concat(targetDir, "/").concat(appName, "/apps/app"),
                         commands: [
                             {
+                                command: "rm -rf .git",
+                                description: "Removing git folder",
+                            },
+                            {
                                 command: "yarn add react-query react-with-native react-with-native-date-input react-with-native-form react-with-native-number-input react-with-native-password-input react-with-native-phone-input react-with-native-select-input react-with-native-store react-with-native-text-input react-with-native-textarea-input react-with-native-toggle-input react-with-native-notification react-with-native-router",
                                 description: "Installing app dependencies",
                             },
-                            // open vscode
+                        ],
+                    },
+                    {
+                        // download all third-party dependencies that are tightly integrated and probably still require some bugfixing in v1
+                        dir: "".concat(targetDir, "/").concat(appName, "/third-party"),
+                        commands: includedRepoSlugs.map(function (slug) { return ({
+                            command: "git clone https://github.com/".concat(slug, ".git"),
+                            description: "Adding third-party repo: ".concat(slug),
+                        }); }),
+                    },
+                    {
+                        dir: "".concat(targetDir, "/").concat(appName),
+                        commands: [
                             {
                                 command: "code ".concat(targetDir, "/").concat(appName),
-                                description: "Opening your project",
+                                description: "Opening your project in VSCode",
+                            },
+                            {
+                                command: "git init",
+                                description: "Initialising a git repo",
+                            },
+                            {
+                                command: "git branch -M ".concat(mainBranchName),
+                                description: "Move to 'live' branch",
+                            },
+                            {
+                                command: "git add . && git commit -m \"".concat(initialCommitMessage, "\""),
+                                description: "Creating commit",
+                                isDisabled: !remote,
+                            },
+                            {
+                                command: "git remote add origin ".concat(remote),
+                                description: "Adding remote",
+                                isDisabled: !remote,
+                            },
+                            {
+                                command: "git push -u origin ".concat(mainBranchName),
+                                description: "Push",
+                                isDisabled: !remote,
                             },
                         ],
                     },
@@ -218,7 +321,7 @@ var getSpawnCommandsReducer = function (dir, debug) {
                             case 0: return [4 /*yield*/, previous];
                             case 1:
                                 _a.sent();
-                                return [2 /*return*/, commandsObject.commands.reduce(getSpawnCommandsReducer(commandsObject.dir, debug), Promise.resolve())];
+                                return [2 /*return*/, commandsObject.commands.reduce(getSpawnCommandsReducer(commandsObject.dir, isDebug), Promise.resolve())];
                         }
                     });
                 }); }, Promise.resolve());
