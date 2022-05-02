@@ -247,6 +247,11 @@ var checkEnvironmentSetup = function () {
                                 command: "cp -R ".concat(sensibleAssetsDir, "/templates/init/. ").concat(targetDir, "/").concat(appName),
                                 description: "Copying sensible template",
                             },
+                            {
+                                command: "for f in **/gitignore; do mv \"$f\" \"$(echo \"$f\" | sed s/gitignore/.gitignore/)\"; done",
+                                description: "Rename all gitignore files to .gitignore",
+                                //https://github.com/jherr/create-mf-app/pull/8
+                            },
                         ],
                     },
                     {
