@@ -10,7 +10,7 @@
     "core": "*",
     "react-with-native": "*",
     "react-with-native-store": "*",
-    "sensible-core": "*",
+    "sensible-core": "*"
   },
   "devDependencies": {
     "config": "*",

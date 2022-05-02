@@ -173,8 +173,45 @@ const checkEnvironmentSetup = () => {
     : "0";
   const difference = Date.now() - Number(updatedAt);
   const shouldGetCache =
-    (difference < 86400 * 1000 * 7 || isOffline) && !isForceUpdate;
+    (difference < 86400 * 1000 || isOffline) && !isForceUpdate;
 
+  const openVsCodeAndPush = {
+    dir: `${targetDir}/${appName}`,
+    commands: [
+      {
+        command: `code ${targetDir}/${appName} --goto README.md:1:1`,
+        description: "Opening your project in VSCode",
+      },
+
+      {
+        command: `git init`,
+        description: "Initialising a git repo",
+      },
+
+      {
+        command: `git branch -M ${mainBranchName}`,
+        description: "Move to 'live' branch",
+      },
+
+      {
+        command: `git add . && git commit -m "${initialCommitMessage}"`,
+        description: "Creating commit",
+        isDisabled: !remote,
+      },
+
+      {
+        command: `git remote add origin ${remote}`,
+        description: "Adding remote",
+        isDisabled: !remote,
+      },
+
+      {
+        command: `git push -u origin ${mainBranchName}`,
+        description: "Push",
+        isDisabled: !remote,
+      },
+    ],
+  };
   const commandsWithoutCache: CommandsObject[] = [
     {
       dir: targetDir,
@@ -293,49 +330,13 @@ const checkEnvironmentSetup = () => {
       })),
     },
 
-    {
-      dir: `${targetDir}/${appName}`,
-      commands: [
-        {
-          command: `code ${targetDir}/${appName}`,
-          description: "Opening your project in VSCode",
-        },
-
-        {
-          command: `git init`,
-          description: "Initialising a git repo",
-        },
-
-        {
-          command: `git branch -M ${mainBranchName}`,
-          description: "Move to 'live' branch",
-        },
-
-        {
-          command: `git add . && git commit -m "${initialCommitMessage}"`,
-          description: "Creating commit",
-          isDisabled: !remote,
-        },
-
-        {
-          command: `git remote add origin ${remote}`,
-          description: "Adding remote",
-          isDisabled: !remote,
-        },
-
-        {
-          command: `git push -u origin ${mainBranchName}`,
-          description: "Push",
-          isDisabled: !remote,
-        },
-      ],
-    },
+    openVsCodeAndPush,
 
     {
-      dir: "$HOME",
+      dir: homedir(),
       commands: [
         {
-          command: "mkdir -p .sensible/cache",
+          command: "rm -rf .sensible/cache && mkdir .sensible/cache",
           description: "Creating sensible cache folder",
         },
         {
@@ -343,7 +344,7 @@ const checkEnvironmentSetup = () => {
           description: "creating cache",
         },
         {
-          command: `echo $(node -e 'console.log(Date.now())') > updatedAt.txt`,
+          command: `echo $(node -e 'console.log(Date.now())') > .sensible/updatedAt.txt`,
           description: "Add current timestamp to cached files",
         },
       ],
@@ -364,6 +365,8 @@ const checkEnvironmentSetup = () => {
         },
       ],
     },
+
+    openVsCodeAndPush,
   ];
 
   const commandsFromFolders = shouldGetCache

@@ -5,7 +5,7 @@
     {
       "label": "pull",
       "type": "shell",
-      "command": "source ~/.zshrc && git stash && git pull && git stash pop && yarn",
+      "command": "say \"happy coding. don't forget to ship and pull.\"",
       "group": "none",
       "presentation": {
         "echo": false,

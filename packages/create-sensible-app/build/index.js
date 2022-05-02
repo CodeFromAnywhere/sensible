@@ -182,7 +182,7 @@ var checkEnvironmentSetup = function () {
     console.log("Please make sure you have \n\n- Node 18\n- code cli\n- VSCode\n- yarn");
 };
 (function () { return __awaiter(void 0, void 0, void 0, function () {
-    var appName, remote, sensibleAssetsDir, targetDir, cacheUpdatedAtLocation, updatedAt, difference, shouldGetCache, commandsWithoutCache, cacheCommands, commandsFromFolders;
+    var appName, remote, sensibleAssetsDir, targetDir, cacheUpdatedAtLocation, updatedAt, difference, shouldGetCache, openVsCodeAndPush, commandsWithoutCache, cacheCommands, commandsFromFolders;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0: return [4 /*yield*/, checkEnvironmentSetup()];
@@ -201,7 +201,39 @@ var checkEnvironmentSetup = function () {
                     ? fs_1.default.readFileSync(cacheUpdatedAtLocation, "utf8")
                     : "0";
                 difference = Date.now() - Number(updatedAt);
-                shouldGetCache = (difference < 86400 * 1000 * 7 || isOffline) && !isForceUpdate;
+                shouldGetCache = (difference < 86400 * 1000 || isOffline) && !isForceUpdate;
+                openVsCodeAndPush = {
+                    dir: "".concat(targetDir, "/").concat(appName),
+                    commands: [
+                        {
+                            command: "code ".concat(targetDir, "/").concat(appName, " --goto README.md:1:1"),
+                            description: "Opening your project in VSCode",
+                        },
+                        {
+                            command: "git init",
+                            description: "Initialising a git repo",
+                        },
+                        {
+                            command: "git branch -M ".concat(mainBranchName),
+                            description: "Move to 'live' branch",
+                        },
+                        {
+                            command: "git add . && git commit -m \"".concat(initialCommitMessage, "\""),
+                            description: "Creating commit",
+                            isDisabled: !remote,
+                        },
+                        {
+                            command: "git remote add origin ".concat(remote),
+                            description: "Adding remote",
+                            isDisabled: !remote,
+                        },
+                        {
+                            command: "git push -u origin ".concat(mainBranchName),
+                            description: "Push",
+                            isDisabled: !remote,
+                        },
+                    ],
+                };
                 commandsWithoutCache = [
                     {
                         dir: targetDir,
@@ -263,7 +295,7 @@ var checkEnvironmentSetup = function () {
                                 description: "Installing web dependencies",
                             },
                             {
-                                command: "yarn add -D config@* tsconfig@* tailwindcss postcss autoprefixer",
+                                command: "yarn add -D config@* tsconfig@*",
                                 description: "Installing web devDependencies",
                             },
                             { command: "mkdir src", description: "Making src directory" },
@@ -278,7 +310,7 @@ var checkEnvironmentSetup = function () {
                             { command: "touch src/types.ts", description: "Creating files" },
                             { command: "touch src/constants.ts", description: "Creating files" },
                             {
-                                command: "npx tailwindcss init -p",
+                                command: "npx setup-tailwind-rn",
                                 description: "Installing tailwind",
                             },
                         ],
@@ -298,14 +330,6 @@ var checkEnvironmentSetup = function () {
                                 command: "yarn add @expo/webpack-config babel-plugin-module-resolver concurrently postcss tailwindcss",
                                 description: "Installing app devDependencies",
                             },
-                            /*
-                    should install tailwind-rn according to their docs
-                    
-                    should add this to package.json under scripts:
-                    
-                    "build:tailwind": "tailwindcss --input input.css --output tailwind.css --no-autoprefixer && tailwind-rn",
-                    "dev:tailwind": "concurrently \"tailwindcss --input input.css --output tailwind.css --no-autoprefixer --watch\" \"tailwind-rn --watch\""
-                    */
                         ],
                     },
                     {
@@ -316,43 +340,12 @@ var checkEnvironmentSetup = function () {
                             description: "Adding third-party repo: ".concat(slug),
                         }); }),
                     },
+                    openVsCodeAndPush,
                     {
-                        dir: "".concat(targetDir, "/").concat(appName),
+                        dir: (0, os_1.homedir)(),
                         commands: [
                             {
-                                command: "code ".concat(targetDir, "/").concat(appName),
-                                description: "Opening your project in VSCode",
-                            },
-                            {
-                                command: "git init",
-                                description: "Initialising a git repo",
-                            },
-                            {
-                                command: "git branch -M ".concat(mainBranchName),
-                                description: "Move to 'live' branch",
-                            },
-                            {
-                                command: "git add . && git commit -m \"".concat(initialCommitMessage, "\""),
-                                description: "Creating commit",
-                                isDisabled: !remote,
-                            },
-                            {
-                                command: "git remote add origin ".concat(remote),
-                                description: "Adding remote",
-                                isDisabled: !remote,
-                            },
-                            {
-                                command: "git push -u origin ".concat(mainBranchName),
-                                description: "Push",
-                                isDisabled: !remote,
-                            },
-                        ],
-                    },
-                    {
-                        dir: "$HOME",
-                        commands: [
-                            {
-                                command: "mkdir -p .sensible/cache",
+                                command: "rm -rf .sensible/cache && mkdir .sensible/cache",
                                 description: "Creating sensible cache folder",
                             },
                             {
@@ -360,7 +353,7 @@ var checkEnvironmentSetup = function () {
                                 description: "creating cache",
                             },
                             {
-                                command: "echo $(node -e 'console.log(Date.now())') > updatedAt.txt",
+                                command: "echo $(node -e 'console.log(Date.now())') > .sensible/updatedAt.txt",
                                 description: "Add current timestamp to cached files",
                             },
                         ],
@@ -380,6 +373,7 @@ var checkEnvironmentSetup = function () {
                             },
                         ],
                     },
+                    openVsCodeAndPush,
                 ];
                 commandsFromFolders = shouldGetCache
                     ? cacheCommands
