@@ -242,8 +242,7 @@ const checkEnvironmentSetup = () => {
           description: "Installing web dependencies",
         },
         {
-          command:
-            "yarn add -D config@* tsconfig@* tailwindcss postcss autoprefixer",
+          command: "yarn add -D config@* tsconfig@*",
           description: "Installing web devDependencies",
         },
         { command: "mkdir src", description: "Making src directory" },
@@ -258,7 +257,7 @@ const checkEnvironmentSetup = () => {
         { command: "touch src/types.ts", description: "Creating files" },
         { command: "touch src/constants.ts", description: "Creating files" },
         {
-          command: "npx tailwindcss init -p",
+          command: "npx setup-tailwind-rn",
           description: "Installing tailwind",
         },
       ],
@@ -282,15 +281,6 @@ const checkEnvironmentSetup = () => {
             "yarn add @expo/webpack-config babel-plugin-module-resolver concurrently postcss tailwindcss",
           description: "Installing app devDependencies",
         },
-
-        /* 
-should install tailwind-rn according to their docs
-
-should add this to package.json under scripts:
-
-"build:tailwind": "tailwindcss --input input.css --output tailwind.css --no-autoprefixer && tailwind-rn",
-"dev:tailwind": "concurrently \"tailwindcss --input input.css --output tailwind.css --no-autoprefixer --watch\" \"tailwind-rn --watch\""
-*/
       ],
     },
 
