@@ -2213,7 +2213,7 @@
 
 "create-sensible-app@file:/Users/wijnandkarsens/Developer/Code-From-Anywhere/sensible/packages/create-sensible-app":
   "resolved" "file:packages/create-sensible-app"
-  "version" "1.0.7"
+  "version" "1.0.8"
 
 "cross-spawn@^7.0.2":
   "integrity" "sha512-iRDPJKUPVEND7dHPO8rkbOnPpyDygcDFtWjpeWNCgy8WP2rXcxXL8TskReQl6OrB2G7+UJrags1q15Fudc7G6w=="
