@@ -1,6 +1,6 @@
 # Sensible
 
-This is a [Sensible](https://sensible.to/) project bootstrapped with [`create-sensible-app`](https://github.com/Code-From-Anywhere/sensible/tree/main/packages/create-sensible-app).
+This is a [Sensible](https://sensible.to/) project bootstrapped with [`yarn create sensible-app`](https://github.com/Code-From-Anywhere/sensible/tree/main/packages/create-sensible-app).
 
 ## Getting Started
 
