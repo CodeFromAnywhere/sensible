@@ -5,6 +5,7 @@ import readline from "readline";
 import path from "path";
 import { spawn } from "child_process";
 import fs from "fs";
+import { homedir } from "os";
 
 const DEBUG = false;
 const defaultAppName = "makes-sense";
@@ -21,6 +22,8 @@ const hasFlag = (flag: string): boolean => {
 
 const isDebug = hasFlag("debug") || DEBUG;
 const isInteractive = hasFlag("interactive");
+const isOffline = hasFlag("offline");
+const isForceUpdate = hasFlag("force-update");
 
 type Command = {
   command: string;
@@ -161,7 +164,18 @@ const checkEnvironmentSetup = () => {
   const sensibleAssetsDir = path.resolve(__dirname, "..", `assets`);
   const targetDir = process.cwd();
 
-  const commandsFromFolders: CommandsObject[] = [
+  const cacheUpdatedAtLocation = path.join(
+    homedir(),
+    ".sensible/updatedAt.txt"
+  );
+  const updatedAt = fs.existsSync(cacheUpdatedAtLocation)
+    ? fs.readFileSync(cacheUpdatedAtLocation, "utf8")
+    : "0";
+  const difference = Date.now() - Number(updatedAt);
+  const shouldGetCache =
+    (difference < 86400 * 1000 * 7 || isOffline) && !isForceUpdate;
+
+  const commandsWithoutCache: CommandsObject[] = [
     {
       dir: targetDir,
       commands: [
@@ -200,20 +214,36 @@ const checkEnvironmentSetup = () => {
     },
 
     {
+      dir: `${targetDir}/${appName}/apps/server`,
+      commands: [
+        {
+          command:
+            "yarn add cors dotenv md5 reflect-metadata sequelize sequelize-typescript server sqlite3 typescript",
+          description: "Installing server dependencies",
+        },
+        {
+          command:
+            "yarn add @types/node @types/server @types/validator babel-cli eslint ts-node ts-node-dev",
+          description: "Installing server devDependencies",
+        },
+      ],
+    },
+
+    {
       dir: `${targetDir}/${appName}/apps/web`,
       commands: [
         {
           command: "rm -rf .git",
-          description: "Removing git folder",
+          description: "Removing web git folder",
         },
-
         {
           command:
-            "yarn add react-query react-with-native react-with-native-date-input react-with-native-form react-with-native-number-input react-with-native-password-input react-with-native-phone-input react-with-native-select-input react-with-native-store react-with-native-text-input react-with-native-textarea-input react-with-native-toggle-input react-with-native-notification react-with-native-router next-transpile-linked-modules next-transpile-modules @badrap/bar-of-progress",
+            "yarn add core@* ui@* react-query react-with-native react-with-native-form react-with-native-password-input react-with-native-store react-with-native-text-input react-with-native-router next-transpile-modules @badrap/bar-of-progress",
           description: "Installing web dependencies",
         },
         {
-          command: "yarn add -D tailwindcss postcss autoprefixer",
+          command:
+            "yarn add -D config@* tsconfig@* tailwindcss postcss autoprefixer",
           description: "Installing web devDependencies",
         },
         { command: "mkdir src", description: "Making src directory" },
@@ -243,9 +273,24 @@ const checkEnvironmentSetup = () => {
         },
         {
           command:
-            "yarn add react-query react-with-native react-with-native-date-input react-with-native-form react-with-native-number-input react-with-native-password-input react-with-native-phone-input react-with-native-select-input react-with-native-store react-with-native-text-input react-with-native-textarea-input react-with-native-toggle-input react-with-native-notification react-with-native-router",
+            "yarn add core@* ui@* sensible-core@* tailwind-rn react-query react-with-native react-with-native-form react-with-native-store @react-native-async-storage/async-storage react-with-native-text-input react-with-native-router @react-navigation/native @react-navigation/native-stack",
           description: "Installing app dependencies",
         },
+
+        {
+          command:
+            "yarn add @expo/webpack-config babel-plugin-module-resolver concurrently postcss tailwindcss",
+          description: "Installing app devDependencies",
+        },
+
+        /* 
+should install tailwind-rn according to their docs
+
+should add this to package.json under scripts:
+
+"build:tailwind": "tailwindcss --input input.css --output tailwind.css --no-autoprefixer && tailwind-rn",
+"dev:tailwind": "concurrently \"tailwindcss --input input.css --output tailwind.css --no-autoprefixer --watch\" \"tailwind-rn --watch\""
+*/
       ],
     },
 
@@ -295,7 +340,45 @@ const checkEnvironmentSetup = () => {
         },
       ],
     },
+
+    {
+      dir: "$HOME",
+      commands: [
+        {
+          command: "mkdir -p .sensible/cache",
+          description: "Creating sensible cache folder",
+        },
+        {
+          command: `cp -R ${targetDir}/${appName}/. .sensible/cache`,
+          description: "creating cache",
+        },
+        {
+          command: `echo $(node -e 'console.log(Date.now())') > updatedAt.txt`,
+          description: "Add current timestamp to cached files",
+        },
+      ],
+    },
   ];
+
+  const cacheCommands: CommandsObject[] = [
+    {
+      dir: targetDir,
+      commands: [
+        {
+          command: `mkdir ${appName}`,
+          description: "Creating your app folder",
+        },
+        {
+          command: `cp -R $HOME/.sensible/cache/. ${targetDir}/${appName}`,
+          description: "Copying sensible from cache",
+        },
+      ],
+    },
+  ];
+
+  const commandsFromFolders = shouldGetCache
+    ? cacheCommands
+    : commandsWithoutCache;
 
   commandsFromFolders.reduce(
     async (previous: Promise<void>, commandsObject: CommandsObject) => {
