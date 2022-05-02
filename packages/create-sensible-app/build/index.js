@@ -51,9 +51,10 @@ var defaultAppName = "makes-sense";
 //test environment should be optional and easy to set up, live should be the default, since we want people to immedeately ship
 var mainBranchName = "live";
 var initialCommitMessage = "🧠 This Makes Sense";
+// currently, this results in a couple of invalid hook calls due to mismatching react* versions
 var includedRepoSlugs = [
-    "Code-From-Anywhere/react-with-native",
-    "Code-From-Anywhere/sensible",
+//"Code-From-Anywhere/react-with-native",
+//"Code-From-Anywhere/sensible",
 ];
 var hasFlag = function (flag) {
     return process.argv.includes("--".concat(flag));
@@ -80,11 +81,12 @@ function slugify(string) {
         .replace(/-+$/, ""); // Trim - from end of text
 }
 var getArgumentOrAsk = function (argumentPosition, question) { return __awaiter(void 0, void 0, void 0, function () {
-    var firstArgument, rl;
+    var argumentsWithoutFlags, argument, rl;
     return __generator(this, function (_a) {
-        firstArgument = process.argv[argumentPosition + 1];
-        if (firstArgument && firstArgument.length > 0)
-            return [2 /*return*/, firstArgument];
+        argumentsWithoutFlags = process.argv.filter(function (a) { return !a.startsWith("--"); });
+        argument = argumentsWithoutFlags[argumentPosition + 1];
+        if (argument && argument.length > 0)
+            return [2 /*return*/, argument];
         if (!isInteractive) {
             return [2 /*return*/, ""];
         }
@@ -181,8 +183,8 @@ var getSpawnCommandsReducer = function (dir, debug) {
 var checkEnvironmentSetup = function () {
     console.log("Please make sure you have \n\n- Node 18\n- code cli\n- VSCode\n- yarn");
 };
-(function () { return __awaiter(void 0, void 0, void 0, function () {
-    var appName, remote, sensibleAssetsDir, targetDir, cacheUpdatedAtLocation, updatedAt, difference, shouldGetCache, openVsCodeAndPush, commandsWithoutCache, cacheCommands, commandsFromFolders;
+var main = function () { return __awaiter(void 0, void 0, void 0, function () {
+    var appName, remote, sensibleAssetsDir, targetDir, cacheUpdatedAtLocation, updatedAt, difference, shouldGetCache, openVsCodeAndPush, preventInvalidHookCall, commandsWithoutCache, cacheCommands, commandsFromFolders;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0: return [4 /*yield*/, checkEnvironmentSetup()];
@@ -234,6 +236,10 @@ var checkEnvironmentSetup = function () {
                         },
                     ],
                 };
+                preventInvalidHookCall = {
+                    command: "yarn add react@17.0.2 react-dom@17.0.2",
+                    description: "Install right react version to prevent invalid hook call",
+                };
                 commandsWithoutCache = [
                     {
                         dir: targetDir,
@@ -248,7 +254,7 @@ var checkEnvironmentSetup = function () {
                                 description: "Copying sensible template",
                             },
                             {
-                                command: "for f in **/gitignore; do mv \"$f\" \"$(echo \"$f\" | sed s/gitignore/.gitignore/)\"; done",
+                                command: "cd && ".concat(appName, " && for f in **/gitignore; do mv \"$f\" \"$(echo \"$f\" | sed s/gitignore/.gitignore/)\"; done"),
                                 description: "Rename all gitignore files to .gitignore",
                                 //https://github.com/jherr/create-mf-app/pull/8
                             },
@@ -283,7 +289,7 @@ var checkEnvironmentSetup = function () {
                                 description: "Installing server dependencies",
                             },
                             {
-                                command: "yarn add @types/node @types/server @types/validator babel-cli eslint ts-node ts-node-dev",
+                                command: "yarn add -D @types/node @types/server @types/validator babel-cli eslint ts-node ts-node-dev",
                                 description: "Installing server devDependencies",
                             },
                         ],
@@ -295,6 +301,7 @@ var checkEnvironmentSetup = function () {
                                 command: "rm -rf .git",
                                 description: "Removing web git folder",
                             },
+                            preventInvalidHookCall,
                             {
                                 command: "yarn add core@* ui@* react-query react-with-native react-with-native-form react-with-native-password-input react-with-native-store react-with-native-text-input react-with-native-router next-transpile-modules @badrap/bar-of-progress",
                                 description: "Installing web dependencies",
@@ -327,12 +334,13 @@ var checkEnvironmentSetup = function () {
                                 command: "rm -rf .git",
                                 description: "Removing git folder",
                             },
+                            preventInvalidHookCall,
                             {
-                                command: "yarn add core@* ui@* sensible-core@* tailwind-rn react-query react-with-native react-with-native-form react-with-native-store @react-native-async-storage/async-storage react-with-native-text-input react-with-native-router @react-navigation/native @react-navigation/native-stack",
+                                command: "npx expo-cli install core@* ui@* sensible-core@* tailwind-rn react-query react-with-native react-with-native-form react-with-native-store @react-native-async-storage/async-storage react-with-native-text-input react-with-native-router @react-navigation/native @react-navigation/native-stack",
                                 description: "Installing app dependencies",
                             },
                             {
-                                command: "yarn add @expo/webpack-config babel-plugin-module-resolver concurrently postcss tailwindcss",
+                                command: "yarn add -D @expo/webpack-config babel-plugin-module-resolver concurrently postcss tailwindcss",
                                 description: "Installing app devDependencies",
                             },
                         ],
@@ -396,5 +404,6 @@ var checkEnvironmentSetup = function () {
                 return [2 /*return*/];
         }
     });
-}); })();
+}); };
+main();
 //# sourceMappingURL=index.js.map

@@ -20,7 +20,7 @@ export class User
   @Column
   public loginToken!: string;
 
-  @Column({ type: DataTypes.BIGINT.UNSIGNED, defaultValue: 0 })
+  @Column({ type: DataTypes.BIGINT, defaultValue: 0 })
   public onlineAt!: number;
 
   @Column

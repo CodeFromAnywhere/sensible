@@ -12,9 +12,11 @@ const defaultAppName = "makes-sense";
 //test environment should be optional and easy to set up, live should be the default, since we want people to immedeately ship
 const mainBranchName = "live";
 const initialCommitMessage = "🧠 This Makes Sense";
-const includedRepoSlugs = [
-  "Code-From-Anywhere/react-with-native",
-  "Code-From-Anywhere/sensible",
+
+// currently, this results in a couple of invalid hook calls due to mismatching react* versions
+const includedRepoSlugs: string[] = [
+  //"Code-From-Anywhere/react-with-native",
+  //"Code-From-Anywhere/sensible",
 ];
 const hasFlag = (flag: string): boolean => {
   return process.argv.includes(`--${flag}`);
@@ -58,8 +60,9 @@ const getArgumentOrAsk = async (
   argumentPosition: number,
   question: string
 ): Promise<string> => {
-  let firstArgument = process.argv[argumentPosition + 1];
-  if (firstArgument && firstArgument.length > 0) return firstArgument;
+  const argumentsWithoutFlags = process.argv.filter((a) => !a.startsWith("--"));
+  let argument = argumentsWithoutFlags[argumentPosition + 1];
+  if (argument && argument.length > 0) return argument;
 
   if (!isInteractive) {
     return "";
@@ -157,7 +160,7 @@ const checkEnvironmentSetup = () => {
 - yarn`);
 };
 
-(async () => {
+const main = async () => {
   await checkEnvironmentSetup();
   const appName = await getName();
   const remote = await getRemote(appName);
@@ -212,6 +215,11 @@ const checkEnvironmentSetup = () => {
       },
     ],
   };
+
+  const preventInvalidHookCall = {
+    command: "yarn add react@17.0.2 react-dom@17.0.2",
+    description: "Install right react version to prevent invalid hook call",
+  };
   const commandsWithoutCache: CommandsObject[] = [
     {
       dir: targetDir,
@@ -226,7 +234,7 @@ const checkEnvironmentSetup = () => {
           description: "Copying sensible template",
         },
         {
-          command: `for f in **/gitignore; do mv "$f" "$(echo "$f" | sed s/gitignore/.gitignore/)"; done`,
+          command: `cd && ${appName} && for f in **/gitignore; do mv "$f" "$(echo "$f" | sed s/gitignore/.gitignore/)"; done`,
           description: "Rename all gitignore files to .gitignore",
           //https://github.com/jherr/create-mf-app/pull/8
         },
@@ -265,7 +273,7 @@ const checkEnvironmentSetup = () => {
         },
         {
           command:
-            "yarn add @types/node @types/server @types/validator babel-cli eslint ts-node ts-node-dev",
+            "yarn add -D @types/node @types/server @types/validator babel-cli eslint ts-node ts-node-dev",
           description: "Installing server devDependencies",
         },
       ],
@@ -278,6 +286,7 @@ const checkEnvironmentSetup = () => {
           command: "rm -rf .git",
           description: "Removing web git folder",
         },
+        preventInvalidHookCall,
         {
           command:
             "yarn add core@* ui@* react-query react-with-native react-with-native-form react-with-native-password-input react-with-native-store react-with-native-text-input react-with-native-router next-transpile-modules @badrap/bar-of-progress",
@@ -312,15 +321,16 @@ const checkEnvironmentSetup = () => {
           command: "rm -rf .git",
           description: "Removing git folder",
         },
+        preventInvalidHookCall,
         {
           command:
-            "yarn add core@* ui@* sensible-core@* tailwind-rn react-query react-with-native react-with-native-form react-with-native-store @react-native-async-storage/async-storage react-with-native-text-input react-with-native-router @react-navigation/native @react-navigation/native-stack",
+            "npx expo-cli install core@* ui@* sensible-core@* tailwind-rn react-query react-with-native react-with-native-form react-with-native-store @react-native-async-storage/async-storage react-with-native-text-input react-with-native-router @react-navigation/native @react-navigation/native-stack",
           description: "Installing app dependencies",
         },
 
         {
           command:
-            "yarn add @expo/webpack-config babel-plugin-module-resolver concurrently postcss tailwindcss",
+            "yarn add -D @expo/webpack-config babel-plugin-module-resolver concurrently postcss tailwindcss",
           description: "Installing app devDependencies",
         },
       ],
@@ -388,4 +398,6 @@ const checkEnvironmentSetup = () => {
     },
     Promise.resolve()
   );
-})();
+};
+
+main();

@@ -1,4 +1,6 @@
 {
+  "name":"sensible-app-server",
+  "version":"0.0.0",
   "main": "src/index.ts",
   "scripts": {
     "start": "node build/index.js",
