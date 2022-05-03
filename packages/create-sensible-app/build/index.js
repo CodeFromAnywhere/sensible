@@ -46,7 +46,6 @@ var path_1 = __importDefault(require("path"));
 var child_process_1 = require("child_process");
 var fs_1 = __importDefault(require("fs"));
 var os_1 = require("os");
-var DEBUG = false;
 var defaultAppName = "makes-sense";
 //test environment should be optional and easy to set up, live should be the default, since we want people to immedeately ship
 var mainBranchName = "live";
@@ -59,7 +58,7 @@ var includedRepoSlugs = [
 var hasFlag = function (flag) {
     return process.argv.includes("--".concat(flag));
 };
-var isDebug = hasFlag("debug") || DEBUG;
+var isDebug = hasFlag("debug");
 var isInteractive = hasFlag("interactive");
 var isOffline = hasFlag("offline");
 var isForceUpdate = hasFlag("force-update");
@@ -181,10 +180,10 @@ var getSpawnCommandsReducer = function (dir, debug) {
     }); };
 };
 var checkEnvironmentSetup = function () {
-    console.log("Please make sure you have \n\n- Node 18\n- code cli\n- VSCode\n- yarn");
+    console.log("Please make sure you have \n\n- Node 18\n- code cli\n- VSCode\n- yarn\n- jq");
 };
 var main = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var appName, remote, sensibleAssetsDir, targetDir, cacheUpdatedAtLocation, updatedAt, difference, shouldGetCache, openVsCodeAndPush, preventInvalidHookCall, commandsWithoutCache, cacheCommands, commandsFromFolders;
+    var appName, remote, sensibleAssetsDir, targetDir, cacheUpdatedAtLocation, updatedAt, difference, shouldGetCache, pushToGit, openVSCode, preventInvalidHookCall, commandsWithoutCache, cacheCommands, commandsFromFolders;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0: return [4 /*yield*/, checkEnvironmentSetup()];
@@ -204,13 +203,9 @@ var main = function () { return __awaiter(void 0, void 0, void 0, function () {
                     : "0";
                 difference = Date.now() - Number(updatedAt);
                 shouldGetCache = (difference < 86400 * 1000 || isOffline) && !isForceUpdate;
-                openVsCodeAndPush = {
+                pushToGit = {
                     dir: "".concat(targetDir, "/").concat(appName),
                     commands: [
-                        {
-                            command: "code ".concat(targetDir, "/").concat(appName, " --goto README.md:1:1"),
-                            description: "Opening your project in VSCode",
-                        },
                         {
                             command: "git init",
                             description: "Initialising a git repo",
@@ -236,6 +231,10 @@ var main = function () { return __awaiter(void 0, void 0, void 0, function () {
                         },
                     ],
                 };
+                openVSCode = {
+                    command: "code ".concat(targetDir, "/").concat(appName, " --goto README.md:1:1"),
+                    description: "Opening your project in VSCode",
+                };
                 preventInvalidHookCall = {
                     command: "yarn add react@17.0.2 react-dom@17.0.2",
                     description: "Install right react version to prevent invalid hook call",
@@ -254,9 +253,11 @@ var main = function () { return __awaiter(void 0, void 0, void 0, function () {
                                 description: "Copying sensible template",
                             },
                             {
-                                command: "cd && ".concat(appName, " && for f in **/gitignore; do mv \"$f\" \"$(echo \"$f\" | sed s/gitignore/.gitignore/)\"; done"),
-                                description: "Rename all gitignore files to .gitignore",
                                 //https://github.com/jherr/create-mf-app/pull/8
+                                command: "sleep 1 && cd ".concat(appName, " && find . -type f -name 'gitignore' -execdir mv {} .{} ';'"),
+                                // NB: the below doesn't work because glob patterns sometines only work in interacgtive mode (see https://superuser.com/questions/715007/ls-with-glob-not-working-in-a-bash-script)
+                                //command: `sleep 2 && cd ${appName} && for f in **/gitignore; do mv "$f" "$(echo "$f" | sed s/gitignore/.gitignore/)"; done`,
+                                description: "Rename all gitignore files to .gitignore",
                             },
                         ],
                     },
@@ -279,6 +280,7 @@ var main = function () { return __awaiter(void 0, void 0, void 0, function () {
                                 command: "cp -R ".concat(sensibleAssetsDir, "/templates/app/* ").concat(targetDir, "/").concat(appName, "/apps/app"),
                                 description: "Copying app template",
                             },
+                            openVSCode,
                         ],
                     },
                     {
@@ -336,6 +338,11 @@ var main = function () { return __awaiter(void 0, void 0, void 0, function () {
                             },
                             preventInvalidHookCall,
                             {
+                                // NB: without renaming it doesn't work
+                                command: "mv package.json package-old.json && jq '.main |= \"index.ts\"' package-old.json > package.json && rm package-old.json",
+                                description: "changing main entry of package.json",
+                            },
+                            {
                                 command: "npx expo-cli install core@* ui@* sensible-core@* tailwind-rn react-query react-with-native react-with-native-form react-with-native-store @react-native-async-storage/async-storage react-with-native-text-input react-with-native-router @react-navigation/native @react-navigation/native-stack",
                                 description: "Installing app dependencies",
                             },
@@ -353,7 +360,7 @@ var main = function () { return __awaiter(void 0, void 0, void 0, function () {
                             description: "Adding third-party repo: ".concat(slug),
                         }); }),
                     },
-                    openVsCodeAndPush,
+                    pushToGit,
                     {
                         dir: (0, os_1.homedir)(),
                         commands: [
@@ -384,23 +391,26 @@ var main = function () { return __awaiter(void 0, void 0, void 0, function () {
                                 command: "cp -R $HOME/.sensible/cache/. ".concat(targetDir, "/").concat(appName),
                                 description: "Copying sensible from cache",
                             },
+                            openVSCode,
                         ],
                     },
-                    openVsCodeAndPush,
+                    pushToGit,
                 ];
                 commandsFromFolders = shouldGetCache
                     ? cacheCommands
                     : commandsWithoutCache;
-                commandsFromFolders.reduce(function (previous, commandsObject) { return __awaiter(void 0, void 0, void 0, function () {
-                    return __generator(this, function (_a) {
-                        switch (_a.label) {
-                            case 0: return [4 /*yield*/, previous];
-                            case 1:
-                                _a.sent();
-                                return [2 /*return*/, commandsObject.commands.reduce(getSpawnCommandsReducer(commandsObject.dir, isDebug), Promise.resolve())];
-                        }
-                    });
-                }); }, Promise.resolve());
+                return [4 /*yield*/, commandsFromFolders.reduce(function (previous, commandsObject) { return __awaiter(void 0, void 0, void 0, function () {
+                        return __generator(this, function (_a) {
+                            switch (_a.label) {
+                                case 0: return [4 /*yield*/, previous];
+                                case 1:
+                                    _a.sent();
+                                    return [2 /*return*/, commandsObject.commands.reduce(getSpawnCommandsReducer(commandsObject.dir, isDebug), Promise.resolve())];
+                            }
+                        });
+                    }); }, Promise.resolve())];
+            case 4:
+                _a.sent();
                 return [2 /*return*/];
         }
     });

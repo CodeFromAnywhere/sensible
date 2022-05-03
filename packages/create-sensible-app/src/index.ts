@@ -7,7 +7,6 @@ import { spawn } from "child_process";
 import fs from "fs";
 import { homedir } from "os";
 
-const DEBUG = false;
 const defaultAppName = "makes-sense";
 //test environment should be optional and easy to set up, live should be the default, since we want people to immedeately ship
 const mainBranchName = "live";
@@ -22,7 +21,7 @@ const hasFlag = (flag: string): boolean => {
   return process.argv.includes(`--${flag}`);
 };
 
-const isDebug = hasFlag("debug") || DEBUG;
+const isDebug = hasFlag("debug");
 const isInteractive = hasFlag("interactive");
 const isOffline = hasFlag("offline");
 const isForceUpdate = hasFlag("force-update");
@@ -157,7 +156,8 @@ const checkEnvironmentSetup = () => {
 - Node 18
 - code cli
 - VSCode
-- yarn`);
+- yarn
+- jq`);
 };
 
 const main = async () => {
@@ -178,14 +178,9 @@ const main = async () => {
   const shouldGetCache =
     (difference < 86400 * 1000 || isOffline) && !isForceUpdate;
 
-  const openVsCodeAndPush = {
+  const pushToGit = {
     dir: `${targetDir}/${appName}`,
     commands: [
-      {
-        command: `code ${targetDir}/${appName} --goto README.md:1:1`,
-        description: "Opening your project in VSCode",
-      },
-
       {
         command: `git init`,
         description: "Initialising a git repo",
@@ -216,6 +211,10 @@ const main = async () => {
     ],
   };
 
+  const openVSCode = {
+    command: `code ${targetDir}/${appName} --goto README.md:1:1`,
+    description: "Opening your project in VSCode",
+  };
   const preventInvalidHookCall = {
     command: "yarn add react@17.0.2 react-dom@17.0.2",
     description: "Install right react version to prevent invalid hook call",
@@ -233,10 +232,13 @@ const main = async () => {
           command: `cp -R ${sensibleAssetsDir}/templates/init/. ${targetDir}/${appName}`,
           description: "Copying sensible template",
         },
+
         {
-          command: `cd && ${appName} && for f in **/gitignore; do mv "$f" "$(echo "$f" | sed s/gitignore/.gitignore/)"; done`,
-          description: "Rename all gitignore files to .gitignore",
           //https://github.com/jherr/create-mf-app/pull/8
+          command: `sleep 1 && cd ${appName} && find . -type f -name 'gitignore' -execdir mv {} .{} ';'`,
+          // NB: the below doesn't work because glob patterns sometines only work in interacgtive mode (see https://superuser.com/questions/715007/ls-with-glob-not-working-in-a-bash-script)
+          //command: `sleep 2 && cd ${appName} && for f in **/gitignore; do mv "$f" "$(echo "$f" | sed s/gitignore/.gitignore/)"; done`,
+          description: "Rename all gitignore files to .gitignore",
         },
       ],
     },
@@ -260,6 +262,7 @@ const main = async () => {
           command: `cp -R ${sensibleAssetsDir}/templates/app/* ${targetDir}/${appName}/apps/app`,
           description: "Copying app template",
         },
+        openVSCode,
       ],
     },
 
@@ -322,6 +325,14 @@ const main = async () => {
           description: "Removing git folder",
         },
         preventInvalidHookCall,
+
+        {
+          // NB: without renaming it doesn't work
+          command:
+            "mv package.json package-old.json && jq '.main |= \"index.ts\"' package-old.json > package.json && rm package-old.json",
+          description: "changing main entry of package.json",
+        },
+
         {
           command:
             "npx expo-cli install core@* ui@* sensible-core@* tailwind-rn react-query react-with-native react-with-native-form react-with-native-store @react-native-async-storage/async-storage react-with-native-text-input react-with-native-router @react-navigation/native @react-navigation/native-stack",
@@ -345,7 +356,7 @@ const main = async () => {
       })),
     },
 
-    openVsCodeAndPush,
+    pushToGit,
 
     {
       dir: homedir(),
@@ -378,17 +389,18 @@ const main = async () => {
           command: `cp -R $HOME/.sensible/cache/. ${targetDir}/${appName}`,
           description: "Copying sensible from cache",
         },
+        openVSCode,
       ],
     },
 
-    openVsCodeAndPush,
+    pushToGit,
   ];
 
   const commandsFromFolders = shouldGetCache
     ? cacheCommands
     : commandsWithoutCache;
 
-  commandsFromFolders.reduce(
+  await commandsFromFolders.reduce(
     async (previous: Promise<void>, commandsObject: CommandsObject) => {
       await previous;
       return commandsObject.commands.reduce(
