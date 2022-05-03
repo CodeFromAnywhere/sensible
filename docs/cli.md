@@ -2,8 +2,17 @@
 
 `npx create-senssible-app` or `yarn create sensible-app` bootstraps a new sensible project for you, with sensible defaults. After installation you can also use `create-sensible-app`, `sense`, `sensible`, `s` or `makes-sense`.
 
+### Environment setup
+
+- macos
+- node 18, npm, yarn
+- vscode with code cli
+- jq
+- git
+- watchman
+
 ### Arguments
-There are a couple of flags and arguments to alter the way it works. Everything is optional, and it is recommended to KISS and just live with the defaults:
+There are a couple of flags and arguments to alter the way it works. Everything is optional, and it is recommended to KISS, be sensible, and just live with the defaults:
 
 * `name` as first argument (optional): name of your project
 * `repo` as second argument (optional): Where should your app be hosted? Provide an URL or a GitHub slug (either "org/repo" or "username/repo").

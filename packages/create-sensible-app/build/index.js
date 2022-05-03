@@ -219,7 +219,7 @@ var askEnvironmentSetup = function () { return __awaiter(void 0, void 0, void 0,
     var envIsSetup;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, ask("Do you have the following environment setup and tools installed? Continuing with a different setup could cause bugs...\n\n- macos\n- node 18\n- code cli\n- vscode\n- yarn\n- jq\n- git\n- watchman\n\ny/n?")];
+            case 0: return [4 /*yield*/, ask("Do you have the following environment setup and tools installed? Continuing with a different setup could cause bugs...\n\n- macos\n- node 18, npm, yarn\n- vscode with code cli\n- jq\n- git\n- watchman\n\ny/n?")];
             case 1:
                 envIsSetup = _a.sent();
                 if (envIsSetup === "y") {
@@ -246,7 +246,7 @@ var main = function () { return __awaiter(void 0, void 0, void 0, function () {
                 _b.label = 2;
             case 2:
                 if (_a)
-                    throw "Please set up your environment first";
+                    throw "Please set up your environment first, see https://github.com/Code-From-Anywhere/sensible/blob/main/docs/cli.md for more info.";
                 return [4 /*yield*/, getName()];
             case 3:
                 appName = _b.sent();

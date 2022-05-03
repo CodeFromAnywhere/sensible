@@ -201,10 +201,8 @@ const askEnvironmentSetup = async () => {
     await ask(`Do you have the following environment setup and tools installed? Continuing with a different setup could cause bugs...
 
 - macos
-- node 18
-- code cli
-- vscode
-- yarn
+- node 18, npm, yarn
+- vscode with code cli
 - jq
 - git
 - watchman
@@ -221,7 +219,7 @@ y/n?`);
 const main = async () => {
   try {
     if (updatedAt === "0" && !(await askEnvironmentSetup()))
-      throw `Please set up your environment first`;
+      throw `Please set up your environment first, see https://github.com/Code-From-Anywhere/sensible/blob/main/docs/cli.md for more info.`;
 
     const appName = await getName();
     const remote = await getRemote(appName);
