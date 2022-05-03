@@ -136,9 +136,13 @@ const getName = async (): Promise<string> => {
   let n = 0;
   let fullAppName = appName;
   while (fs.existsSync(fullAppName)) {
-    console.log(`Folder ${fullAppName} already exists...`);
     n++;
     fullAppName = `${appName}${n}`;
+  }
+  if (fullAppName !== appName) {
+    console.log(
+      `Using name ${fullAppName} because ${appName} folder already exists.`
+    );
   }
   return fullAppName;
 };
@@ -233,271 +237,267 @@ Yes (y, yes, enter) or no?\n\n`);
 };
 
 const main = async () => {
-  try {
-    if (updatedAt === "0" && !(await askEnvironmentSetup()))
-      throw `Please set up your environment first.`;
+  if (updatedAt === "0" && !(await askEnvironmentSetup())) {
+    console.log(`Please set up your environment first.`);
+    process.exit(1);
+  }
+  const appName = await getName();
+  const remote = await getRemote(appName);
+  const sensibleAssetsDir = path.resolve(__dirname, "..", `assets`);
+  const targetDir = process.cwd();
 
-    const appName = await getName();
-    const remote = await getRemote(appName);
-    const sensibleAssetsDir = path.resolve(__dirname, "..", `assets`);
-    const targetDir = process.cwd();
+  const pushToGit = {
+    dir: `${targetDir}/${appName}`,
+    commands: [
+      {
+        command: `git init`,
+        description: "Initialising a git repo",
+      },
 
-    const pushToGit = {
-      dir: `${targetDir}/${appName}`,
+      {
+        command: `git branch -M ${mainBranchName}`,
+        description: `Move to '${mainBranchName}' branch`,
+      },
+
+      {
+        command: `git add . && git commit -m "${initialCommitMessage}"`,
+        description: "Creating commit",
+      },
+
+      {
+        command: `git remote add origin ${remote}`,
+        description: "Adding remote",
+        isDisabled: !remote,
+      },
+
+      {
+        command: `git push -u origin ${mainBranchName}`,
+        description: "Push",
+        isDisabled: !remote,
+      },
+    ],
+  };
+
+  const openVSCode = {
+    command: `code ${targetDir}/${appName} --goto README.md:1:1`,
+    description: "Opening your project in VSCode",
+  };
+  const preventInvalidHookCall = {
+    command: "yarn add react@17.0.2 react-dom@17.0.2",
+    description: "Install right react version to prevent invalid hook call",
+  };
+  const setNewDefaults: Command = {
+    command: `echo ${flagArgumentsString} > ${settingsLocation}`,
+    description: "Save new setttings",
+    isDisabled: !isNewDefaults,
+  };
+
+  const commandsWithoutCache: CommandsObject[] = [
+    {
+      dir: targetDir,
       commands: [
         {
-          command: `git init`,
-          description: "Initialising a git repo",
+          command: `mkdir ${appName}`,
+          description: "Making folder for your app",
+        },
+        {
+          //NB: "*" doesn't match hidden files, so we use "." here
+          command: `cp -R ${sensibleAssetsDir}/templates/init/. ${targetDir}/${appName}`,
+          description: "Copying sensible template",
         },
 
         {
-          command: `git branch -M ${mainBranchName}`,
-          description: `Move to '${mainBranchName}' branch`,
+          //https://github.com/jherr/create-mf-app/pull/8
+
+          command: `cd ${appName} && find . -type f -name 'gitignore' -execdir mv {} .{} ';'`,
+          // NB: not sure if sleep is needed.
+          // NB: the below doesn't work because glob patterns sometines only work in interactive mode (see https://superuser.com/questions/715007/ls-with-glob-not-working-in-a-bash-script)
+          //command: `sleep 2 && cd ${appName} && for f in **/gitignore; do mv "$f" "$(echo "$f" | sed s/gitignore/.gitignore/)"; done`,
+          description: "Rename all gitignore files to .gitignore",
         },
 
         {
-          command: `git add . && git commit -m "${initialCommitMessage}"`,
-          description: "Creating commit",
-          isDisabled: !remote,
-        },
-
-        {
-          command: `git remote add origin ${remote}`,
-          description: "Adding remote",
-          isDisabled: !remote,
-        },
-
-        {
-          command: `git push -u origin ${mainBranchName}`,
-          description: "Push",
-          isDisabled: !remote,
+          command: `cd ${appName} && find . -type f -name 'package.template.json' -execdir mv {} package.json ';'`,
+          description: "Rename all package.template.json files to package.json",
         },
       ],
-    };
+    },
 
-    const openVSCode = {
-      command: `code ${targetDir}/${appName} --goto README.md:1:1`,
-      description: "Opening your project in VSCode",
-    };
-    const preventInvalidHookCall = {
-      command: "yarn add react@17.0.2 react-dom@17.0.2",
-      description: "Install right react version to prevent invalid hook call",
-    };
-    const setNewDefaults: Command = {
-      command: `echo ${flagArgumentsString} > ${settingsLocation}`,
-      description: "Save new setttings",
-      isDisabled: !isNewDefaults,
-    };
+    {
+      dir: `${targetDir}/${appName}/apps`,
+      commands: [
+        {
+          command: "yarn create next-app --typescript web",
+          description: "Creating next-app",
+        },
+        {
+          command: "npx expo-cli init -t expo-template-blank-typescript app",
+          description: "Creating expo-app",
+        },
+        {
+          command: `cp -R ${sensibleAssetsDir}/templates/web/* ${targetDir}/${appName}/apps/web`,
+          description: "Copying web template",
+        },
+        {
+          command: `cp -R ${sensibleAssetsDir}/templates/app/* ${targetDir}/${appName}/apps/app`,
+          description: "Copying app template",
+        },
+      ],
+    },
 
-    const commandsWithoutCache: CommandsObject[] = [
-      {
-        dir: targetDir,
-        commands: [
-          {
-            command: `mkdir ${appName}`,
-            description: "Making folder for your app",
-          },
-          {
-            //NB: "*" doesn't match hidden files, so we use "." here
-            command: `cp -R ${sensibleAssetsDir}/templates/init/. ${targetDir}/${appName}`,
-            description: "Copying sensible template",
-          },
+    {
+      dir: `${targetDir}/${appName}/apps/server`,
+      commands: [
+        {
+          command:
+            "yarn add cors dotenv md5 reflect-metadata sequelize sequelize-typescript server sqlite3 typescript",
+          description: "Installing server dependencies",
+        },
+        {
+          command:
+            "yarn add -D @types/node @types/server @types/validator babel-cli eslint ts-node ts-node-dev",
+          description: "Installing server devDependencies",
+        },
+      ],
+    },
 
-          {
-            //https://github.com/jherr/create-mf-app/pull/8
+    {
+      dir: `${targetDir}/${appName}/apps/web`,
+      commands: [
+        {
+          command: "rm -rf .git",
+          description: "Removing web git folder",
+        },
+        preventInvalidHookCall,
+        {
+          command:
+            "yarn add core@* ui@* react-query react-with-native react-with-native-form react-with-native-password-input react-with-native-store react-with-native-text-input react-with-native-router next-transpile-modules @badrap/bar-of-progress",
+          description: "Installing web dependencies",
+        },
+        {
+          command: "yarn add -D config@* tsconfig@*",
+          description: "Installing web devDependencies",
+        },
+        {
+          command: "mv styles src/styles",
+          description: "Moving some stuff around",
+        },
+        {
+          command: "mv pages src/pages",
+          description: "Moving some stuff around",
+        },
+        { command: "touch src/types.ts", description: "Creating files" },
+        { command: "touch src/constants.ts", description: "Creating files" },
+        // {
+        //   command: "npx setup-tailwind-rn",
+        //   description: "Installing tailwind",
+        // },
+      ],
+    },
 
-            command: `sleep 1 && cd ${appName} && find . -type f -name 'gitignore' -execdir mv {} .{} ';'`,
-            // NB: not sure if sleep is needed.
-            // NB: the below doesn't work because glob patterns sometines only work in interactive mode (see https://superuser.com/questions/715007/ls-with-glob-not-working-in-a-bash-script)
-            //command: `sleep 2 && cd ${appName} && for f in **/gitignore; do mv "$f" "$(echo "$f" | sed s/gitignore/.gitignore/)"; done`,
-            description: "Rename all gitignore files to .gitignore",
-          },
+    {
+      dir: `${targetDir}/${appName}/apps/app`,
+      commands: [
+        {
+          command: "rm -rf .git",
+          description: "Removing git folder",
+        },
+        preventInvalidHookCall,
 
-          {
-            command: `cd ${appName} && find . -type f -name 'package.template.json' -execdir mv {} package.json ';'`,
-            description:
-              "Rename all package.template.json files to package.json",
-          },
-        ],
-      },
+        {
+          // NB: without renaming it doesn't work
+          command:
+            "mv package.json package-old.json && jq '.main |= \"index.ts\"' package-old.json > package.json && rm package-old.json",
+          description: "changing main entry of package.json",
+        },
 
-      {
-        dir: `${targetDir}/${appName}/apps`,
-        commands: [
-          {
-            command: "yarn create next-app --typescript web",
-            description: "Creating next-app",
-          },
-          {
-            command: "npx expo-cli init -t expo-template-blank-typescript app",
-            description: "Creating expo-app",
-          },
-          {
-            command: `cp -R ${sensibleAssetsDir}/templates/web/* ${targetDir}/${appName}/apps/web`,
-            description: "Copying web template",
-          },
-          {
-            command: `cp -R ${sensibleAssetsDir}/templates/app/* ${targetDir}/${appName}/apps/app`,
-            description: "Copying app template",
-          },
-        ],
-      },
+        {
+          command:
+            "npx expo-cli install core@* ui@* sensible-core@* tailwind-rn react-query react-with-native react-with-native-form react-with-native-store @react-native-async-storage/async-storage react-with-native-text-input react-with-native-router @react-navigation/native @react-navigation/native-stack",
+          description: "Installing app dependencies",
+        },
 
-      {
-        dir: `${targetDir}/${appName}/apps/server`,
-        commands: [
-          {
-            command:
-              "yarn add cors dotenv md5 reflect-metadata sequelize sequelize-typescript server sqlite3 typescript",
-            description: "Installing server dependencies",
-          },
-          {
-            command:
-              "yarn add -D @types/node @types/server @types/validator babel-cli eslint ts-node ts-node-dev",
-            description: "Installing server devDependencies",
-          },
-        ],
-      },
+        {
+          command:
+            "yarn add -D @expo/webpack-config babel-plugin-module-resolver concurrently postcss tailwindcss",
+          description: "Installing app devDependencies",
+        },
+      ],
+    },
 
-      {
-        dir: `${targetDir}/${appName}/apps/web`,
-        commands: [
-          {
-            command: "rm -rf .git",
-            description: "Removing web git folder",
-          },
-          preventInvalidHookCall,
-          {
-            command:
-              "yarn add core@* ui@* react-query react-with-native react-with-native-form react-with-native-password-input react-with-native-store react-with-native-text-input react-with-native-router next-transpile-modules @badrap/bar-of-progress",
-            description: "Installing web dependencies",
-          },
-          {
-            command: "yarn add -D config@* tsconfig@*",
-            description: "Installing web devDependencies",
-          },
-          {
-            command: "mv styles src/styles",
-            description: "Moving some stuff around",
-          },
-          {
-            command: "mv pages src/pages",
-            description: "Moving some stuff around",
-          },
-          { command: "touch src/types.ts", description: "Creating files" },
-          { command: "touch src/constants.ts", description: "Creating files" },
-          {
-            command: "npx setup-tailwind-rn",
-            description: "Installing tailwind",
-          },
-        ],
-      },
+    {
+      // download all third-party dependencies that are tightly integrated and probably still require some bugfixing in v1
+      dir: `${targetDir}/${appName}/third-party`,
+      commands: isNoThirdParty
+        ? []
+        : includedRepoSlugs.map((slug) => ({
+            command: `git clone https://github.com/${slug}.git`,
+            description: `Adding third-party repo: ${slug}`,
+          })),
+    },
 
-      {
-        dir: `${targetDir}/${appName}/apps/app`,
-        commands: [
-          {
-            command: "rm -rf .git",
-            description: "Removing git folder",
-          },
-          preventInvalidHookCall,
+    {
+      dir: `${targetDir}/${appName}`,
+      commands: [openVSCode],
+    },
 
-          {
-            // NB: without renaming it doesn't work
-            command:
-              "mv package.json package-old.json && jq '.main |= \"index.ts\"' package-old.json > package.json && rm package-old.json",
-            description: "changing main entry of package.json",
-          },
+    pushToGit,
 
-          {
-            command:
-              "npx expo-cli install core@* ui@* sensible-core@* tailwind-rn react-query react-with-native react-with-native-form react-with-native-store @react-native-async-storage/async-storage react-with-native-text-input react-with-native-router @react-navigation/native @react-navigation/native-stack",
-            description: "Installing app dependencies",
-          },
+    {
+      dir: homedir(),
+      commands: [
+        {
+          // NB: -p stands for parents and makes directories recursively
+          command: "rm -rf .sensible/cache && mkdir -p .sensible/cache",
+          description: "Creating sensible cache folder",
+        },
+        {
+          command: `cp -R ${targetDir}/${appName}/. .sensible/cache`,
+          description: "creating cache",
+        },
+        {
+          command: `echo $(node -e 'console.log(Date.now())') > .sensible/updatedAt.txt`,
+          description: "Add current timestamp to cached files",
+        },
 
-          {
-            command:
-              "yarn add -D @expo/webpack-config babel-plugin-module-resolver concurrently postcss tailwindcss",
-            description: "Installing app devDependencies",
-          },
-        ],
-      },
+        setNewDefaults,
+      ],
+    },
+  ];
 
-      {
-        // download all third-party dependencies that are tightly integrated and probably still require some bugfixing in v1
-        dir: `${targetDir}/${appName}/third-party`,
-        commands: isNoThirdParty
-          ? []
-          : includedRepoSlugs.map((slug) => ({
-              command: `git clone https://github.com/${slug}.git`,
-              description: `Adding third-party repo: ${slug}`,
-            })),
-      },
+  const cacheCommands: CommandsObject[] = [
+    {
+      dir: targetDir,
+      commands: [
+        {
+          command: `mkdir ${appName}`,
+          description: "Creating your app folder",
+        },
+        {
+          command: `cp -R $HOME/.sensible/cache/. ${targetDir}/${appName}`,
+          description: "Copying sensible from cache",
+        },
+        openVSCode,
+        setNewDefaults,
+      ],
+    },
 
-      {
-        dir: `${targetDir}/${appName}`,
-        commands: [openVSCode],
-      },
+    pushToGit,
+  ];
 
-      pushToGit,
+  const commandsFromFolders = shouldGetCache
+    ? cacheCommands
+    : commandsWithoutCache;
 
-      {
-        dir: homedir(),
-        commands: [
-          {
-            command: "rm -rf .sensible/cache && mkdir .sensible/cache",
-            description: "Creating sensible cache folder",
-          },
-          {
-            command: `cp -R ${targetDir}/${appName}/. .sensible/cache`,
-            description: "creating cache",
-          },
-          {
-            command: `echo $(node -e 'console.log(Date.now())') > .sensible/updatedAt.txt`,
-            description: "Add current timestamp to cached files",
-          },
-
-          setNewDefaults,
-        ],
-      },
-    ];
-
-    const cacheCommands: CommandsObject[] = [
-      {
-        dir: targetDir,
-        commands: [
-          {
-            command: `mkdir ${appName}`,
-            description: "Creating your app folder",
-          },
-          {
-            command: `cp -R $HOME/.sensible/cache/. ${targetDir}/${appName}`,
-            description: "Copying sensible from cache",
-          },
-          openVSCode,
-          setNewDefaults,
-        ],
-      },
-
-      pushToGit,
-    ];
-
-    const commandsFromFolders = shouldGetCache
-      ? cacheCommands
-      : commandsWithoutCache;
-
-    await commandsFromFolders.reduce(
-      async (previous: Promise<void>, commandsObject: CommandsObject) => {
-        await previous;
-        return commandsObject.commands.reduce(
-          getSpawnCommandsReducer(commandsObject.dir, !!isDebug),
-          Promise.resolve()
-        );
-      },
-      Promise.resolve()
-    );
-  } catch (e) {
-    console.warn(e);
-  }
+  await commandsFromFolders.reduce(
+    async (previous: Promise<void>, commandsObject: CommandsObject) => {
+      await previous;
+      return commandsObject.commands.reduce(
+        getSpawnCommandsReducer(commandsObject.dir, !!isDebug),
+        Promise.resolve()
+      );
+    },
+    Promise.resolve()
+  );
 };
 main();

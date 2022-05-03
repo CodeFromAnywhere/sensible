@@ -147,9 +147,11 @@ var getName = function () { return __awaiter(void 0, void 0, void 0, function ()
                 n = 0;
                 fullAppName = appName;
                 while (fs_1.default.existsSync(fullAppName)) {
-                    console.log("Folder ".concat(fullAppName, " already exists..."));
                     n++;
                     fullAppName = "".concat(appName).concat(n);
+                }
+                if (fullAppName !== appName) {
+                    console.log("Using name ".concat(fullAppName, " because ").concat(appName, " folder already exists."));
                 }
                 return [2 /*return*/, fullAppName];
         }
@@ -246,11 +248,10 @@ var askEnvironmentSetup = function () { return __awaiter(void 0, void 0, void 0,
     });
 }); };
 var main = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, appName, remote, sensibleAssetsDir, targetDir, pushToGit, openVSCode, preventInvalidHookCall, setNewDefaults, commandsWithoutCache, cacheCommands, commandsFromFolders, e_1;
+    var _a, appName, remote, sensibleAssetsDir, targetDir, pushToGit, openVSCode, preventInvalidHookCall, setNewDefaults, commandsWithoutCache, cacheCommands, commandsFromFolders;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
-                _b.trys.push([0, 6, , 7]);
                 _a = updatedAt === "0";
                 if (!_a) return [3 /*break*/, 2];
                 return [4 /*yield*/, askEnvironmentSetup()];
@@ -258,8 +259,10 @@ var main = function () { return __awaiter(void 0, void 0, void 0, function () {
                 _a = !(_b.sent());
                 _b.label = 2;
             case 2:
-                if (_a)
-                    throw "Please set up your environment first.";
+                if (_a) {
+                    console.log("Please set up your environment first.");
+                    process.exit(1);
+                }
                 return [4 /*yield*/, getName()];
             case 3:
                 appName = _b.sent();
@@ -282,7 +285,6 @@ var main = function () { return __awaiter(void 0, void 0, void 0, function () {
                         {
                             command: "git add . && git commit -m \"".concat(initialCommitMessage, "\""),
                             description: "Creating commit",
-                            isDisabled: !remote,
                         },
                         {
                             command: "git remote add origin ".concat(remote),
@@ -324,7 +326,7 @@ var main = function () { return __awaiter(void 0, void 0, void 0, function () {
                             },
                             {
                                 //https://github.com/jherr/create-mf-app/pull/8
-                                command: "sleep 1 && cd ".concat(appName, " && find . -type f -name 'gitignore' -execdir mv {} .{} ';'"),
+                                command: "cd ".concat(appName, " && find . -type f -name 'gitignore' -execdir mv {} .{} ';'"),
                                 // NB: not sure if sleep is needed.
                                 // NB: the below doesn't work because glob patterns sometines only work in interactive mode (see https://superuser.com/questions/715007/ls-with-glob-not-working-in-a-bash-script)
                                 //command: `sleep 2 && cd ${appName} && for f in **/gitignore; do mv "$f" "$(echo "$f" | sed s/gitignore/.gitignore/)"; done`,
@@ -396,10 +398,10 @@ var main = function () { return __awaiter(void 0, void 0, void 0, function () {
                             },
                             { command: "touch src/types.ts", description: "Creating files" },
                             { command: "touch src/constants.ts", description: "Creating files" },
-                            {
-                                command: "npx setup-tailwind-rn",
-                                description: "Installing tailwind",
-                            },
+                            // {
+                            //   command: "npx setup-tailwind-rn",
+                            //   description: "Installing tailwind",
+                            // },
                         ],
                     },
                     {
@@ -444,7 +446,8 @@ var main = function () { return __awaiter(void 0, void 0, void 0, function () {
                         dir: (0, os_1.homedir)(),
                         commands: [
                             {
-                                command: "rm -rf .sensible/cache && mkdir .sensible/cache",
+                                // NB: -p stands for parents and makes directories recursively
+                                command: "rm -rf .sensible/cache && mkdir -p .sensible/cache",
                                 description: "Creating sensible cache folder",
                             },
                             {
@@ -492,12 +495,7 @@ var main = function () { return __awaiter(void 0, void 0, void 0, function () {
                     }); }, Promise.resolve())];
             case 5:
                 _b.sent();
-                return [3 /*break*/, 7];
-            case 6:
-                e_1 = _b.sent();
-                console.warn(e_1);
-                return [3 /*break*/, 7];
-            case 7: return [2 /*return*/];
+                return [2 /*return*/];
         }
     });
 }); };

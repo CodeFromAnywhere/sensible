@@ -1,130 +1,61 @@
 {
   "version": "2.0.0",
+  "options": { "shell": { "executable": "sh", "args": ["-c"] } },
   "tasks": [
-    //pull
     {
-      "label": "pull",
+      "label": "Welcome",
       "type": "shell",
-      "command": "say \"Happy coding. don't forget to ship and pull, and stay sensible! you got this.\"",
-      "group": "none",
-      "presentation": {
-        "echo": false,
-        "focus": false,
-        "group": "run",
-        "panel": "shared",
-        "reveal": "never"
-      },
-      "isBackground": true,
-      "runOptions": {
-        "runOn": "folderOpen"
-      }
-    },
-
-    // core
-    {
-        "label": "Launch server",
-        // "dependsOn": "pull",
-      "type": "shell",
-      "command": "source ~/.zshrc && cd packages/core && yarn dev", // Enter your command here
-      "group": "none",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "shared",
-        "showReuseMessage": true,
-        "clear": false,
-        "group": "run"
-      },
-      "isBackground": true,
-      "runOptions": {
-        "runOn": "folderOpen"
-      }
-    },
-    
-    // server
-    {
-      // "dependsOn": "pull",
-      "label": "Launch web",
-      "type": "shell",
-      "command": "source ~/.zshrc && cd apps/server && yarn dev", // Enter your command here
-      "group": "none",
-      "isBackground": true,
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "shared",
-        "showReuseMessage": true,
-        "clear": false,
-        "group": "run"
-      },
-      "runOptions": {
-        "runOn": "folderOpen"
-      }
-    },
-
-     // web
-    {
-      // "dependsOn": "pull",
-      "label": "Launch web",
-      "type": "shell",
-      "command": "source ~/.zshrc && cd apps/web && yarn dev", // Enter your command here
-      "group": "none",
-      "isBackground": true,
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "shared",
-        "showReuseMessage": true,
-        "clear": false,
-        "group": "run"
-      },
-      "runOptions": {
-        "runOn": "folderOpen"
-      }
-    },
-
-     // app
-    {
-        "label": "Launch app",
-        // "dependsOn": "pull",
-      "type": "shell",
-      "command": "source ~/.zshrc && cd apps/app && yarn start", // Enter your command here
-      "group": "none",
-      "isBackground": true,
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "shared",
-        "showReuseMessage": true,
-        "clear": false,
-        "group": "run"
-      },
-      "runOptions": {
-        "runOn": "folderOpen"
-      }
+      "presentation": { "reveal": "never", "close": true },
+      "command": "say \"Happy coding. Don't forget to ship and pull, and stay sensible! You got this.\"",
+      "runOptions": { "runOn": "folderOpen" }
     },
 
     {
-      // "dependsOn": "pull",
-      "isBackground": true,
       "label": "Open sensible docs",
       "type": "shell",
+      "presentation": { "reveal": "never", "close": true },
       "command": "open https://docs.sensibleframework.co/localhost:4000",
-      "presentation": {
-        "echo": false,
-        "focus": false,
-        "group": "browser",
-        "panel": "shared",
-        "reveal": "never"
-      },
-      "runOptions": {
-        "runOn": "folderOpen"
-      }
+      "runOptions": { "runOn": "folderOpen" }
     },
 
+    {
+      "label": "Watch Core",
+      "type": "shell",
+      "isBackground": true, //prevent loading indicator ui
+      "options": { "cwd": "${workspaceFolder}/packages/core" },
+      "presentation": { "group": "run" },
+      "command": "yarn dev",
+      "runOptions": { "runOn": "folderOpen" }
+    },
+
+    {
+      "label": "Run server",
+      "type": "shell",
+      "isBackground": true, //prevent loading indicator ui
+      "options": { "cwd": "${workspaceFolder}/apps/server" },
+      "presentation": { "group": "run" },
+      "command": "yarn dev",
+      "runOptions": { "runOn": "folderOpen" }
+    },
+
+    {
+      "label": "Run web packager",
+      "type": "shell",
+      "isBackground": true, //prevent loading indicator ui
+      "options": { "cwd": "${workspaceFolder}/apps/web" },
+      "presentation": { "group": "run" },
+      "command": "yarn dev",
+      "runOptions": { "runOn": "folderOpen" }
+    },
+
+    {
+      "label": "Start app packager",
+      "type": "shell",
+      "isBackground": true, //prevent loading indicator ui
+      "options": { "cwd": "${workspaceFolder}/apps/app" },
+      "command": "yarn start",
+      "presentation": { "group": "run" },
+      "runOptions": { "runOn": "folderOpen" }
+    }
   ]
 }
