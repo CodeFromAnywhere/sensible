@@ -1,10 +1,11 @@
 {
   "version": "2.0.0",
+  // important! Among other things, the server can't find core if we don't use the sh executable. NB: This can also be set per task.
+  "type": "shell",
   "options": { "shell": { "executable": "sh", "args": ["-c"] } },
   "tasks": [
     {
       "label": "Welcome",
-      "type": "shell",
       "presentation": { "reveal": "never", "close": true },
       "command": "say \"Happy coding. Don't forget to ship and pull, and stay sensible! You got this.\"",
       "runOptions": { "runOn": "folderOpen" }
@@ -12,15 +13,15 @@
 
     {
       "label": "Open sensible docs",
-      "type": "shell",
       "presentation": { "reveal": "never", "close": true },
       "command": "open https://docs.sensibleframework.co/localhost:4000",
       "runOptions": { "runOn": "folderOpen" }
     },
 
+    // the below scripts are ran in one panel with different tabs (group=run)
+
     {
-      "label": "Watch Core",
-      "type": "shell",
+      "label": "Core",
       "isBackground": true, //prevent loading indicator ui
       "options": { "cwd": "${workspaceFolder}/packages/core" },
       "presentation": { "group": "run" },
@@ -29,8 +30,7 @@
     },
 
     {
-      "label": "Run server",
-      "type": "shell",
+      "label": "Server",
       "isBackground": true, //prevent loading indicator ui
       "options": { "cwd": "${workspaceFolder}/apps/server" },
       "presentation": { "group": "run" },
@@ -39,8 +39,7 @@
     },
 
     {
-      "label": "Run web packager",
-      "type": "shell",
+      "label": "Web packager",
       "isBackground": true, //prevent loading indicator ui
       "options": { "cwd": "${workspaceFolder}/apps/web" },
       "presentation": { "group": "run" },
@@ -49,8 +48,7 @@
     },
 
     {
-      "label": "Start app packager",
-      "type": "shell",
+      "label": "App packager",
       "isBackground": true, //prevent loading indicator ui
       "options": { "cwd": "${workspaceFolder}/apps/app" },
       "command": "yarn start",
