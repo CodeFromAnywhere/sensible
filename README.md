@@ -2,9 +2,10 @@
 <a href="https://www.sensibleframework.co" target="_blank">
 <img src="./assets/icon2.png" width="250" /><br />
 www.sensibleframework.co
-</a></p>
-
+</a>
 [docs](/docs) | [packages](/packages)
+</p>
+
 
 
 # The fastest way to build an app
