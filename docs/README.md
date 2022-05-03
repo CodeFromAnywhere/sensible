@@ -1,6 +1,6 @@
 # Documentation
 
-* [cli](/cli.md)
+* [cli](cli.md)
 * [code sharing](/code-sharing.md)
 * [conventions](/conventions.md)
 * [developer productivity](/developer-productivity.md)
