@@ -175,13 +175,17 @@ const getSpawnCommandsReducer =
           shell: true,
           cwd: dir,
         })
-          .addListener("exit", (code) => {
+          .on("exit", (code) => {
             const CODE_SUCCESSFUL = 0;
             if (code === CODE_SUCCESSFUL) {
               //once done, clear the console
               console.clear();
               clearInterval(interval);
               resolve();
+            } else {
+              clearInterval(interval);
+              console.log(messages.join("\n"));
+              throw `The following command failed: "${command}"`;
             }
           })
           //save all output so it can be printed on an error
@@ -198,7 +202,7 @@ const getSpawnCommandsReducer =
 
 const askEnvironmentSetup = async () => {
   const envIsSetup =
-    await ask(`Do you have the following environment setup and tools installed? Continuing with a different setup could cause bugs...
+    await ask(`Do you have the following environment setup and tools installed? Continuing with a different setup could cause bugs. 
 
 - macos
 - node 18, npm, yarn
@@ -207,9 +211,11 @@ const askEnvironmentSetup = async () => {
 - git
 - watchman
 
-y/n?`);
+See https://github.com/Code-From-Anywhere/sensible/blob/main/docs/cli.md for more info.
 
-  if (envIsSetup === "y") {
+Yes (y, yes, enter) or no?\n\n`);
+
+  if (["y", "", "yes"].includes(envIsSetup)) {
     return true;
   } else {
     return false;
@@ -219,7 +225,7 @@ y/n?`);
 const main = async () => {
   try {
     if (updatedAt === "0" && !(await askEnvironmentSetup()))
-      throw `Please set up your environment first, see https://github.com/Code-From-Anywhere/sensible/blob/main/docs/cli.md for more info.`;
+      throw `Please set up your environment first.`;
 
     const appName = await getName();
     const remote = await getRemote(appName);
@@ -296,6 +302,12 @@ const main = async () => {
             //command: `sleep 2 && cd ${appName} && for f in **/gitignore; do mv "$f" "$(echo "$f" | sed s/gitignore/.gitignore/)"; done`,
             description: "Rename all gitignore files to .gitignore",
           },
+
+          {
+            command: `cd ${appName} && find . -type f -name 'package.template.json' -execdir mv {} package.json ';'`,
+            description:
+              "Rename all package.template.json files to package.json",
+          },
         ],
       },
 
@@ -354,7 +366,6 @@ const main = async () => {
             command: "yarn add -D config@* tsconfig@*",
             description: "Installing web devDependencies",
           },
-          { command: "mkdir src", description: "Making src directory" },
           {
             command: "mv styles src/styles",
             description: "Moving some stuff around",

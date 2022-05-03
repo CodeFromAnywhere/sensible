@@ -3,6 +3,7 @@
 `npx create-senssible-app` or `yarn create sensible-app` bootstraps a new sensible project for you, with sensible defaults. After installation you can also use `create-sensible-app`, `sense`, `sensible`, `s` or `makes-sense`.
 
 ### Environment setup
+You need to have the following environment setup and tools installed. Continuing with a different setup could cause bugs...
 
 - macos
 - node 18, npm, yarn

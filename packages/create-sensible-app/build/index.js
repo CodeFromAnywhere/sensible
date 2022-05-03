@@ -192,13 +192,18 @@ var getSpawnCommandsReducer = function (dir, debug) {
                                     shell: true,
                                     cwd: dir,
                                 })
-                                    .addListener("exit", function (code) {
+                                    .on("exit", function (code) {
                                     var CODE_SUCCESSFUL = 0;
                                     if (code === CODE_SUCCESSFUL) {
                                         //once done, clear the console
                                         console.clear();
                                         clearInterval(interval);
                                         resolve();
+                                    }
+                                    else {
+                                        clearInterval(interval);
+                                        console.log(messages.join("\n"));
+                                        throw "The following command failed: \"".concat(command, "\"");
                                     }
                                 })
                                     //save all output so it can be printed on an error
@@ -219,10 +224,10 @@ var askEnvironmentSetup = function () { return __awaiter(void 0, void 0, void 0,
     var envIsSetup;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, ask("Do you have the following environment setup and tools installed? Continuing with a different setup could cause bugs...\n\n- macos\n- node 18, npm, yarn\n- vscode with code cli\n- jq\n- git\n- watchman\n\ny/n?")];
+            case 0: return [4 /*yield*/, ask("Do you have the following environment setup and tools installed? Continuing with a different setup could cause bugs. \n\n- macos\n- node 18, npm, yarn\n- vscode with code cli\n- jq\n- git\n- watchman\n\nSee https://github.com/Code-From-Anywhere/sensible/blob/main/docs/cli.md for more info.\n\nYes (y, yes, enter) or no?\n\n")];
             case 1:
                 envIsSetup = _a.sent();
-                if (envIsSetup === "y") {
+                if (["y", "", "yes"].includes(envIsSetup)) {
                     return [2 /*return*/, true];
                 }
                 else {
@@ -246,7 +251,7 @@ var main = function () { return __awaiter(void 0, void 0, void 0, function () {
                 _b.label = 2;
             case 2:
                 if (_a)
-                    throw "Please set up your environment first, see https://github.com/Code-From-Anywhere/sensible/blob/main/docs/cli.md for more info.";
+                    throw "Please set up your environment first.";
                 return [4 /*yield*/, getName()];
             case 3:
                 appName = _b.sent();
@@ -317,6 +322,10 @@ var main = function () { return __awaiter(void 0, void 0, void 0, function () {
                                 //command: `sleep 2 && cd ${appName} && for f in **/gitignore; do mv "$f" "$(echo "$f" | sed s/gitignore/.gitignore/)"; done`,
                                 description: "Rename all gitignore files to .gitignore",
                             },
+                            {
+                                command: "cd ".concat(appName, " && find . -type f -name 'package.template.json' -execdir mv {} package.json ';'"),
+                                description: "Rename all package.template.json files to package.json",
+                            },
                         ],
                     },
                     {
@@ -369,7 +378,6 @@ var main = function () { return __awaiter(void 0, void 0, void 0, function () {
                                 command: "yarn add -D config@* tsconfig@*",
                                 description: "Installing web devDependencies",
                             },
-                            { command: "mkdir src", description: "Making src directory" },
                             {
                                 command: "mv styles src/styles",
                                 description: "Moving some stuff around",
