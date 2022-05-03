@@ -5,7 +5,7 @@
     {
       "label": "pull",
       "type": "shell",
-      "command": "say \"happy coding. don't forget to ship and pull.\"",
+      "command": "say \"Happy coding. don't forget to ship and pull, and stay sensible! you got this.\"",
       "group": "none",
       "presentation": {
         "echo": false,
@@ -23,7 +23,7 @@
     // core
     {
         "label": "Launch server",
-        "dependsOn": "pull",
+        // "dependsOn": "pull",
       "type": "shell",
       "command": "source ~/.zshrc && cd packages/core && yarn dev", // Enter your command here
       "group": "none",
@@ -44,7 +44,7 @@
     
     // server
     {
-      "dependsOn": "pull",
+      // "dependsOn": "pull",
       "label": "Launch web",
       "type": "shell",
       "command": "source ~/.zshrc && cd apps/server && yarn dev", // Enter your command here
@@ -66,7 +66,7 @@
 
      // web
     {
-      "dependsOn": "pull",
+      // "dependsOn": "pull",
       "label": "Launch web",
       "type": "shell",
       "command": "source ~/.zshrc && cd apps/web && yarn dev", // Enter your command here
@@ -89,7 +89,7 @@
      // app
     {
         "label": "Launch app",
-        "dependsOn": "pull",
+        // "dependsOn": "pull",
       "type": "shell",
       "command": "source ~/.zshrc && cd apps/app && yarn start", // Enter your command here
       "group": "none",
@@ -109,33 +109,15 @@
     },
 
     {
-      "dependsOn": "pull",
-      "isBackground": true,
-      "label": "Open localhost",
-      "type": "shell",
-      "command": "sleep 2 && open http://localhost:3000",
-      "presentation": {
-        "echo": false,
-        "focus": false,
-        "group": "run",
-        "panel": "shared",
-        "reveal": "never"
-      },
-      "runOptions": {
-        "runOn": "folderOpen"
-      }
-    },
-
-    {
-      "dependsOn": "pull",
+      // "dependsOn": "pull",
       "isBackground": true,
       "label": "Open sensible docs",
       "type": "shell",
-      "command": "sleep 2 && open https://docs.sensibleframework.co/localhost",
+      "command": "open https://docs.sensibleframework.co/localhost:4000",
       "presentation": {
         "echo": false,
         "focus": false,
-        "group": "run",
+        "group": "browser",
         "panel": "shared",
         "reveal": "never"
       },

@@ -46,22 +46,50 @@ var path_1 = __importDefault(require("path"));
 var child_process_1 = require("child_process");
 var fs_1 = __importDefault(require("fs"));
 var os_1 = require("os");
+var DEBUG_COMMANDS = false;
 var defaultAppName = "makes-sense";
 //test environment should be optional and easy to set up, live should be the default, since we want people to immedeately ship
-var mainBranchName = "live";
 var initialCommitMessage = "🧠 This Makes Sense";
 // currently, this results in a couple of invalid hook calls due to mismatching react* versions
 var includedRepoSlugs = [
-//"Code-From-Anywhere/react-with-native",
-//"Code-From-Anywhere/sensible",
+    "Code-From-Anywhere/react-with-native",
+    "Code-From-Anywhere/sensible",
 ];
-var hasFlag = function (flag) {
-    return process.argv.includes("--".concat(flag));
+var settingsLocation = path_1.default.join((0, os_1.homedir)(), ".sensible/settings.txt");
+var settingsString = fs_1.default.existsSync(settingsLocation)
+    ? fs_1.default.readFileSync(settingsLocation, "utf8")
+    : "";
+var settingsArray = settingsString.split(" ");
+var findArgument = function (flag) { return function (arg) {
+    return arg.startsWith("--".concat(flag));
+}; };
+var getFlagValue = function (flag) {
+    return flag ? flag.split("=")[1] || true : false;
 };
-var isDebug = hasFlag("debug");
-var isInteractive = hasFlag("interactive");
-var isOffline = hasFlag("offline");
-var isForceUpdate = hasFlag("force-update");
+var getFlag = function (flag) {
+    var foundFlagSettings = settingsArray.find(findArgument(flag));
+    var foundFlag = process.argv.find(findArgument(flag));
+    var flagValue = getFlagValue(foundFlagSettings) || getFlagValue(foundFlag);
+    return flagValue;
+};
+var isDebug = getFlag("debug");
+var isInteractive = getFlag("interactive");
+var isOffline = getFlag("offline");
+var isNoCache = getFlag("no-cache");
+var isNoThirdParty = getFlag("no-third-party");
+var mainBranch = getFlag("branch");
+var cacheDays = getFlag("cache-days");
+var isNewDefaults = getFlag("new-defaults");
+var cacheDaysNumber = typeof cacheDays === "string" && !isNaN(Number(cacheDays))
+    ? Number(cacheDays)
+    : 1;
+var cacheUpdatedAtLocation = path_1.default.join((0, os_1.homedir)(), ".sensible/updatedAt.txt");
+var updatedAt = fs_1.default.existsSync(cacheUpdatedAtLocation)
+    ? fs_1.default.readFileSync(cacheUpdatedAtLocation, "utf8")
+    : "0";
+var difference = Date.now() - Number(updatedAt);
+var shouldGetCache = (difference < 86400 * 1000 * cacheDaysNumber || isOffline) && !isNoCache;
+var mainBranchName = typeof mainBranch === "string" && mainBranch.length > 0 ? mainBranch : "live";
 function slugify(string) {
     var a = "àáâäæãåāăąçćčđďèéêëēėęěğǵḧîïíīįìıİłḿñńǹňôöòóœøōõőṕŕřßśšşșťțûüùúūǘůűųẃẍÿýžźż·/_,:;";
     var b = "aaaaaaaaaacccddeeeeeeeegghiiiiiiiilmnnnnoooooooooprrsssssttuuuuuuuuuwxyyzzz------";
@@ -79,27 +107,33 @@ function slugify(string) {
         .replace(/^-+/, "") // Trim - from start of text
         .replace(/-+$/, ""); // Trim - from end of text
 }
+var ask = function (question) {
+    var rl = readline_1.default.createInterface({
+        input: process.stdin,
+        output: process.stdout,
+        terminal: false,
+    });
+    return new Promise(function (resolve) {
+        rl.question(question, function (input) {
+            resolve(input);
+            rl.close();
+        });
+    });
+};
+var flagArgumentsString = process.argv
+    .filter(function (a) { return a.startsWith("--"); })
+    .join(" ");
+var argumentsWithoutFlags = process.argv.filter(function (a) { return !a.startsWith("--"); });
 var getArgumentOrAsk = function (argumentPosition, question) { return __awaiter(void 0, void 0, void 0, function () {
-    var argumentsWithoutFlags, argument, rl;
+    var argument;
     return __generator(this, function (_a) {
-        argumentsWithoutFlags = process.argv.filter(function (a) { return !a.startsWith("--"); });
         argument = argumentsWithoutFlags[argumentPosition + 1];
         if (argument && argument.length > 0)
             return [2 /*return*/, argument];
         if (!isInteractive) {
             return [2 /*return*/, ""];
         }
-        rl = readline_1.default.createInterface({
-            input: process.stdin,
-            output: process.stdout,
-            terminal: false,
-        });
-        return [2 /*return*/, new Promise(function (resolve) {
-                rl.question(question, function (name) {
-                    resolve(name);
-                    rl.close();
-                });
-            })];
+        return [2 /*return*/, ask(question)];
     });
 }); };
 var getName = function () { return __awaiter(void 0, void 0, void 0, function () {
@@ -144,65 +178,83 @@ var getSpawnCommandsReducer = function (dir, debug) {
                 case 0: return [4 /*yield*/, previous];
                 case 1:
                     _a.sent();
-                    // this can be used to test if the commands really are excecuted sequentially with the right parameters.
-                    // return new Promise<void>((resolve) => {
-                    //   setTimeout(() => {
-                    //     resolve(console.log(`extecuted ${command} in ${dir}`));
-                    //   }, 1000);
-                    // });
                     //tell the user what is happening, with a dot every second
                     process.stdout.write(command.description);
                     interval = setInterval(function () { return process.stdout.write("."); }, 1000);
                     return [2 /*return*/, new Promise(function (resolve) {
                             var messages = [];
-                            (0, child_process_1.spawn)(command.command, {
-                                stdio: debug ? "inherit" : "ignore",
-                                shell: true,
-                                cwd: dir,
-                            })
-                                .addListener("exit", function (code) {
-                                //once done, clear the console
-                                console.clear();
-                                clearInterval(interval);
-                                resolve();
-                            })
-                                //save all output so it can be printed on an error
-                                .on("message", function (message) {
-                                messages.push(message.toString());
-                            })
-                                .on("error", function (err) {
-                                console.log(messages.join("\n"));
-                                throw "The following command failed: \"".concat(command, "\": \"").concat(err, "\"");
-                            });
+                            if (DEBUG_COMMANDS) {
+                                console.log("".concat(Date.toString(), ": extecuted ").concat(command, " in ").concat(dir));
+                            }
+                            else {
+                                (0, child_process_1.spawn)(command.command, {
+                                    stdio: debug ? "inherit" : "ignore",
+                                    shell: true,
+                                    cwd: dir,
+                                })
+                                    .addListener("exit", function (code) {
+                                    var CODE_SUCCESSFUL = 0;
+                                    if (code === CODE_SUCCESSFUL) {
+                                        //once done, clear the console
+                                        console.clear();
+                                        clearInterval(interval);
+                                        resolve();
+                                    }
+                                })
+                                    //save all output so it can be printed on an error
+                                    .on("message", function (message) {
+                                    messages.push(message.toString());
+                                })
+                                    .on("error", function (err) {
+                                    console.log(messages.join("\n"));
+                                    throw "The following command failed: \"".concat(command, "\": \"").concat(err, "\"");
+                                });
+                            }
                         })];
             }
         });
     }); };
 };
-var checkEnvironmentSetup = function () {
-    console.log("Please make sure you have \n\n- Node 18\n- code cli\n- VSCode\n- yarn\n- jq");
-};
-var main = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var appName, remote, sensibleAssetsDir, targetDir, cacheUpdatedAtLocation, updatedAt, difference, shouldGetCache, pushToGit, openVSCode, preventInvalidHookCall, commandsWithoutCache, cacheCommands, commandsFromFolders;
+var askEnvironmentSetup = function () { return __awaiter(void 0, void 0, void 0, function () {
+    var envIsSetup;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, checkEnvironmentSetup()];
+            case 0: return [4 /*yield*/, ask("Do you have the following environment setup and tools installed? Continuing with a different setup could cause bugs...\n\n- macos\n- node 18\n- code cli\n- vscode\n- yarn\n- jq\n- git\n- watchman\n\ny/n?")];
             case 1:
-                _a.sent();
-                return [4 /*yield*/, getName()];
+                envIsSetup = _a.sent();
+                if (envIsSetup === "y") {
+                    return [2 /*return*/, true];
+                }
+                else {
+                    return [2 /*return*/, false];
+                }
+                return [2 /*return*/];
+        }
+    });
+}); };
+var main = function () { return __awaiter(void 0, void 0, void 0, function () {
+    var _a, appName, remote, sensibleAssetsDir, targetDir, pushToGit, openVSCode, preventInvalidHookCall, setNewDefaults, commandsWithoutCache, cacheCommands, commandsFromFolders, e_1;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
+            case 0:
+                _b.trys.push([0, 6, , 7]);
+                _a = updatedAt === "0";
+                if (!_a) return [3 /*break*/, 2];
+                return [4 /*yield*/, askEnvironmentSetup()];
+            case 1:
+                _a = !(_b.sent());
+                _b.label = 2;
             case 2:
-                appName = _a.sent();
-                return [4 /*yield*/, getRemote(appName)];
+                if (_a)
+                    throw "Please set up your environment first";
+                return [4 /*yield*/, getName()];
             case 3:
-                remote = _a.sent();
+                appName = _b.sent();
+                return [4 /*yield*/, getRemote(appName)];
+            case 4:
+                remote = _b.sent();
                 sensibleAssetsDir = path_1.default.resolve(__dirname, "..", "assets");
                 targetDir = process.cwd();
-                cacheUpdatedAtLocation = path_1.default.join((0, os_1.homedir)(), ".sensible/updatedAt.txt");
-                updatedAt = fs_1.default.existsSync(cacheUpdatedAtLocation)
-                    ? fs_1.default.readFileSync(cacheUpdatedAtLocation, "utf8")
-                    : "0";
-                difference = Date.now() - Number(updatedAt);
-                shouldGetCache = (difference < 86400 * 1000 || isOffline) && !isForceUpdate;
                 pushToGit = {
                     dir: "".concat(targetDir, "/").concat(appName),
                     commands: [
@@ -212,7 +264,7 @@ var main = function () { return __awaiter(void 0, void 0, void 0, function () {
                         },
                         {
                             command: "git branch -M ".concat(mainBranchName),
-                            description: "Move to 'live' branch",
+                            description: "Move to '".concat(mainBranchName, "' branch"),
                         },
                         {
                             command: "git add . && git commit -m \"".concat(initialCommitMessage, "\""),
@@ -239,6 +291,11 @@ var main = function () { return __awaiter(void 0, void 0, void 0, function () {
                     command: "yarn add react@17.0.2 react-dom@17.0.2",
                     description: "Install right react version to prevent invalid hook call",
                 };
+                setNewDefaults = {
+                    command: "echo ".concat(flagArgumentsString, " > ").concat(settingsLocation),
+                    description: "Save new setttings",
+                    isDisabled: !isNewDefaults,
+                };
                 commandsWithoutCache = [
                     {
                         dir: targetDir,
@@ -255,7 +312,8 @@ var main = function () { return __awaiter(void 0, void 0, void 0, function () {
                             {
                                 //https://github.com/jherr/create-mf-app/pull/8
                                 command: "sleep 1 && cd ".concat(appName, " && find . -type f -name 'gitignore' -execdir mv {} .{} ';'"),
-                                // NB: the below doesn't work because glob patterns sometines only work in interacgtive mode (see https://superuser.com/questions/715007/ls-with-glob-not-working-in-a-bash-script)
+                                // NB: not sure if sleep is needed.
+                                // NB: the below doesn't work because glob patterns sometines only work in interactive mode (see https://superuser.com/questions/715007/ls-with-glob-not-working-in-a-bash-script)
                                 //command: `sleep 2 && cd ${appName} && for f in **/gitignore; do mv "$f" "$(echo "$f" | sed s/gitignore/.gitignore/)"; done`,
                                 description: "Rename all gitignore files to .gitignore",
                             },
@@ -280,7 +338,6 @@ var main = function () { return __awaiter(void 0, void 0, void 0, function () {
                                 command: "cp -R ".concat(sensibleAssetsDir, "/templates/app/* ").concat(targetDir, "/").concat(appName, "/apps/app"),
                                 description: "Copying app template",
                             },
-                            openVSCode,
                         ],
                     },
                     {
@@ -355,10 +412,16 @@ var main = function () { return __awaiter(void 0, void 0, void 0, function () {
                     {
                         // download all third-party dependencies that are tightly integrated and probably still require some bugfixing in v1
                         dir: "".concat(targetDir, "/").concat(appName, "/third-party"),
-                        commands: includedRepoSlugs.map(function (slug) { return ({
-                            command: "git clone https://github.com/".concat(slug, ".git"),
-                            description: "Adding third-party repo: ".concat(slug),
-                        }); }),
+                        commands: isNoThirdParty
+                            ? []
+                            : includedRepoSlugs.map(function (slug) { return ({
+                                command: "git clone https://github.com/".concat(slug, ".git"),
+                                description: "Adding third-party repo: ".concat(slug),
+                            }); }),
+                    },
+                    {
+                        dir: "".concat(targetDir, "/").concat(appName),
+                        commands: [openVSCode],
                     },
                     pushToGit,
                     {
@@ -376,6 +439,7 @@ var main = function () { return __awaiter(void 0, void 0, void 0, function () {
                                 command: "echo $(node -e 'console.log(Date.now())') > .sensible/updatedAt.txt",
                                 description: "Add current timestamp to cached files",
                             },
+                            setNewDefaults,
                         ],
                     },
                 ];
@@ -392,6 +456,7 @@ var main = function () { return __awaiter(void 0, void 0, void 0, function () {
                                 description: "Copying sensible from cache",
                             },
                             openVSCode,
+                            setNewDefaults,
                         ],
                     },
                     pushToGit,
@@ -405,13 +470,18 @@ var main = function () { return __awaiter(void 0, void 0, void 0, function () {
                                 case 0: return [4 /*yield*/, previous];
                                 case 1:
                                     _a.sent();
-                                    return [2 /*return*/, commandsObject.commands.reduce(getSpawnCommandsReducer(commandsObject.dir, isDebug), Promise.resolve())];
+                                    return [2 /*return*/, commandsObject.commands.reduce(getSpawnCommandsReducer(commandsObject.dir, !!isDebug), Promise.resolve())];
                             }
                         });
                     }); }, Promise.resolve())];
-            case 4:
-                _a.sent();
-                return [2 /*return*/];
+            case 5:
+                _b.sent();
+                return [3 /*break*/, 7];
+            case 6:
+                e_1 = _b.sent();
+                console.warn(e_1);
+                return [3 /*break*/, 7];
+            case 7: return [2 /*return*/];
         }
     });
 }); };

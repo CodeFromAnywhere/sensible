@@ -6,8 +6,13 @@ This is a [Sensible](https://sensible.to/) project bootstrapped with [`yarn crea
 
 This project is recommended to be worked on from [VSCode](https://code.visualstudio.com).
 
-The easiest way to start developing is to run the tasks when opening the folder. This is a setting that has to be activated only once after creating the project. If this is the first time opening this project from VSCode, run `Cmd + Shift + P` run the command `Manage automatic tasks in folder` and select `Allow Automatic Tasks In Folder`. After this you can run the command `Developer: Reload Window`. The editor will now restart and run all tasks needed to start developing.
+The easiest way to start developing is to run the tasks when opening the folder. This is a setting that has to be activated only once after creating the project. If this is the first time opening this project from VSCode, run the command `Manage automatic tasks in folder` and allow it. After restarting the editor your project will be ran.
 
+**TL;DR:**
+
+1. `Cmd + Shift + P` --> `Manage automatic tasks in folder` --> `Allow Automatic Tasks In Folder`. 
+2. `Cmd + Shift + P` --> `Developer: Reload Window`
+3. Profit
 
 ## Learn more
 
