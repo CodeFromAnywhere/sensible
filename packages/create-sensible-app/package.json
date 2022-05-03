@@ -1,13 +1,13 @@
 {
   "name": "create-sensible-app",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "A cli to create a new sensible app for you",
   "bin": {
     "create-sensible-app": "./build/index.js",
     "make-sense": "./build/index.js",
     "sense": "./build/index.js",
     "sensible": "./build/index.js",
-    "s":"./build/index.js"
+    "s": "./build/index.js"
   },
   "main": "build/index.js",
   "source": "src/index.ts",

@@ -48,6 +48,8 @@ If you need more help, just look in the auto-generated docs!
 - Full-stack auto-completion using Typescript
 - KISS
 - Maximise learnability, minimise tech debt, simplify onboarding
+- No profit no pay
+- Decentralised, Open Source, maybe code
 
 <p align="center">
 <a href="https://www.sensibleframework.co" target="_blank">
