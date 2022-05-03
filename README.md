@@ -1,8 +1,8 @@
 <p align="center">
 <a href="https://www.sensibleframework.co" target="_blank">
 <img src="./assets/icon2.png" width="250" /><br />
-www.sensibleframework.co
-</a>
+website
+</a> |
 <a href="https://github.com/Code-From-Anywhere/sensible/tree/main/docs">docs</a> | <a href="https://github.com/Code-From-Anywhere/sensible/tree/main/packages">packages</a>
 </p>
 
