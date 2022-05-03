@@ -8,9 +8,9 @@ website
 
 
 
-# The fastest way to build an app
+# The Shared Full Stack Typescript Framework
 
-**The Shared Full Stack Typescript Framework** With strict conventions and the newest typescript and code sharing possibilities, we were able to create the most advanced typescript framework ever and boost the productivity of hundreds of development teams, maybe even by a factor of 10 or more if you compare it to the industry standard.
+With strict conventions and the newest typescript and code sharing possibilities, we were able to create the most advanced typescript framework ever and boost the productivity of hundreds of development teams, maybe even by a factor of 10 or more if you compare it to the industry standard.
 
 Sensible's mission is to boost the productivity of 100.000+ Software Developers, making it as easy as possible to build a high-quality full-stack mobile/desktop app/website.
 
