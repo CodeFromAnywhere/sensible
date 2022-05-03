@@ -160,6 +160,12 @@ const getSpawnCommandsReducer =
   async (previous: Promise<void>, command: Command) => {
     await previous;
 
+    // if command is disabled, immediately resolve so it is skippped.
+    if (command.isDisabled) {
+      return new Promise<void>((resolve) => {
+        resolve();
+      });
+    }
     //tell the user what is happening, with a dot every second
     process.stdout.write(command.description);
     const interval = setInterval(() => process.stdout.write("."), 1000);
@@ -185,7 +191,8 @@ const getSpawnCommandsReducer =
             } else {
               clearInterval(interval);
               console.log(messages.join("\n"));
-              throw `The following command failed: "${command}"`;
+              console.log(`The following command failed: "${command.command}"`);
+              process.exit(1);
             }
           })
           //save all output so it can be printed on an error
@@ -194,7 +201,10 @@ const getSpawnCommandsReducer =
           })
           .on("error", (err) => {
             console.log(messages.join("\n"));
-            throw `The following command failed: "${command}": "${err}"`;
+            console.log(
+              `The following command failed: "${command.command}": "${err}"`
+            );
+            process.exit(1);
           });
       }
     });

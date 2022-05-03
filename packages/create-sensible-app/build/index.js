@@ -178,6 +178,12 @@ var getSpawnCommandsReducer = function (dir, debug) {
                 case 0: return [4 /*yield*/, previous];
                 case 1:
                     _a.sent();
+                    // if command is disabled, immediately resolve so it is skippped.
+                    if (command.isDisabled) {
+                        return [2 /*return*/, new Promise(function (resolve) {
+                                resolve();
+                            })];
+                    }
                     //tell the user what is happening, with a dot every second
                     process.stdout.write(command.description);
                     interval = setInterval(function () { return process.stdout.write("."); }, 1000);
@@ -203,7 +209,8 @@ var getSpawnCommandsReducer = function (dir, debug) {
                                     else {
                                         clearInterval(interval);
                                         console.log(messages.join("\n"));
-                                        throw "The following command failed: \"".concat(command, "\"");
+                                        console.log("The following command failed: \"".concat(command.command, "\""));
+                                        process.exit(1);
                                     }
                                 })
                                     //save all output so it can be printed on an error
@@ -212,7 +219,8 @@ var getSpawnCommandsReducer = function (dir, debug) {
                                 })
                                     .on("error", function (err) {
                                     console.log(messages.join("\n"));
-                                    throw "The following command failed: \"".concat(command, "\": \"").concat(err, "\"");
+                                    console.log("The following command failed: \"".concat(command.command, "\": \"").concat(err, "\""));
+                                    process.exit(1);
                                 });
                             }
                         })];
