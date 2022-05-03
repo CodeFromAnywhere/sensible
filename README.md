@@ -3,9 +3,7 @@
 <img src="./assets/icon2.png" width="250" /><br />
 www.sensibleframework.co
 </a>
-
-[docs](/docs) | [packages](/packages)
-
+<a href="https://github.com/Code-From-Anywhere/sensible/tree/main/docs">docs</a> | <a href="https://github.com/Code-From-Anywhere/sensible/tree/main/packages">packages</a>
 </p>
 
 
