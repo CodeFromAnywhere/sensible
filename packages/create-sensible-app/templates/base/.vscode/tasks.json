@@ -31,8 +31,12 @@
 
     {
       "label": "Server",
+      "type": "shell",
       "isBackground": true, //prevent loading indicator ui
-      "options": { "cwd": "${workspaceFolder}/apps/server" },
+      "options": {
+        "shell": { "executable": "sh", "args": ["-c"] },
+        "cwd": "${workspaceFolder}/apps/server"
+      },
       "presentation": { "group": "run" },
       "command": "yarn dev",
       "runOptions": { "runOn": "folderOpen" }

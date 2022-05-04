@@ -201,49 +201,55 @@ var getSpawnCommandsReducer = function (dir, debug) {
                     interval = setInterval(function () { return process.stdout.write("."); }, 1000);
                     return [2 /*return*/, new Promise(function (resolve) {
                             var messages = [];
-                            if (DEBUG_COMMANDS) {
-                                console.log("".concat(Date.toString(), ": extecuted ").concat(command, " in ").concat(dir));
-                            }
-                            else {
-                                if (command.command) {
-                                    (0, child_process_1.spawn)(command.command, {
-                                        stdio: debug ? "inherit" : "ignore",
-                                        shell: true,
-                                        cwd: dir,
-                                    })
-                                        .on("exit", function (code) {
-                                        var CODE_SUCCESSFUL = 0;
-                                        if (code === CODE_SUCCESSFUL) {
-                                            //once done, clear the console
-                                            console.clear();
-                                            clearInterval(interval);
-                                            resolve();
-                                        }
-                                        else {
-                                            clearInterval(interval);
-                                            console.log(messages.join("\n"));
-                                            console.log("The following command failed: \"".concat(command.command, "\""));
-                                            process.exit(1);
-                                        }
-                                    })
-                                        //save all output so it can be printed on an error
-                                        .on("message", function (message) {
-                                        messages.push(message.toString());
-                                    })
-                                        .on("error", function (err) {
-                                        console.log(messages.join("\n"));
-                                        console.log("The following command failed: \"".concat(command.command, "\": \"").concat(err, "\""));
-                                        process.exit(1);
-                                    });
-                                }
-                                else if (command.nodeFunction) {
-                                    command.nodeFunction(function () {
-                                        resolve();
-                                    });
-                                }
-                                else {
+                            var onFinish = function (_a) {
+                                var success = _a.success;
+                                //once done, clear the console
+                                console.clear();
+                                clearInterval(interval);
+                                if (success) {
                                     resolve();
                                 }
+                            };
+                            if (DEBUG_COMMANDS) {
+                                console.log("".concat(Date.toString(), ": extecuted ").concat(command, " in ").concat(dir));
+                                resolve();
+                            }
+                            else if (command.command) {
+                                (0, child_process_1.spawn)(command.command, {
+                                    stdio: debug ? "inherit" : "ignore",
+                                    shell: true,
+                                    cwd: dir,
+                                })
+                                    .on("exit", function (code) {
+                                    var CODE_SUCCESSFUL = 0;
+                                    if (code === CODE_SUCCESSFUL) {
+                                        onFinish({ success: true });
+                                    }
+                                    else {
+                                        onFinish({ success: false });
+                                        console.log(messages.join("\n"));
+                                        console.log("The following command failed: \"".concat(command.command, "\""));
+                                        process.exit(1);
+                                    }
+                                })
+                                    //save all output so it can be printed on an error
+                                    .on("message", function (message) {
+                                    messages.push(message.toString());
+                                })
+                                    .on("error", function (err) {
+                                    onFinish({ success: false });
+                                    console.log(messages.join("\n"));
+                                    console.log("The following command failed: \"".concat(command.command, "\": \"").concat(err, "\""));
+                                    process.exit(1);
+                                });
+                            }
+                            else if (command.nodeFunction) {
+                                command.nodeFunction(function () {
+                                    resolve();
+                                });
+                            }
+                            else {
+                                resolve();
                             }
                         })];
             }

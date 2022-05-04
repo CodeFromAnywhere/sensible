@@ -186,49 +186,53 @@ const getSpawnCommandsReducer =
     return new Promise<void>((resolve) => {
       const messages: string[] = [];
 
-      if (DEBUG_COMMANDS) {
-        console.log(`${Date.toString()}: extecuted ${command} in ${dir}`);
-      } else {
-        if (command.command) {
-          spawn(command.command, {
-            stdio: debug ? "inherit" : "ignore",
-            shell: true,
-            cwd: dir,
-          })
-            .on("exit", (code) => {
-              const CODE_SUCCESSFUL = 0;
-              if (code === CODE_SUCCESSFUL) {
-                //once done, clear the console
-                console.clear();
-                clearInterval(interval);
-                resolve();
-              } else {
-                clearInterval(interval);
-                console.log(messages.join("\n"));
-                console.log(
-                  `The following command failed: "${command.command}"`
-                );
-                process.exit(1);
-              }
-            })
-            //save all output so it can be printed on an error
-            .on("message", (message) => {
-              messages.push(message.toString());
-            })
-            .on("error", (err) => {
-              console.log(messages.join("\n"));
-              console.log(
-                `The following command failed: "${command.command}": "${err}"`
-              );
-              process.exit(1);
-            });
-        } else if (command.nodeFunction) {
-          command.nodeFunction(() => {
-            resolve();
-          });
-        } else {
+      const onFinish = ({ success }: { success: boolean }) => {
+        //once done, clear the console
+        console.clear();
+        clearInterval(interval);
+        if (success) {
           resolve();
         }
+      };
+
+      if (DEBUG_COMMANDS) {
+        console.log(`${Date.toString()}: extecuted ${command} in ${dir}`);
+        resolve();
+      } else if (command.command) {
+        spawn(command.command, {
+          stdio: debug ? "inherit" : "ignore",
+          shell: true,
+          cwd: dir,
+        })
+          .on("exit", (code) => {
+            const CODE_SUCCESSFUL = 0;
+            if (code === CODE_SUCCESSFUL) {
+              onFinish({ success: true });
+            } else {
+              onFinish({ success: false });
+              console.log(messages.join("\n"));
+              console.log(`The following command failed: "${command.command}"`);
+              process.exit(1);
+            }
+          })
+          //save all output so it can be printed on an error
+          .on("message", (message) => {
+            messages.push(message.toString());
+          })
+          .on("error", (err) => {
+            onFinish({ success: false });
+            console.log(messages.join("\n"));
+            console.log(
+              `The following command failed: "${command.command}": "${err}"`
+            );
+            process.exit(1);
+          });
+      } else if (command.nodeFunction) {
+        command.nodeFunction(() => {
+          resolve();
+        });
+      } else {
+        resolve();
       }
     });
   };
