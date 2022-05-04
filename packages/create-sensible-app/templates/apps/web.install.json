@@ -33,6 +33,14 @@
     {
       "command": "cd web && yarn add -D config@* tsconfig@*",
       "description": "Installing web devDependencies"
+    },
+    {
+      "command": "rm -rf web/pages web/styles",
+      "description": "Remove unused boilerplate"
+    },
+    {
+      "command": "cd web && yarn add -D tailwindcss postcss autoprefixer && npx tailwindcss init -p",
+      "description": "Install tailwind in your web project"
     }
   ]
 }

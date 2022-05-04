@@ -1,8 +1,10 @@
-const rwnModules = require("./transpile.config");
+// all modules i'm using that use custom tailwind classes without converting them to css should be added here.
+const transpileModules = ["react-with-native", "react-with-native-form"];
+
 const TAILWIND_CONTENT_MODULE_DIR_1 = "./node_modules/[module]/**/*.tsx";
 const TAILWIND_CONTENT_MODULE_DIR_2 = "../../node_modules/[module]/**/*.tsx";
 
-const rwnModulesContent = rwnModules
+const transpileModulesContent = transpileModules
   .map((module) => {
     return [
       // it needs to search both node_modules and the node_modules of my workspace
@@ -24,7 +26,7 @@ module.exports = {
   content: [
     "./src/**/*.{js,ts,jsx,tsx}",
     "../../packages/ui/src/**/*.{js,ts,jsx,tsx}",
-    ...rwnModulesContent,
+    ...transpileModulesContent,
   ],
   theme: {
     extend: {},

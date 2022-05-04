@@ -62,8 +62,8 @@ var defaultAppName = "makes-sense";
 var initialCommitMessage = "🧠 This Makes Sense";
 // currently, this results in a couple of invalid hook calls due to mismatching react* versions
 var includedRepoSlugs = [
-    "Code-From-Anywhere/react-with-native",
-    "Code-From-Anywhere/sensible",
+// "Code-From-Anywhere/react-with-native",
+// "Code-From-Anywhere/sensible",
 ];
 var settingsLocation = path_1.default.join((0, os_1.homedir)(), ".sensible/settings.txt");
 var settingsString = fs_1.default.existsSync(settingsLocation)

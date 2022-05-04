@@ -9165,13 +9165,13 @@
     "range-parser" "~1.2.1"
     "statuses" "2.0.1"
 
-"sensible-core@^1.0.40", "sensible-core@^1.0.41", "sensible-core@file:/Users/wijnandkarsens/Developer/Code-From-Anywhere/sensible/packages/sensible-core":
+"sensible-core@*", "sensible-core@^1.0.40", "sensible-core@file:/Users/wijnandkarsens/Developer/Code-From-Anywhere/sensible/packages/sensible-core":
   "resolved" "file:packages/sensible-core"
-  "version" "1.0.47"
+  "version" "1.0.48"
   dependencies:
     "typescript-json-schema" "^0.53.0"
 
-"sensible-docs@^0.0.3":
+"sensible-docs@*":
   "integrity" "sha512-zknV6b3dzKIRGs/GmbxjSCxGYtKwFMjoTX2UftcI2m7xqhSAS2Ov+fs+aebJFxfpcLADNiO+lvm2qKnRGltIpg=="
   "resolved" "https://registry.npmjs.org/sensible-docs/-/sensible-docs-0.0.3.tgz"
   "version" "0.0.3"

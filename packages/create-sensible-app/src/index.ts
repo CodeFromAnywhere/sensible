@@ -22,8 +22,8 @@ const initialCommitMessage = "🧠 This Makes Sense";
 
 // currently, this results in a couple of invalid hook calls due to mismatching react* versions
 const includedRepoSlugs: string[] = [
-  "Code-From-Anywhere/react-with-native",
-  "Code-From-Anywhere/sensible",
+  // "Code-From-Anywhere/react-with-native",
+  // "Code-From-Anywhere/sensible",
 ];
 
 const settingsLocation = path.join(homedir(), ".sensible/settings.txt");

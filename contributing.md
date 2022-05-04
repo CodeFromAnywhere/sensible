@@ -13,3 +13,5 @@ sense () { node ~/path/to/sensible/packages/create-sensible-app/build/index.js $
 This will make it easy to test the cli from anywhere while making changes.
 
 Also, please note you can't add `package.json` and `.gitignore` files to templates! Call them `package.template.json` and `gitignore` (without dot) repectively in order for everything to function as expected (they will be renamed on installation)
+
+For more info, see [templates](./docs/templates.md)

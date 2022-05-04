@@ -1,10 +1,6 @@
 import { FolderPath, Path } from "sensible-core";
-export declare const isArrayGuard: (moduleExports: any) => boolean;
-/**
- * @param slug what should the suffix or the name of thie file be (plural also possible)
- * @returns file path array
- */
-export declare const findFiles: (slug: string, basePath: string) => FolderPath[];
+export declare const withoutExtension: (fileName: string) => string;
+export declare const getExtension: (fileName: string) => string;
 export declare const findFilesRecursively: ({ match, basePath, relativePath, onlyInSubFolders, onlyInCurrentFolder, }: {
     match: (fileName: string, extension: string) => boolean;
     basePath: Path;
@@ -15,8 +11,12 @@ export declare const findFilesRecursively: ({ match, basePath, relativePath, onl
     onlyInSubFolders?: boolean | undefined;
     onlyInCurrentFolder?: boolean | undefined;
 }) => FolderPath[];
-export declare const withoutExtension: (fileName: string) => string;
-export declare const getExtension: (fileName: string) => string;
+export declare const isArrayGuard: (moduleExports: any) => boolean;
+/**
+ * @param slug what should the suffix or the name of thie file be (plural also possible)
+ * @returns file path array
+ */
+export declare const findFiles: (slug: string, basePath: string) => FolderPath[];
 export declare const importFromFiles: ({ files, importStrategy, list, guard, }: {
     files: Path[];
     importStrategy?: "default" | "fileName" | "list" | undefined;

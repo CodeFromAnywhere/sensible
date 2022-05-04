@@ -31,13 +31,33 @@
     },
 
     {
-      "command": "cd app && npx expo-cli install core@* ui@* sensible-core@* tailwind-rn react-query react-with-native react-with-native-form react-with-native-store @react-native-async-storage/async-storage react-with-native-text-input react-with-native-router @react-navigation/native @react-navigation/native-stack",
+      "command": "cd app && npx expo-cli install core@* ui@* sensible-core@* react-query react-with-native react-with-native-form react-with-native-store @react-native-async-storage/async-storage react-with-native-text-input",
       "description": "Installing app dependencies"
     },
 
     {
-      "command": "cd app && yarn add -D @expo/webpack-config babel-plugin-module-resolver concurrently postcss tailwindcss",
+      "command": "cd app && npx expo-cli install @react-navigation/native @react-navigation/native-stack",
+      "description": "Install react-navigation"
+    },
+
+    {
+      "command": "cd app && yarn add -D @expo/webpack-config babel-plugin-module-resolver",
       "description": "Installing app devDependencies"
+    },
+
+    {
+      "command": "cd app && yarn add tailwind-rn && yarn add -D tailwindcss postcss concurrently && npx tailwindcss init && echo '@tailwind utilities;' > input.css",
+      "description": "Install tailwind"
+    },
+
+    {
+      "command": "cd app && mv package.json package-old.json && jq '.scripts.\"build:tailwind\" |= \"tailwindcss --input input.css --output tailwind.css --no-autoprefixer && tailwind-rn\"' package-old.json > package.json && rm package-old.json",
+      "description": "add build:tailwind script"
+    },
+
+    {
+      "command": "cd app && mv package.json package-old.json && jq '.scripts.\"dev:tailwind\" |= \"concurrently \"tailwindcss --input input.css --output tailwind.css --no-autoprefixer --watch\" \"tailwind-rn --watch\"\"' package-old.json > package.json && rm package-old.json",
+      "description": "add dev:tailwind script"
     }
   ]
 }

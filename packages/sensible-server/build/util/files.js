@@ -3,26 +3,21 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.importFromFiles = exports.getExtension = exports.withoutExtension = exports.findFilesRecursively = exports.findFiles = exports.isArrayGuard = void 0;
+exports.importFromFiles = exports.findFiles = exports.isArrayGuard = exports.findFilesRecursively = exports.getExtension = exports.withoutExtension = void 0;
+const sensible_core_1 = require("sensible-core");
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
-const sensible_core_1 = require("sensible-core");
-const isArrayGuard = (moduleExports) => typeof moduleExports === "object" && Array.isArray(moduleExports);
-exports.isArrayGuard = isArrayGuard;
-/**
- * @param slug what should the suffix or the name of thie file be (plural also possible)
- * @returns file path array
- */
-const findFiles = (slug, basePath) => {
-    return (0, exports.findFilesRecursively)({
-        basePath,
-        match: (fileName) => fileName === slug ||
-            fileName === slug + "s" ||
-            fileName.endsWith(`.${slug}`) ||
-            fileName.endsWith(`.${slug}s`),
-    });
+const withoutExtension = (fileName) => {
+    const pieces = fileName.split(".");
+    pieces.pop();
+    return pieces.join(".");
 };
-exports.findFiles = findFiles;
+exports.withoutExtension = withoutExtension;
+const getExtension = (fileName) => {
+    const pieces = fileName.split(".");
+    return pieces.pop();
+};
+exports.getExtension = getExtension;
 const findFilesRecursively = ({ match, basePath, relativePath, onlyInSubFolders, onlyInCurrentFolder, }) => {
     const location = relativePath ? path_1.default.join(basePath, relativePath) : basePath;
     const contents = fs_1.default.readdirSync(location, { withFileTypes: true });
@@ -52,17 +47,22 @@ const findFilesRecursively = ({ match, basePath, relativePath, onlyInSubFolders,
     }, []);
 };
 exports.findFilesRecursively = findFilesRecursively;
-const withoutExtension = (fileName) => {
-    const pieces = fileName.split(".");
-    pieces.pop();
-    return pieces.join(".");
+const isArrayGuard = (moduleExports) => typeof moduleExports === "object" && Array.isArray(moduleExports);
+exports.isArrayGuard = isArrayGuard;
+/**
+ * @param slug what should the suffix or the name of thie file be (plural also possible)
+ * @returns file path array
+ */
+const findFiles = (slug, basePath) => {
+    return (0, exports.findFilesRecursively)({
+        basePath,
+        match: (fileName) => fileName === slug ||
+            fileName === slug + "s" ||
+            fileName.endsWith(`.${slug}`) ||
+            fileName.endsWith(`.${slug}s`),
+    });
 };
-exports.withoutExtension = withoutExtension;
-const getExtension = (fileName) => {
-    const pieces = fileName.split(".");
-    return pieces.pop();
-};
-exports.getExtension = getExtension;
+exports.findFiles = findFiles;
 const importFromFiles = ({ files, importStrategy = "default", list, guard, }) => {
     return files
         .map((filePath) => {
