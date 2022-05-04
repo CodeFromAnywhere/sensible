@@ -3765,9 +3765,9 @@
 
 "create-sensible-app@file:/Users/wijnandkarsens/Developer/Code-From-Anywhere/sensible/packages/create-sensible-app":
   "resolved" "file:packages/create-sensible-app"
-  "version" "1.0.15"
+  "version" "1.0.16"
   dependencies:
-    "sensible-core" "*"
+    "sensible-server" "*"
 
 "cross-spawn@^6.0.0":
   "integrity" "sha512-eTVLrBSt7fjbDygz805pMnstIs2VTBNkRm0qxZd+M7A5XDdxVRWO5MxGBXZhjY4cqLYLdtrGqRf8mBPmzwSpWQ=="
@@ -9167,7 +9167,7 @@
 
 "sensible-core@^1.0.40", "sensible-core@^1.0.41", "sensible-core@file:/Users/wijnandkarsens/Developer/Code-From-Anywhere/sensible/packages/sensible-core":
   "resolved" "file:packages/sensible-core"
-  "version" "1.0.46"
+  "version" "1.0.47"
   dependencies:
     "typescript-json-schema" "^0.53.0"
 
@@ -9212,7 +9212,7 @@
 
 "sensible-server@*", "sensible-server@file:/Users/wijnandkarsens/Developer/Code-From-Anywhere/sensible/packages/sensible-server":
   "resolved" "file:packages/sensible-server"
-  "version" "1.0.74"
+  "version" "1.0.75"
   dependencies:
     "ajv" "^8.10.0"
     "gray-matter" "^4.0.3"
