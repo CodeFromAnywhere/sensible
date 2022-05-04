@@ -9,11 +9,11 @@ If there are, we should warn people.
 const templateExtension = ".template";
 
 /**
- * finds all template files recursively and returns the paths in an array
+ * finds all .template renamed files recursively and returns the paths in an array
  */
 export const findTemplateFiles = (templateFolder?: string): string[] => {
   return findFilesRecursively({
-    basePath: path.join(__dirname, "assets/templates", templateFolder || ""),
+    basePath: path.join(__dirname, "..", "templates", templateFolder || ""),
     match: (fileName, extension) =>
       fileName.includes(".template") || extension.includes(".template"),
   }).map((x) => x.path);
@@ -47,13 +47,16 @@ const test = (): boolean => {
 
 //console.log(test());
 
-export const findAndRenameTemplateFiles = () => {
+export const findAndRenameTemplateFiles = (resolve: () => void) => {
   findTemplateFiles()
     .map((path) => ({
       oldPath: path,
       newPath: renameTemplateToNormalFile(path),
     }))
     .map(({ oldPath, newPath }) => {
+      console.log({ oldPath, newPath });
       fs.renameSync(oldPath, newPath);
     });
+  // not sure, maybe I need to make sure that it's renamed before resolving.... it's not waiting now. It could crash and still resolve!
+  resolve();
 };

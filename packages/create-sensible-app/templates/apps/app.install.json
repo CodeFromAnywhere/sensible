@@ -1,0 +1,30 @@
+{
+  "commands": [
+    {
+      "command": "npx expo-cli init -t expo-template-blank-typescript app",
+      "description": "Creating expo-app"
+    },
+    {
+      "command": "cd app && rm -rf .git",
+      "description": "Removing git folder"
+    },
+    {
+      "command": "cd app && yarn add react@17.0.2 react-dom@17.0.2",
+      "description": "Install right react version to prevent invalid hook call"
+    },
+    {
+      "command": "cd app && mv package.json package-old.json && jq '.main |= \"index.ts\"' package-old.json > package.json && rm package-old.json",
+      "description": "changing main entry of package.json"
+    },
+
+    {
+      "command": "cd app && npx expo-cli install core@* ui@* sensible-core@* tailwind-rn react-query react-with-native react-with-native-form react-with-native-store @react-native-async-storage/async-storage react-with-native-text-input react-with-native-router @react-navigation/native @react-navigation/native-stack",
+      "description": "Installing app dependencies"
+    },
+
+    {
+      "command": "cd app && yarn add -D @expo/webpack-config babel-plugin-module-resolver concurrently postcss tailwindcss",
+      "description": "Installing app devDependencies"
+    }
+  ]
+}

@@ -6,11 +6,14 @@ import path from "path";
 import { spawn } from "child_process";
 import fs from "fs";
 import { homedir } from "os";
-import {
-  findAndRenameTemplateFiles,
-  findTemplateFiles,
-  renameTemplateToNormalFile,
-} from "./util.template";
+import { findAndRenameTemplateFiles } from "./util.template";
+
+type TaskObject = {};
+
+type InstallObject = {
+  commands: Command[];
+  tasks: TaskObject[];
+};
 
 const DEBUG_COMMANDS = false;
 const defaultAppName = "makes-sense";
@@ -69,7 +72,7 @@ const mainBranchName =
 
 type Command = {
   command?: string;
-  nodeFunction?: () => void;
+  nodeFunction?: (resolve: () => void) => void;
   description: string;
   isDisabled?: boolean;
 };
@@ -186,36 +189,44 @@ const getSpawnCommandsReducer =
       if (DEBUG_COMMANDS) {
         console.log(`${Date.toString()}: extecuted ${command} in ${dir}`);
       } else {
-        spawn(command.command, {
-          stdio: debug ? "inherit" : "ignore",
-          shell: true,
-          cwd: dir,
-        })
-          .on("exit", (code) => {
-            const CODE_SUCCESSFUL = 0;
-            if (code === CODE_SUCCESSFUL) {
-              //once done, clear the console
-              console.clear();
-              clearInterval(interval);
-              resolve();
-            } else {
-              clearInterval(interval);
+        if (command.command) {
+          spawn(command.command, {
+            stdio: debug ? "inherit" : "ignore",
+            shell: true,
+            cwd: dir,
+          })
+            .on("exit", (code) => {
+              const CODE_SUCCESSFUL = 0;
+              if (code === CODE_SUCCESSFUL) {
+                //once done, clear the console
+                console.clear();
+                clearInterval(interval);
+                resolve();
+              } else {
+                clearInterval(interval);
+                console.log(messages.join("\n"));
+                console.log(
+                  `The following command failed: "${command.command}"`
+                );
+                process.exit(1);
+              }
+            })
+            //save all output so it can be printed on an error
+            .on("message", (message) => {
+              messages.push(message.toString());
+            })
+            .on("error", (err) => {
               console.log(messages.join("\n"));
-              console.log(`The following command failed: "${command.command}"`);
+              console.log(
+                `The following command failed: "${command.command}": "${err}"`
+              );
               process.exit(1);
-            }
-          })
-          //save all output so it can be printed on an error
-          .on("message", (message) => {
-            messages.push(message.toString());
-          })
-          .on("error", (err) => {
-            console.log(messages.join("\n"));
-            console.log(
-              `The following command failed: "${command.command}": "${err}"`
-            );
-            process.exit(1);
-          });
+            });
+        } else if (command.nodeFunction) {
+          command.nodeFunction(resolve);
+        } else {
+          resolve();
+        }
       }
     });
   };
@@ -242,6 +253,20 @@ Yes (y, yes, enter) or no?\n\n`);
   }
 };
 
+/**
+ * replace all variables in a command string with the actual value
+ */
+const commandReplaceVariables =
+  (variables: { [key: string]: string }) =>
+  (command: Command): Command => {
+    return {
+      description: command.description,
+      command: Object.keys(variables).reduce((command, key) => {
+        return command?.replaceAll(`{${key}}`, variables[key]);
+      }, command.command),
+    };
+  };
+
 const main = async () => {
   if (updatedAt === "0" && !(await askEnvironmentSetup())) {
     console.log(`Please set up your environment first.`);
@@ -249,12 +274,17 @@ const main = async () => {
   }
   const appName = await getName();
   const remote = await getRemote(appName);
-  const sensibleAssetsDir = path.resolve(__dirname, "..", `assets`);
+  const sensibleDir = path.resolve(__dirname, "..");
   const targetDir = process.cwd();
 
   const pushToGit = {
     dir: `${targetDir}/${appName}`,
     commands: [
+      {
+        command: "rm -rf .git",
+        description: "Remove previous git",
+      },
+
       {
         command: `git init`,
         description: "Initialising a git repo",
@@ -288,16 +318,13 @@ const main = async () => {
     command: `code ${targetDir}/${appName} --goto README.md:1:1`,
     description: "Opening your project in VSCode",
   };
-  const preventInvalidHookCall = {
-    command: "yarn add react@17.0.2 react-dom@17.0.2",
-    description: "Install right react version to prevent invalid hook call",
-  };
   const setNewDefaults: Command = {
     command: `echo ${flagArgumentsString} > ${settingsLocation}`,
     description: "Save new setttings",
     isDisabled: !isNewDefaults,
   };
 
+  const selectedApps = ["app", "web"];
   const commandsWithoutCache: CommandsObject[] = [
     {
       dir: targetDir,
@@ -308,50 +335,13 @@ const main = async () => {
         },
         {
           //NB: "*" doesn't match hidden files, so we use "." here
-          command: `cp -R ${sensibleAssetsDir}/templates/init/. ${targetDir}/${appName}`,
-          description: "Copying sensible template",
+          command: `cp -R ${sensibleDir}/templates/base/. ${targetDir}/${appName}`,
+          description: "Copying sensible base",
         },
 
         {
           nodeFunction: findAndRenameTemplateFiles,
           description: "Rename template files to normal files",
-        },
-
-        {
-          //https://github.com/jherr/create-mf-app/pull/8
-
-          command: `cd ${appName} && find . -type f -name 'gitignore' -execdir mv {} .{} ';'`,
-          // NB: not sure if sleep is needed.
-          // NB: the below doesn't work because glob patterns sometines only work in interactive mode (see https://superuser.com/questions/715007/ls-with-glob-not-working-in-a-bash-script)
-          //command: `sleep 2 && cd ${appName} && for f in **/gitignore; do mv "$f" "$(echo "$f" | sed s/gitignore/.gitignore/)"; done`,
-          description: "Rename all gitignore files to .gitignore",
-        },
-
-        {
-          command: `cd ${appName} && find . -type f -name 'package.template.json' -execdir mv {} package.json ';'`,
-          description: "Rename all package.template.json files to package.json",
-        },
-      ],
-    },
-
-    {
-      dir: `${targetDir}/${appName}/apps`,
-      commands: [
-        {
-          command: "yarn create next-app --typescript web",
-          description: "Creating next-app",
-        },
-        {
-          command: "npx expo-cli init -t expo-template-blank-typescript app",
-          description: "Creating expo-app",
-        },
-        {
-          command: `cp -R ${sensibleAssetsDir}/templates/web/* ${targetDir}/${appName}/apps/web`,
-          description: "Copying web template",
-        },
-        {
-          command: `cp -R ${sensibleAssetsDir}/templates/app/* ${targetDir}/${appName}/apps/app`,
-          description: "Copying app template",
         },
       ],
     },
@@ -373,70 +363,6 @@ const main = async () => {
     },
 
     {
-      dir: `${targetDir}/${appName}/apps/web`,
-      commands: [
-        {
-          command: "rm -rf .git",
-          description: "Removing web git folder",
-        },
-        preventInvalidHookCall,
-        {
-          command:
-            "yarn add core@* ui@* react-query react-with-native react-with-native-form react-with-native-password-input react-with-native-store react-with-native-text-input react-with-native-router next-transpile-modules @badrap/bar-of-progress",
-          description: "Installing web dependencies",
-        },
-        {
-          command: "yarn add -D config@* tsconfig@*",
-          description: "Installing web devDependencies",
-        },
-        {
-          command: "mv styles src/styles",
-          description: "Moving some stuff around",
-        },
-        {
-          command: "mv pages src/pages",
-          description: "Moving some stuff around",
-        },
-        { command: "touch src/types.ts", description: "Creating files" },
-        { command: "touch src/constants.ts", description: "Creating files" },
-        // {
-        //   command: "npx setup-tailwind-rn",
-        //   description: "Installing tailwind",
-        // },
-      ],
-    },
-
-    {
-      dir: `${targetDir}/${appName}/apps/app`,
-      commands: [
-        {
-          command: "rm -rf .git",
-          description: "Removing git folder",
-        },
-        preventInvalidHookCall,
-
-        {
-          // NB: without renaming it doesn't work
-          command:
-            "mv package.json package-old.json && jq '.main |= \"index.ts\"' package-old.json > package.json && rm package-old.json",
-          description: "changing main entry of package.json",
-        },
-
-        {
-          command:
-            "npx expo-cli install core@* ui@* sensible-core@* tailwind-rn react-query react-with-native react-with-native-form react-with-native-store @react-native-async-storage/async-storage react-with-native-text-input react-with-native-router @react-navigation/native @react-navigation/native-stack",
-          description: "Installing app dependencies",
-        },
-
-        {
-          command:
-            "yarn add -D @expo/webpack-config babel-plugin-module-resolver concurrently postcss tailwindcss",
-          description: "Installing app devDependencies",
-        },
-      ],
-    },
-
-    {
       // download all third-party dependencies that are tightly integrated and probably still require some bugfixing in v1
       dir: `${targetDir}/${appName}/third-party`,
       commands: isNoThirdParty
@@ -446,6 +372,30 @@ const main = async () => {
             description: `Adding third-party repo: ${slug}`,
           })),
     },
+
+    // only install selected apps
+    ...selectedApps.map((app) => {
+      const appsCommands: InstallObject = JSON.parse(
+        fs.readFileSync(
+          path.join(sensibleDir, `templates/apps/${app}.install.json`),
+          { encoding: "utf8" }
+        )
+      );
+
+      const filledInAppCommands = appsCommands.commands.map(
+        commandReplaceVariables({})
+      );
+
+      return {
+        dir: `${targetDir}/${appName}/apps`,
+        commands: filledInAppCommands.concat([
+          {
+            command: `cp -R ${sensibleDir}/templates/apps/${app}/. ${targetDir}/${appName}/apps/${app}`,
+            description: `Copying ${app} template`,
+          },
+        ]),
+      };
+    }),
 
     {
       dir: `${targetDir}/${appName}`,
@@ -462,10 +412,12 @@ const main = async () => {
           command: "rm -rf .sensible/cache && mkdir -p .sensible/cache",
           description: "Creating sensible cache folder",
         },
+
         {
           command: `cp -R ${targetDir}/${appName}/. .sensible/cache`,
-          description: "creating cache",
+          description: "Creating cache",
         },
+
         {
           command: `echo $(node -e 'console.log(Date.now())') > .sensible/updatedAt.txt`,
           description: "Add current timestamp to cached files",

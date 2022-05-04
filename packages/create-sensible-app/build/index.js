@@ -37,6 +37,15 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -196,35 +205,43 @@ var getSpawnCommandsReducer = function (dir, debug) {
                                 console.log("".concat(Date.toString(), ": extecuted ").concat(command, " in ").concat(dir));
                             }
                             else {
-                                (0, child_process_1.spawn)(command.command, {
-                                    stdio: debug ? "inherit" : "ignore",
-                                    shell: true,
-                                    cwd: dir,
-                                })
-                                    .on("exit", function (code) {
-                                    var CODE_SUCCESSFUL = 0;
-                                    if (code === CODE_SUCCESSFUL) {
-                                        //once done, clear the console
-                                        console.clear();
-                                        clearInterval(interval);
-                                        resolve();
-                                    }
-                                    else {
-                                        clearInterval(interval);
+                                if (command.command) {
+                                    (0, child_process_1.spawn)(command.command, {
+                                        stdio: debug ? "inherit" : "ignore",
+                                        shell: true,
+                                        cwd: dir,
+                                    })
+                                        .on("exit", function (code) {
+                                        var CODE_SUCCESSFUL = 0;
+                                        if (code === CODE_SUCCESSFUL) {
+                                            //once done, clear the console
+                                            console.clear();
+                                            clearInterval(interval);
+                                            resolve();
+                                        }
+                                        else {
+                                            clearInterval(interval);
+                                            console.log(messages.join("\n"));
+                                            console.log("The following command failed: \"".concat(command.command, "\""));
+                                            process.exit(1);
+                                        }
+                                    })
+                                        //save all output so it can be printed on an error
+                                        .on("message", function (message) {
+                                        messages.push(message.toString());
+                                    })
+                                        .on("error", function (err) {
                                         console.log(messages.join("\n"));
-                                        console.log("The following command failed: \"".concat(command.command, "\""));
+                                        console.log("The following command failed: \"".concat(command.command, "\": \"").concat(err, "\""));
                                         process.exit(1);
-                                    }
-                                })
-                                    //save all output so it can be printed on an error
-                                    .on("message", function (message) {
-                                    messages.push(message.toString());
-                                })
-                                    .on("error", function (err) {
-                                    console.log(messages.join("\n"));
-                                    console.log("The following command failed: \"".concat(command.command, "\": \"").concat(err, "\""));
-                                    process.exit(1);
-                                });
+                                    });
+                                }
+                                else if (command.nodeFunction) {
+                                    command.nodeFunction(resolve);
+                                }
+                                else {
+                                    resolve();
+                                }
                             }
                         })];
             }
@@ -248,8 +265,21 @@ var askEnvironmentSetup = function () { return __awaiter(void 0, void 0, void 0,
         }
     });
 }); };
+/**
+ * replace all variables in a command string with the actual value
+ */
+var commandReplaceVariables = function (variables) {
+    return function (command) {
+        return {
+            description: command.description,
+            command: Object.keys(variables).reduce(function (command, key) {
+                return command === null || command === void 0 ? void 0 : command.replaceAll("{".concat(key, "}"), variables[key]);
+            }, command.command),
+        };
+    };
+};
 var main = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, appName, remote, sensibleAssetsDir, targetDir, pushToGit, openVSCode, preventInvalidHookCall, setNewDefaults, commandsWithoutCache, cacheCommands, commandsFromFolders;
+    var _a, appName, remote, sensibleDir, targetDir, pushToGit, openVSCode, setNewDefaults, selectedApps, commandsWithoutCache, cacheCommands, commandsFromFolders;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
@@ -270,11 +300,15 @@ var main = function () { return __awaiter(void 0, void 0, void 0, function () {
                 return [4 /*yield*/, getRemote(appName)];
             case 4:
                 remote = _b.sent();
-                sensibleAssetsDir = path_1.default.resolve(__dirname, "..", "assets");
+                sensibleDir = path_1.default.resolve(__dirname, "..");
                 targetDir = process.cwd();
                 pushToGit = {
                     dir: "".concat(targetDir, "/").concat(appName),
                     commands: [
+                        {
+                            command: "rm -rf .git",
+                            description: "Remove previous git",
+                        },
                         {
                             command: "git init",
                             description: "Initialising a git repo",
@@ -303,16 +337,13 @@ var main = function () { return __awaiter(void 0, void 0, void 0, function () {
                     command: "code ".concat(targetDir, "/").concat(appName, " --goto README.md:1:1"),
                     description: "Opening your project in VSCode",
                 };
-                preventInvalidHookCall = {
-                    command: "yarn add react@17.0.2 react-dom@17.0.2",
-                    description: "Install right react version to prevent invalid hook call",
-                };
                 setNewDefaults = {
                     command: "echo ".concat(flagArgumentsString, " > ").concat(settingsLocation),
                     description: "Save new setttings",
                     isDisabled: !isNewDefaults,
                 };
-                commandsWithoutCache = [
+                selectedApps = ["app", "web"];
+                commandsWithoutCache = __spreadArray(__spreadArray([
                     {
                         dir: targetDir,
                         commands: [
@@ -322,55 +353,12 @@ var main = function () { return __awaiter(void 0, void 0, void 0, function () {
                             },
                             {
                                 //NB: "*" doesn't match hidden files, so we use "." here
-                                command: "cp -R ".concat(sensibleAssetsDir, "/templates/init/. ").concat(targetDir, "/").concat(appName),
-                                description: "Copying sensible template",
+                                command: "cp -R ".concat(sensibleDir, "/templates/base/. ").concat(targetDir, "/").concat(appName),
+                                description: "Copying sensible base",
                             },
                             {
-                                nodeFunction: function () {
-                                    return (0, util_template_1.findTemplateFiles)()
-                                        .map(function (path) { return ({
-                                        oldPath: path,
-                                        newPath: (0, util_template_1.renameTemplateToNormalFile)(path),
-                                    }); })
-                                        .map(function (_a) {
-                                        var oldPath = _a.oldPath, newPath = _a.newPath;
-                                        fs_1.default.renameSync(oldPath, newPath);
-                                    });
-                                },
+                                nodeFunction: util_template_1.findAndRenameTemplateFiles,
                                 description: "Rename template files to normal files",
-                            },
-                            {
-                                //https://github.com/jherr/create-mf-app/pull/8
-                                command: "cd ".concat(appName, " && find . -type f -name 'gitignore' -execdir mv {} .{} ';'"),
-                                // NB: not sure if sleep is needed.
-                                // NB: the below doesn't work because glob patterns sometines only work in interactive mode (see https://superuser.com/questions/715007/ls-with-glob-not-working-in-a-bash-script)
-                                //command: `sleep 2 && cd ${appName} && for f in **/gitignore; do mv "$f" "$(echo "$f" | sed s/gitignore/.gitignore/)"; done`,
-                                description: "Rename all gitignore files to .gitignore",
-                            },
-                            {
-                                command: "cd ".concat(appName, " && find . -type f -name 'package.template.json' -execdir mv {} package.json ';'"),
-                                description: "Rename all package.template.json files to package.json",
-                            },
-                        ],
-                    },
-                    {
-                        dir: "".concat(targetDir, "/").concat(appName, "/apps"),
-                        commands: [
-                            {
-                                command: "yarn create next-app --typescript web",
-                                description: "Creating next-app",
-                            },
-                            {
-                                command: "npx expo-cli init -t expo-template-blank-typescript app",
-                                description: "Creating expo-app",
-                            },
-                            {
-                                command: "cp -R ".concat(sensibleAssetsDir, "/templates/web/* ").concat(targetDir, "/").concat(appName, "/apps/web"),
-                                description: "Copying web template",
-                            },
-                            {
-                                command: "cp -R ".concat(sensibleAssetsDir, "/templates/app/* ").concat(targetDir, "/").concat(appName, "/apps/app"),
-                                description: "Copying app template",
                             },
                         ],
                     },
@@ -388,61 +376,6 @@ var main = function () { return __awaiter(void 0, void 0, void 0, function () {
                         ],
                     },
                     {
-                        dir: "".concat(targetDir, "/").concat(appName, "/apps/web"),
-                        commands: [
-                            {
-                                command: "rm -rf .git",
-                                description: "Removing web git folder",
-                            },
-                            preventInvalidHookCall,
-                            {
-                                command: "yarn add core@* ui@* react-query react-with-native react-with-native-form react-with-native-password-input react-with-native-store react-with-native-text-input react-with-native-router next-transpile-modules @badrap/bar-of-progress",
-                                description: "Installing web dependencies",
-                            },
-                            {
-                                command: "yarn add -D config@* tsconfig@*",
-                                description: "Installing web devDependencies",
-                            },
-                            {
-                                command: "mv styles src/styles",
-                                description: "Moving some stuff around",
-                            },
-                            {
-                                command: "mv pages src/pages",
-                                description: "Moving some stuff around",
-                            },
-                            { command: "touch src/types.ts", description: "Creating files" },
-                            { command: "touch src/constants.ts", description: "Creating files" },
-                            // {
-                            //   command: "npx setup-tailwind-rn",
-                            //   description: "Installing tailwind",
-                            // },
-                        ],
-                    },
-                    {
-                        dir: "".concat(targetDir, "/").concat(appName, "/apps/app"),
-                        commands: [
-                            {
-                                command: "rm -rf .git",
-                                description: "Removing git folder",
-                            },
-                            preventInvalidHookCall,
-                            {
-                                // NB: without renaming it doesn't work
-                                command: "mv package.json package-old.json && jq '.main |= \"index.ts\"' package-old.json > package.json && rm package-old.json",
-                                description: "changing main entry of package.json",
-                            },
-                            {
-                                command: "npx expo-cli install core@* ui@* sensible-core@* tailwind-rn react-query react-with-native react-with-native-form react-with-native-store @react-native-async-storage/async-storage react-with-native-text-input react-with-native-router @react-navigation/native @react-navigation/native-stack",
-                                description: "Installing app dependencies",
-                            },
-                            {
-                                command: "yarn add -D @expo/webpack-config babel-plugin-module-resolver concurrently postcss tailwindcss",
-                                description: "Installing app devDependencies",
-                            },
-                        ],
-                    },
-                    {
                         // download all third-party dependencies that are tightly integrated and probably still require some bugfixing in v1
                         dir: "".concat(targetDir, "/").concat(appName, "/third-party"),
                         commands: isNoThirdParty
@@ -451,7 +384,20 @@ var main = function () { return __awaiter(void 0, void 0, void 0, function () {
                                 command: "git clone https://github.com/".concat(slug, ".git"),
                                 description: "Adding third-party repo: ".concat(slug),
                             }); }),
-                    },
+                    }
+                ], selectedApps.map(function (app) {
+                    var appsCommands = JSON.parse(fs_1.default.readFileSync(path_1.default.join(sensibleDir, "templates/apps/".concat(app, ".install.json")), { encoding: "utf8" }));
+                    var filledInAppCommands = appsCommands.commands.map(commandReplaceVariables({}));
+                    return {
+                        dir: "".concat(targetDir, "/").concat(appName, "/apps"),
+                        commands: filledInAppCommands.concat([
+                            {
+                                command: "cp -R ".concat(sensibleDir, "/templates/apps/").concat(app, "/. ").concat(targetDir, "/").concat(appName, "/apps/").concat(app),
+                                description: "Copying ".concat(app, " template"),
+                            },
+                        ]),
+                    };
+                }), true), [
                     {
                         dir: "".concat(targetDir, "/").concat(appName),
                         commands: [openVSCode],
@@ -467,7 +413,7 @@ var main = function () { return __awaiter(void 0, void 0, void 0, function () {
                             },
                             {
                                 command: "cp -R ".concat(targetDir, "/").concat(appName, "/. .sensible/cache"),
-                                description: "creating cache",
+                                description: "Creating cache",
                             },
                             {
                                 command: "echo $(node -e 'console.log(Date.now())') > .sensible/updatedAt.txt",
@@ -476,7 +422,7 @@ var main = function () { return __awaiter(void 0, void 0, void 0, function () {
                             setNewDefaults,
                         ],
                     },
-                ];
+                ], false);
                 cacheCommands = [
                     {
                         dir: targetDir,
