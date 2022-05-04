@@ -1,0 +1,41 @@
+{
+  "name": "sensible-app-server",
+  "version": "0.0.0",
+  "main": "src/index.ts",
+  "scripts": {
+    "start": "node build/index.js",
+    "dev": "ts-node-dev src/index.ts --deps",
+    "serve": "NODE_ENV=production pm2 start build/index.js",
+    "restart": "pm2 restart build/index.js",
+    "cluster": "NODE_ENV=production pm2 start build/index.js -i 0 --name king",
+    "clusterReload": "NODE_ENV=production pm2 reload king",
+    "reloadAll": "git pull && yarn && yarn build && yarn clusterReload",
+    "build": "tsc"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "core": "*",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.0",
+    "md5": "^2.3.0",
+    "reflect-metadata": "^0.1.13",
+    "sensible-core": "*",
+    "sensible-server": "*",
+    "sequelize": "^6.19.0",
+    "sequelize-typescript": "^2.1.3",
+    "server": "^1.0.37",
+    "sqlite3": "^5.0.6",
+    "typescript": "^4.6.4"
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.31",
+    "@types/server": "^1.0.5",
+    "@types/validator": "^13.7.2",
+    "babel-cli": "^6.26.0",
+    "config": "*",
+    "eslint": "^8.14.0",
+    "ts-node": "^10.7.0",
+    "ts-node-dev": "^1.1.8",
+    "tsconfig": "*"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "name": "ui",
+  "version": "0.0.0",
+  "description": "All frontend components can go here",
+  "main": "src/index.ts",
+  "scripts": {},
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "core": "*",
+    "react-with-native": "*",
+    "react-with-native-store": "*",
+    "sensible-core": "*"
+  },
+  "devDependencies": {
+    "config": "*",
+    "react-native": "*",
+    "tsconfig": "*"
+  }
+}

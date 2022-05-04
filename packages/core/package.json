@@ -1,0 +1,23 @@
+{
+  "name": "core",
+  "version": "0.0.0",
+  "description": "",
+  "main": "build/index.js",
+  "type": "commonjs",
+  "source": "src/index.ts",
+  "scripts": {
+    "release": "standard-version",
+    "lint": "tsc --noEmit && eslint ./ --ext .ts",
+    "build": "tsc",
+    "dev": "tsc -w"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "sensible-core": "*",
+    "typescript": "*"
+  },
+  "devDependencies": {
+    "tsconfig": "*",
+    "config": "*"
+  }
+}

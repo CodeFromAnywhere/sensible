@@ -1,0 +1,1 @@
+All frontend components can go here. Make sure they work for any project
