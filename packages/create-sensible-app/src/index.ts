@@ -6,7 +6,7 @@ import path from "path";
 import { spawn } from "child_process";
 import fs from "fs";
 import { homedir } from "os";
-import { findAndRenameTemplateFiles } from "./util.template";
+import { findAndRenameTemplateFiles } from "./util.templates";
 
 type TaskObject = {};
 
@@ -223,7 +223,9 @@ const getSpawnCommandsReducer =
               process.exit(1);
             });
         } else if (command.nodeFunction) {
-          command.nodeFunction(resolve);
+          command.nodeFunction(() => {
+            resolve();
+          });
         } else {
           resolve();
         }
@@ -340,7 +342,7 @@ const main = async () => {
         },
 
         {
-          nodeFunction: findAndRenameTemplateFiles,
+          nodeFunction: findAndRenameTemplateFiles(`${targetDir}/${appName}`),
           description: "Rename template files to normal files",
         },
       ],

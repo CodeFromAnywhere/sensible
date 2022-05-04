@@ -55,7 +55,7 @@ var path_1 = __importDefault(require("path"));
 var child_process_1 = require("child_process");
 var fs_1 = __importDefault(require("fs"));
 var os_1 = require("os");
-var util_template_1 = require("./util.template");
+var util_templates_1 = require("./util.templates");
 var DEBUG_COMMANDS = false;
 var defaultAppName = "makes-sense";
 //test environment should be optional and easy to set up, live should be the default, since we want people to immedeately ship
@@ -237,7 +237,9 @@ var getSpawnCommandsReducer = function (dir, debug) {
                                     });
                                 }
                                 else if (command.nodeFunction) {
-                                    command.nodeFunction(resolve);
+                                    command.nodeFunction(function () {
+                                        resolve();
+                                    });
                                 }
                                 else {
                                     resolve();
@@ -357,7 +359,7 @@ var main = function () { return __awaiter(void 0, void 0, void 0, function () {
                                 description: "Copying sensible base",
                             },
                             {
-                                nodeFunction: util_template_1.findAndRenameTemplateFiles,
+                                nodeFunction: (0, util_templates_1.findAndRenameTemplateFiles)("".concat(targetDir, "/").concat(appName)),
                                 description: "Rename template files to normal files",
                             },
                         ],
