@@ -27,11 +27,11 @@
       "type": "shell",
       "options": {
         "cwd": "${workspaceFolder}/apps/server",
-        "shell": { "executable": "zsh", "args": ["-l"] }
+        "shell": { "executable": "zsh", "args": ["-c"] }
       },
       "presentation": { "group": "run" },
-      "command": "yarn dev",
-      "runOptions": { "runOn": "folderOpen" }
+      "command": "yarn dev"
+      // "runOptions": { "runOn": "folderOpen" }
     },
 
     //the below two should be REMOVED once I get it from the *.install.json
@@ -41,12 +41,11 @@
       "isBackground": true,
       "type": "shell",
       "options": {
-        "cwd": "${workspaceFolder}/apps/app",
-        "shell": { "executable": "zsh", "args": ["-l"] }
+        "cwd": "${workspaceFolder}/apps/app"
       },
       "command": "yarn dev",
-      "presentation": { "group": "run" },
-      "runOptions": { "runOn": "folderOpen" }
+      "presentation": { "group": "run" }
+      // "runOptions": { "runOn": "folderOpen" }
     },
 
     {
@@ -54,8 +53,8 @@
       "isBackground": true,
       "options": { "cwd": "${workspaceFolder}/apps/web" },
       "presentation": { "group": "run" },
-      "command": "yarn dev",
-      "runOptions": { "runOn": "folderOpen" }
+      "command": "yarn dev"
+      // "runOptions": { "runOn": "folderOpen" }
     }
   ]
 }

@@ -3771,7 +3771,7 @@
 
 "create-sensible-app@file:/Users/wijnandkarsens/Developer/Code-From-Anywhere/sensible/packages/create-sensible-app":
   "resolved" "file:packages/create-sensible-app"
-  "version" "1.0.16"
+  "version" "1.0.17"
   dependencies:
     "sensible-server" "*"
 
