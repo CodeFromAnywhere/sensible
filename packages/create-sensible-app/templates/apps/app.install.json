@@ -36,7 +36,7 @@
     },
 
     {
-      "command": "cd app && npx expo-cli install @react-navigation/native @react-navigation/native-stack",
+      "command": "cd app && npx expo-cli install @react-navigation/native @react-navigation/native-stack react-native-screens react-native-safe-area-context",
       "description": "Install react-navigation"
     },
 
@@ -50,6 +50,10 @@
       "description": "Install tailwind"
     },
 
+    {
+      "command": "yarn add -D npm-run-all",
+      "description": "install script to run all expo stuff at once"
+    },
     {
       "command": "cd app && npx add-tailwind-rn-scripts",
       "description": "What a pain!"

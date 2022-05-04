@@ -1,16 +1,7 @@
 {
   "version": "2.0.0",
-  // important! Among other things, the server can't find core if we don't use the sh executable. NB: This can also be set per task.
   "type": "shell",
-  "options": { "shell": { "executable": "sh", "args": ["-c"] } },
   "tasks": [
-    {
-      "label": "Welcome",
-      "presentation": { "reveal": "never", "close": true },
-      "command": "say \"Happy coding. Don't forget to ship and pull, and stay sensible! You got this.\"",
-      "runOptions": { "runOn": "folderOpen" }
-    },
-
     {
       "label": "Open sensible docs",
       "presentation": { "reveal": "never", "close": true },
@@ -26,16 +17,17 @@
       "options": { "cwd": "${workspaceFolder}/packages/core" },
       "presentation": { "group": "run" },
       "command": "yarn dev",
+      "type": "shell",
       "runOptions": { "runOn": "folderOpen" }
     },
 
     {
       "label": "Server",
-      "type": "shell",
       "isBackground": true, //prevent loading indicator ui
+      "type": "shell",
       "options": {
-        "shell": { "executable": "sh", "args": ["-c"] },
-        "cwd": "${workspaceFolder}/apps/server"
+        "cwd": "${workspaceFolder}/apps/server",
+        "shell": { "executable": "zsh", "args": ["-l"] }
       },
       "presentation": { "group": "run" },
       "command": "yarn dev",
@@ -47,8 +39,12 @@
     {
       "label": "App packager",
       "isBackground": true,
-      "options": { "cwd": "${workspaceFolder}/apps/app" },
-      "command": "yarn start",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}/apps/app",
+        "shell": { "executable": "zsh", "args": ["-l"] }
+      },
+      "command": "yarn dev",
       "presentation": { "group": "run" },
       "runOptions": { "runOn": "folderOpen" }
     },

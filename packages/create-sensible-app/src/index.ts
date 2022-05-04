@@ -48,7 +48,7 @@ const getFlag = (flag: string): boolean | string => {
 const isDebug = getFlag("debug");
 const isInteractive = getFlag("interactive");
 const isOffline = getFlag("offline");
-const isNoCache = getFlag("no-cache");
+const isNoCache = getFlag("no-cache") || true; //doesn't work for some reason
 const isNoThirdParty = getFlag("no-third-party");
 const mainBranch = getFlag("branch");
 const cacheDays = getFlag("cache-days");

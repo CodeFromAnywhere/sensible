@@ -8,8 +8,11 @@ const addScriptToPackage = async () => {
     scripts: {
       "build:tailwind":
         "tailwindcss --input input.css --output tailwind.css --no-autoprefixer && tailwind-rn",
-      "dev:tailwind":
-        'concurrently "tailwindcss --input input.css --output tailwind.css --no-autoprefixer --watch" "tailwind-rn --watch"',
+      "dev:tailwindcss":
+        "tailwindcss --input input.css --output tailwind.css --no-autoprefixer --watch",
+      "dev:tailwindrn": "tailwind-rn --watch",
+      "dev:expo": "expo start",
+      dev: "npm-run-all dev:*",
     },
   });
 
