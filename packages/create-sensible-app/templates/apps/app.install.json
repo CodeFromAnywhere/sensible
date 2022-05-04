@@ -1,4 +1,17 @@
 {
+  "config": {
+    "tasks": [
+      {
+        "label": "App packager",
+        "isBackground": true,
+        "options": { "cwd": "${workspaceFolder}/apps/app" },
+        "command": "yarn start",
+        "presentation": { "group": "run" },
+        "runOptions": { "runOn": "folderOpen" }
+      }
+    ]
+  },
+  "instructions": "",
   "commands": [
     {
       "command": "npx expo-cli init -t expo-template-blank-typescript app",

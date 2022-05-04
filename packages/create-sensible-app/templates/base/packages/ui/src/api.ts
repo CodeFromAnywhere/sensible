@@ -1,5 +1,5 @@
 import { AllEndpoints } from "core";
-import { makeApi } from "sensible-ui";
+import { makeApi } from "sensible-core";
 import env from "../env.json";
 import { isDev } from "./isDev";
 const { localServer, remoteServer, runLocalServer } = env;

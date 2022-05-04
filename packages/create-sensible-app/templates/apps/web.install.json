@@ -1,4 +1,17 @@
 {
+  "config": {
+    "tasks": [
+      {
+        "label": "Web packager",
+        "isBackground": true,
+        "options": { "cwd": "${workspaceFolder}/apps/web" },
+        "presentation": { "group": "run" },
+        "command": "yarn dev",
+        "runOptions": { "runOn": "folderOpen" }
+      }
+    ]
+  },
+  "instructions": "",
   "commands": [
     {
       "command": "yarn create next-app --typescript web",

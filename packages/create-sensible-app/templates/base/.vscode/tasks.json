@@ -42,21 +42,23 @@
       "runOptions": { "runOn": "folderOpen" }
     },
 
+    //the below two should be REMOVED once I get it from the *.install.json
+
     {
-      "label": "Web packager",
-      "isBackground": true, //prevent loading indicator ui
-      "options": { "cwd": "${workspaceFolder}/apps/web" },
+      "label": "App packager",
+      "isBackground": true,
+      "options": { "cwd": "${workspaceFolder}/apps/app" },
+      "command": "yarn start",
       "presentation": { "group": "run" },
-      "command": "yarn dev",
       "runOptions": { "runOn": "folderOpen" }
     },
 
     {
-      "label": "App packager",
-      "isBackground": true, //prevent loading indicator ui
-      "options": { "cwd": "${workspaceFolder}/apps/app" },
-      "command": "yarn start",
+      "label": "Web packager",
+      "isBackground": true,
+      "options": { "cwd": "${workspaceFolder}/apps/web" },
       "presentation": { "group": "run" },
+      "command": "yarn dev",
       "runOptions": { "runOn": "folderOpen" }
     }
   ]

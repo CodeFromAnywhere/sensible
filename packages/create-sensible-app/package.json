@@ -1,6 +1,6 @@
 {
   "name": "create-sensible-app",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "description": "A cli to create a new sensible app for you",
   "bin": {
     "create-sensible-app": "./build/index.js",

@@ -3,7 +3,7 @@ import { Div, P } from "react-with-native";
 const HomeScreen = () => {
   return (
     <Div>
-      <P>Hello Bruna</P>
+      <P>Hello World!</P>
     </Div>
   );
 };

@@ -1,5 +1,4 @@
 export * from "./api";
-export * from "./App";
 export * from "./Store";
-import * as Screens from "./screens";
+import * as Screens from "./plugins/user/screens";
 export { Screens };

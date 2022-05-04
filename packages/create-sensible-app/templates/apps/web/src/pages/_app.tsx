@@ -1,9 +1,9 @@
-import "../styles/globals.css";
+import "../globals.css";
 import { AppProps } from "next/app";
 import ProgressBar from "@badrap/bar-of-progress";
 import Router from "next/router";
 import { QueryClient, QueryClientProvider } from "react-query";
-import { StoreProvider } from "../store";
+import { StoreProvider } from "ui";
 
 const progress = new ProgressBar();
 
@@ -12,15 +12,8 @@ Router.events.on("routeChangeStart", progress.start);
 Router.events.on("routeChangeComplete", progress.finish);
 Router.events.on("routeChangeError", progress.finish);
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: Infinity,
-      structuralSharing: false,
-    },
-  },
-});
-function MyApp({ Component, pageProps }: any) {
+const queryClient = new QueryClient();
+function MyApp({ Component, pageProps }: AppProps) {
   //TODO: Remove any
 
   return (
