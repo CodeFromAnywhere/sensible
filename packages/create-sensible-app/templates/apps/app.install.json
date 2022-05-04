@@ -51,7 +51,7 @@
     },
 
     {
-      "command": "yarn add -D npm-run-all",
+      "command": "cd app && yarn add -D npm-run-all",
       "description": "install script to run all expo stuff at once"
     },
     {
