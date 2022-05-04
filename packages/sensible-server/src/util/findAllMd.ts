@@ -1,4 +1,5 @@
-import { Md, Path, findFilesRecursively } from "sensible-core";
+import { Md, Path } from "sensible-core";
+import { findFilesRecursively } from "./files";
 import { parseMd } from "./parseMd";
 
 export const findAllMd = (

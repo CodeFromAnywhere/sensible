@@ -5,14 +5,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.findAndRenameTemplateFiles = exports.renameTemplateToNormalFile = exports.renameToTemplateFile = exports.findTemplateFiles = void 0;
 var fs_1 = __importDefault(require("fs"));
-var sensible_core_1 = require("sensible-core");
+var sensible_server_1 = require("sensible-server");
 /*
 As long as there are no .template files present in the template folder that DONT need to be changed, it is fine.
 If there are, we should warn people.
 */
 var templateExtension = ".template";
 var findTemplates = function (basePath, onlyInCurrentFolder) {
-    return (0, sensible_core_1.findFilesRecursively)({
+    return (0, sensible_server_1.findFilesRecursively)({
         basePath: basePath,
         onlyInCurrentFolder: onlyInCurrentFolder,
         match: function (fileName, extension) {
