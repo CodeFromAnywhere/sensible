@@ -1,0 +1,17 @@
+{
+  "name": "add-tailwind-rn-scripts",
+  "version": "1.0.2",
+  "description": "",
+  "type": "module",
+  "main": "index.js",
+  "bin": "index.js",
+  "scripts": {
+    "initpub": "npm publish --access public",
+    "pub": "npm version patch --force && npm publish"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "json-file-plus": "^3.3.1"
+  }
+}

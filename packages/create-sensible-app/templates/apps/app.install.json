@@ -51,13 +51,8 @@
     },
 
     {
-      "command": "cd app && mv package.json package-old.json && jq '.scripts.\"build:tailwind\" |= \"tailwindcss --input input.css --output tailwind.css --no-autoprefixer && tailwind-rn\"' package-old.json > package.json && rm package-old.json",
-      "description": "add build:tailwind script"
-    },
-
-    {
-      "command": "cd app && mv package.json package-old.json && jq '.scripts.\"dev:tailwind\" |= \"concurrently \"tailwindcss --input input.css --output tailwind.css --no-autoprefixer --watch\" \"tailwind-rn --watch\"\"' package-old.json > package.json && rm package-old.json",
-      "description": "add dev:tailwind script"
+      "command": "cd app && npx add-tailwind-rn-scripts",
+      "description": "What a pain!"
     }
   ]
 }
