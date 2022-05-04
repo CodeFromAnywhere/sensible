@@ -1,13 +1,14 @@
 {
   "name": "sensible-core",
-  "version": "1.0.45",
+  "version": "1.0.46",
   "description": "All types and util functions used in any sensible project",
   "main": "build/index.js",
   "source": "src/index.ts",
   "scripts": {
     "initpub": "npm publish --access public",
     "pub": "npm version patch --force && npm publish",
-    "build": "tsc"
+    "build": "tsc",
+    "dev": "tsc -w"
   },
   "author": "",
   "license": "ISC",

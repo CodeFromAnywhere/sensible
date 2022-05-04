@@ -6,6 +6,11 @@ import path from "path";
 import { spawn } from "child_process";
 import fs from "fs";
 import { homedir } from "os";
+import {
+  findAndRenameTemplateFiles,
+  findTemplateFiles,
+  renameTemplateToNormalFile,
+} from "./util.template";
 
 const DEBUG_COMMANDS = false;
 const defaultAppName = "makes-sense";
@@ -63,7 +68,8 @@ const mainBranchName =
   typeof mainBranch === "string" && mainBranch.length > 0 ? mainBranch : "live";
 
 type Command = {
-  command: string;
+  command?: string;
+  nodeFunction?: () => void;
   description: string;
   isDisabled?: boolean;
 };
@@ -304,6 +310,11 @@ const main = async () => {
           //NB: "*" doesn't match hidden files, so we use "." here
           command: `cp -R ${sensibleAssetsDir}/templates/init/. ${targetDir}/${appName}`,
           description: "Copying sensible template",
+        },
+
+        {
+          nodeFunction: findAndRenameTemplateFiles,
+          description: "Rename template files to normal files",
         },
 
         {

@@ -46,6 +46,7 @@ var path_1 = __importDefault(require("path"));
 var child_process_1 = require("child_process");
 var fs_1 = __importDefault(require("fs"));
 var os_1 = require("os");
+var util_template_1 = require("./util.template");
 var DEBUG_COMMANDS = false;
 var defaultAppName = "makes-sense";
 //test environment should be optional and easy to set up, live should be the default, since we want people to immedeately ship
@@ -323,6 +324,20 @@ var main = function () { return __awaiter(void 0, void 0, void 0, function () {
                                 //NB: "*" doesn't match hidden files, so we use "." here
                                 command: "cp -R ".concat(sensibleAssetsDir, "/templates/init/. ").concat(targetDir, "/").concat(appName),
                                 description: "Copying sensible template",
+                            },
+                            {
+                                nodeFunction: function () {
+                                    return (0, util_template_1.findTemplateFiles)()
+                                        .map(function (path) { return ({
+                                        oldPath: path,
+                                        newPath: (0, util_template_1.renameTemplateToNormalFile)(path),
+                                    }); })
+                                        .map(function (_a) {
+                                        var oldPath = _a.oldPath, newPath = _a.newPath;
+                                        fs_1.default.renameSync(oldPath, newPath);
+                                    });
+                                },
+                                description: "Rename template files to normal files",
                             },
                             {
                                 //https://github.com/jherr/create-mf-app/pull/8

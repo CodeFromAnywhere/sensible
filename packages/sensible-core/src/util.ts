@@ -1,4 +1,4 @@
-import { API } from "sensible-core";
+import { API } from ".";
 
 export function onlyUnique<T extends unknown>(
   value: T,

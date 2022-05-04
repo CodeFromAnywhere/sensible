@@ -1,3 +1,4 @@
+import { API } from ".";
 export declare function onlyUnique<T extends unknown>(value: T, index: number, self: T[]): boolean;
 /** general purpose function that maps over an array and only returns it as part of the mapped array if the result is truthy */
 export declare const mapOrRemove: <T extends unknown, U extends unknown>(array: T[], mapFn: (item: T) => U | null) => U[];
@@ -32,4 +33,13 @@ export declare function isEmail(email: string): boolean;
 export declare const makeArrayString: (array: string[]) => string;
 export declare function generatePassword(passwordLength: number): string;
 export declare function shuffleArray(array: any[]): any[];
+export declare const bodyFromQueryString: (query?: string | undefined) => {
+    [key: string]: string;
+} | undefined;
+export declare const toQueryString: (query?: any) => string;
+declare type Config = {
+    apiUrl: string;
+};
+export declare const makeApi: <TAllEndpoints extends unknown>(config: Config) => API<TAllEndpoints>;
+export {};
 //# sourceMappingURL=util.d.ts.map
