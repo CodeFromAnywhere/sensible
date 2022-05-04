@@ -229,10 +229,10 @@ const getSpawnCommandsReducer =
           });
       } else if (command.nodeFunction) {
         command.nodeFunction(() => {
-          resolve();
+          onFinish({ success: true });
         });
       } else {
-        resolve();
+        onFinish({ success: true });
       }
     });
   };

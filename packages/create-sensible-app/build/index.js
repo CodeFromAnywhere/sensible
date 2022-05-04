@@ -245,11 +245,11 @@ var getSpawnCommandsReducer = function (dir, debug) {
                             }
                             else if (command.nodeFunction) {
                                 command.nodeFunction(function () {
-                                    resolve();
+                                    onFinish({ success: true });
                                 });
                             }
                             else {
-                                resolve();
+                                onFinish({ success: true });
                             }
                         })];
             }
