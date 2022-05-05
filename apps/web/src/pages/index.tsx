@@ -1,7 +1,7 @@
 import type { NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { TwitterTweetEmbed } from "react-twitter-embed";
 import { isEmail } from "sensible-core";
 import { api, useStore } from "ui";
@@ -10,6 +10,7 @@ type Brand = {
   path: string;
   url: string;
   alt: string;
+  noFollow?: boolean;
 };
 
 const tweets = ["1522222259326406657"];
@@ -33,9 +34,26 @@ const brands: Brand[] = [
   },
 
   {
-    path: "/github.png",
-    url: "https://codefromanywhere.com",
-    alt: "Go to GitHub",
+    path: "/emesa.jpeg",
+    url: "https://emesa.nl",
+    noFollow: true,
+    alt: "Emesa",
+  },
+  {
+    path: "/stoic.jpeg",
+    url: "https://stoicstrats.com",
+    noFollow: true,
+    alt: "Stoic Strategies",
+  },
+  {
+    path: "/king.webp",
+    url: "https://getking.co",
+    alt: "King",
+  },
+  {
+    path: "/coworksurf.png",
+    url: "https://coworksurf.com",
+    alt: "Coworksurf",
   },
 ];
 
@@ -43,16 +61,6 @@ const Home: NextPage = () => {
   const contentRef = useRef<HTMLDivElement>(null);
   const [email, setEmail] = useStore("email");
   const [isLoading, setIsLoading] = useState(false);
-  useEffect(() => {
-    // setTimeout(() => {
-    //   // window.scrollTo({ behavior: "smooth", top: 1000 });
-    //   contentRef.current?.scrollIntoView({
-    //     behavior: "smooth",
-    //     block: "start",
-    //     inline: "end",
-    //   });
-    // }, 5000);
-  }, []);
 
   return (
     <div
@@ -70,7 +78,7 @@ const Home: NextPage = () => {
 
           -webkit-animation: AnimationName 3s ease infinite;
           -moz-animation: AnimationName 3s ease infinite;
-          animation: AnimationName 3s ease infinite;
+          animation: AnimationName 7s ease infinite;
         }
 
         @keyframes AnimationName {
@@ -103,10 +111,12 @@ const Home: NextPage = () => {
               <div className="absolute top-0 -right-4 w-32 lg:w-96 h-32 lg:h-96 bg-yellow-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
               <div className="absolute -bottom-8 left-20 w-32 lg:w-96 h-32 lg:h-96 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
 
-              <div className="lg:m-8 relative space-y-4">
-                <div className="flex-col p-5 rounded-lg flex items-center justify-between lg:space-x-8">
+              <div className="lg:m-8 relative">
+                <div className="flex-col lg:p-5 rounded-lg flex items-center justify-between lg:space-x-8">
                   <div className="flex-1 mb-6">
-                    <h1 className={"text-3xl lg:text-4xl text-center"}>
+                    <h1
+                      className={"text-xl md:text-3xl lg:text-4xl text-center"}
+                    >
                       The{" "}
                       <b className="font-extrabold hover:opacity-20 opacity-100 transition-opacity ease-out cursor-pointer duration-[2000]">
                         Typescript
@@ -131,8 +141,12 @@ const Home: NextPage = () => {
               </div>
             </div>
 
+            <p className="py-5 text-gray-800 italic">
+              Who&apos;s (using) Sensible?
+            </p>
+
             <div
-              className="flex mx-4 lg:mx-12 w-full relative justify-center"
+              className="flex mx-4 lg:mx-12 w-full relative flex-wrap justify-center"
               ref={contentRef}
             >
               {brands.map((brand, index) => {
@@ -140,13 +154,14 @@ const Home: NextPage = () => {
                   <a
                     key={`brand${index}`}
                     href={brand.url}
-                    className="relative w-10 h-10 lg:w-10 lg:h-10"
+                    rel={brand.noFollow ? "nofollow" : undefined}
+                    className={`m-2 relative w-10 h-10 lg:w-20 lg:h-20`}
                   >
                     <Image
                       src={brand.path}
                       layout="fill"
                       alt={brand.alt}
-                      className="aspect-square rounded-full hover:animate-spin"
+                      className="aspect-square rounded-full hover:animate-pulse"
                     />
                   </a>
                 );
