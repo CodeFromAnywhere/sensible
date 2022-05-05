@@ -4,14 +4,14 @@ import {
   DocsEndpoint,
   Endpoint,
   InterpretableTypes,
+  Link,
   Path,
+  PublicConstantsType,
 } from "sensible-core";
-
-import { ServerEndpoint } from "./types";
-import { getCachedApps } from "./getCachedApps";
-import { Link, PublicConstantsType } from "sensible-core";
-import { findAllMd } from "./util/findAllMd";
 import { Keys, MakeEndpointType } from ".";
+import { getCachedApps } from "./getCachedApps";
+import { ServerEndpoint } from "./types";
+import { findAllMd } from "./util/findAllMd";
 
 export const makeDocsEndpoints = <
   TAllDefaultEndpoints extends { [key in Keys<TAllDefaultEndpoints>]: Endpoint }
@@ -51,10 +51,10 @@ export const makeDocsEndpoints = <
             label: "Issues",
             url: cleanRepoUrl + "/issues",
           },
-          {
-            label: "Board",
-            url: cleanRepoUrl + "/projects",
-          },
+          // {
+          //   label: "Board",
+          //   url: cleanRepoUrl + "/projects",
+          // },
           {
             label: "Branches",
             url: cleanRepoUrl + "branches",

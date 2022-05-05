@@ -1,22 +1,18 @@
+import path from "path";
 import {
+  App,
   Cron,
-  Dependency,
   FrontendFile,
   InterpretableTypes,
+  mapOrRemove,
   ModelSchemaObject,
-  PackageInfo,
-  PackageInfoObject,
   Path,
   ProjectType,
-  App,
-  mapOrRemove,
 } from "sensible-core";
 import { getCachedCrons } from "./getCachedCrons";
-import { getCachedSchema } from "./getCachedSchema";
-import path from "path";
 import { getCachedFrontend } from "./getCachedFrontend";
+import { getCachedSchema } from "./getCachedSchema";
 import { getRelevantPackageInfo } from "./util/getRelevantPackageInfo";
-import { getCachedDependencies } from "./getCachedDependencies";
 import { getRepo } from "./util/getRepo";
 
 export const getAppType = (projectType: ProjectType, folder: string) => {
@@ -52,7 +48,6 @@ export const getAppInfo = (
   }
 
   const type = getAppType(packageInfo.type, folder);
-  const md = []; //findAllMd(folderPath);
 
   let crons: Cron[] = [];
   if (type === "server") {
@@ -73,11 +68,11 @@ export const getAppInfo = (
     description: packageInfo.description,
     homepage: packageInfo.homepage,
     repo: getRepo(packageInfo.repository),
-    md,
     crons,
     frontend,
     models: type === "core" ? modelSchemaObject : undefined,
     // TODO: put back after i cached this properly (if needed). Probably also should put this in separate api?
+    md: [], //findAllMd(folderPath);
     dependencies: [], //getCachedDependencies(packageInfo.dependencies, folderPath),
     devDependencies: [], //getDependencies(packageInfo.devDependencies, folderPath),
     peerDependencies: [], //getDependencies(packageInfo.peerDependencies, folderPath),
