@@ -29,11 +29,13 @@ export const shallowPush = (
 };
 
 export const getQueryStrings = (query: NextRouter["query"]) => {
-  return objectMap(query, (arrayOrStringOrUndefined) =>
+  const queryStrings = objectMap(query, (arrayOrStringOrUndefined) =>
     Array.isArray(arrayOrStringOrUndefined)
       ? arrayOrStringOrUndefined[0]
       : arrayOrStringOrUndefined
   );
+
+  return queryStrings;
 };
 
 export const isEndpoint = (

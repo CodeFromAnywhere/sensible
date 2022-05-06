@@ -7,7 +7,7 @@ import useStore from "../store";
 import { useOtherQuery } from "../util/useQueryHooks";
 import { getQueryStrings } from "../util/util";
 import { useRouter } from "react-with-native-router";
-import { SITE_URL } from "../constants";
+import { NO_API_SELECTED, SITE_URL } from "../constants";
 
 const Header = () => {
   const router = useRouter();
@@ -32,7 +32,12 @@ const Header = () => {
   const description =
     "Sensible is the fastest way to make an app. Check it out!";
 
-  const imageUrl = url ? `https://${url}/logo.png` : "/logo.png";
+  const imageUrl =
+    url === NO_API_SELECTED.slug
+      ? "/logo.png"
+      : url?.startsWith("localhost:")
+      ? `http://${url}/logo.png`
+      : `https://${url}/logo.png`;
 
   return (
     <div className="w-full px-4 border-b border-gray-100">

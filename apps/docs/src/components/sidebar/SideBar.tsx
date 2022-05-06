@@ -9,6 +9,7 @@ import ChooseSection from "./ChooseSection";
 
 const SideBar = () => {
   const core = useCoreQuery();
+
   const schema = core.data?.models;
   const modelKeys = schema ? Object.keys(schema) : [];
   const sections = modelKeys.map((modelKey) => {

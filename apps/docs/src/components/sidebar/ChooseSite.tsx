@@ -9,17 +9,21 @@ const ChooseSite = () => {
   const { url } = getQueryStrings(router.query);
   const [recentSites, setRecentSites] = useStore("recentSites");
 
-  const options = recentSites.map((site) => ({
+  const siteOptions = recentSites.map((site) => ({
     value: site.apiUrl,
     label: `${site.appName ? `${site.appName} (${site.apiUrl})` : site.apiUrl}`,
   }));
+
+  const defaultWithOptions = [
+    { label: "Sensible Docs", value: NO_API_SELECTED.slug },
+  ].concat(siteOptions);
   return (
     <Select
       value={url || NO_API_SELECTED.slug}
       onChange={(e) => {
         router.push(`/${encodeURIComponent(e.target.value)}`);
       }}
-      options={options}
+      options={defaultWithOptions}
     />
   );
 };
