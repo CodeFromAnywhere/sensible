@@ -2,12 +2,12 @@ import * as TJS from "typescript-json-schema";
 import { Svg } from "react-with-native";
 import { toast } from "react-with-native-notification";
 import BsCodeIcon from "../../public/BsCode.svg";
-import { getTypeDefinitionString } from "../util";
+import { getQueryStrings, getTypeDefinitionString } from "../util/util";
 import BsChevronUpIcon from "../../public/BsChevronUp.svg";
 import useStore from "../store";
-import { useSiteParams } from "../hooks/useSiteParams";
 import TypeDefinition from "./TypeDefinition";
 import { DefinitionObject } from "sensible-core";
+import { useRouter } from "react-with-native-router";
 
 const TypeDefinitionContainer = ({
   definition,
@@ -20,24 +20,26 @@ const TypeDefinitionContainer = ({
   definition: TJS.Definition;
   id: string;
 }) => {
+  const router = useRouter();
+  const { url, location } = getQueryStrings(router.query);
+
   const [expandedTypes, setExpandedTypes] = useStore("expandedTypes");
-  const { urlUrl, locationString } = useSiteParams();
 
   const identifier = id;
 
-  const isExpanded = urlUrl
-    ? !!expandedTypes[urlUrl]?.find((x) => x === identifier)
+  const isExpanded = url
+    ? !!expandedTypes[url]?.find((x) => x === identifier)
     : false;
 
   const toggle = () => {
-    if (urlUrl) {
+    if (url) {
       const newExpandedTypes = isExpanded
-        ? expandedTypes[urlUrl].filter((x) => x !== identifier)
-        : (expandedTypes[urlUrl] || []).concat([identifier]);
+        ? expandedTypes[url].filter((x) => x !== identifier)
+        : (expandedTypes[url] || []).concat([identifier]);
 
       setExpandedTypes({
         ...expandedTypes,
-        [urlUrl]: newExpandedTypes,
+        [url]: newExpandedTypes,
       });
     }
   };
@@ -97,7 +99,7 @@ const TypeDefinitionContainer = ({
   const expandedDescriptionElement =
     description && isExpanded ? <p className="mt-6">{description}</p> : null;
 
-  const isSelected = identifier === locationString;
+  const isSelected = identifier === location;
 
   return (
     <div

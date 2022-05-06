@@ -1,11 +1,11 @@
 import useStore from "../store";
-import { isEndpoint } from "../util";
+import { getQueryStrings, isEndpoint } from "../util/util";
 import EndpointContainer from "./EndpointContainer";
 import TypeDefinitionContainer from "./TypeDefinitionContainer";
 import { Svg } from "react-with-native";
 import BsChevronUpIcon from "../../public/BsChevronUp.svg";
-import { useSiteParams } from "../hooks/useSiteParams";
 import { DefinitionObject, getDefinition } from "sensible-core";
+import { useRouter } from "react-with-native-router";
 
 type SectionKey = "endpoints" | "types";
 const Model = ({
@@ -18,21 +18,22 @@ const Model = ({
   };
   modelKey: string;
 }) => {
-  const { urlUrl } = useSiteParams();
+  const router = useRouter();
+  const { url } = getQueryStrings(router.query);
   const [collapsedModels, setCollapsedModels] = useStore("collapsedModels");
-  const isCollapsed = urlUrl
-    ? !!collapsedModels[urlUrl]?.find((x) => x === modelKey)
+  const isCollapsed = url
+    ? !!collapsedModels[url]?.find((x) => x === modelKey)
     : false;
 
   const toggle = () => {
-    if (urlUrl) {
+    if (url) {
       const newCollapsedModels = isCollapsed
-        ? collapsedModels[urlUrl].filter((x) => x !== modelKey)
-        : (collapsedModels[urlUrl] || []).concat([modelKey]);
+        ? collapsedModels[url].filter((x) => x !== modelKey)
+        : (collapsedModels[url] || []).concat([modelKey]);
 
       setCollapsedModels({
         ...collapsedModels,
-        [urlUrl]: newCollapsedModels,
+        [url]: newCollapsedModels,
       });
     }
   };
@@ -85,7 +86,7 @@ const Model = ({
                     const isValid =
                       !section.filter || section.filter(definition);
 
-                    return definition && urlUrl && isValid ? (
+                    return definition && url && isValid ? (
                       <section.component
                         key={`${modelKey}model_${definitionKey}${section.key}`}
                         model={modelKey}

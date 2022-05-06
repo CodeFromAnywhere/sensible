@@ -1,6 +1,12 @@
 import * as TJS from "typescript-json-schema";
-import TypeDefinition from "./components/TypeDefinition";
-import { DefinitionObject, DocsEndpoint, getDefinition } from "sensible-core";
+import TypeDefinition from "../components/TypeDefinition";
+import {
+  DefinitionObject,
+  DocsEndpoint,
+  getDefinition,
+  objectMap,
+} from "sensible-core";
+import { NextRouter } from "next/router";
 export type Method = "GET" | "POST";
 
 export type EndpointDefinition = TJS.Definition & {
@@ -10,6 +16,24 @@ export type EndpointDefinition = TJS.Definition & {
     body: TJS.Definition;
     reponse: TJS.Definition;
   };
+};
+
+export const shallowPush = (
+  { push, query }: NextRouter,
+  queryKey: string,
+  queryValue: string
+) => {
+  push({ query: { ...query, [queryKey]: queryValue } }, undefined, {
+    shallow: true,
+  });
+};
+
+export const getQueryStrings = (query: NextRouter["query"]) => {
+  return objectMap(query, (arrayOrStringOrUndefined) =>
+    Array.isArray(arrayOrStringOrUndefined)
+      ? arrayOrStringOrUndefined[0]
+      : arrayOrStringOrUndefined
+  );
 };
 
 export const isEndpoint = (

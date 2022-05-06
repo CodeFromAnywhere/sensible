@@ -1,14 +1,17 @@
 import Head from "next/head";
 import Link from "next/link";
-import { useSiteParams } from "../hooks/useSiteParams";
 import DarkModeToggle from "./DarkModeToggle";
 import FiMenuIcon from "../../public/FiMenu.svg";
 import { Svg } from "react-with-native";
 import useStore from "../store";
-import { useOtherQuery } from "../hooks/useQueryHooks";
+import { useOtherQuery } from "../util/useQueryHooks";
+import { getQueryStrings } from "../util/util";
+import { useRouter } from "react-with-native-router";
+import { SITE_URL } from "../constants";
 
 const Header = () => {
-  const { urlUrl } = useSiteParams();
+  const router = useRouter();
+  const { url } = getQueryStrings(router.query);
   const other = useOtherQuery();
   const constants = other.data?.constants;
 
@@ -18,10 +21,7 @@ const Header = () => {
   const title = (
     <div className="ml-4">
       <h1 className="text-xl font-bold">{appName || "Sensible Docs"}</h1>
-      <a
-        href="https://sensibleframework.co"
-        className="text-sm cursor-pointer hover:underline"
-      >
+      <a href={SITE_URL} className="text-sm cursor-pointer hover:underline">
         {appName && "Sensible Docs"}
       </a>
     </div>
@@ -32,8 +32,7 @@ const Header = () => {
   const description =
     "Sensible is the fastest way to make an app. Check it out!";
 
-  const imageBase = urlUrl ? urlUrl : "";
-  const imageUrl = imageBase + "/logo.png";
+  const imageUrl = url ? `https://${url}/logo.png` : "/logo.png";
 
   return (
     <div className="w-full px-4 border-b border-gray-100">
@@ -56,15 +55,17 @@ const Header = () => {
         </div>
         <div className="flex flex-row">
           <div className="lg:flex hidden">
+            {/* back to their main site */}
             <a
               className="py-2 px-3 mr-4 hover:bg-gray-100 rounded-md font-semibold"
-              href={constants ? "/" : "https://sensibleframework.co"}
+              href={constants ? constants.domain : SITE_URL}
               rel="noreferrer"
               target={constants ? undefined : "_blank"}
             >
               Home
             </a>
 
+            {/* should be there because we are here */}
             <Link passHref href={"#"}>
               <div className="py-2 px-3 mr-4 bg-gray-100 rounded-md font-semibold cursor-pointer">
                 Docs
@@ -96,16 +97,14 @@ const Header = () => {
 
           <DarkModeToggle />
 
-          {!!urlUrl ? (
-            <div
-              className="visible lg:hidden focus:bg-blueish rounded-full p-2"
-              onClick={() => {
-                setShowMenuMobile(!showMenuMobile);
-              }}
-            >
-              <Svg src={FiMenuIcon} className="w-8 h-8" />
-            </div>
-          ) : null}
+          <div
+            className="visible lg:hidden focus:bg-blueish rounded-full p-2"
+            onClick={() => {
+              setShowMenuMobile(!showMenuMobile);
+            }}
+          >
+            <Svg src={FiMenuIcon} className="w-8 h-8" />
+          </div>
         </div>
       </div>
     </div>

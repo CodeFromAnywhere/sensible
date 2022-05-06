@@ -1,14 +1,17 @@
 import { Svg } from "react-with-native";
-import { useSiteParams } from "../hooks/useSiteParams";
-import CgSearchIcon from "../../public/CgSearch.svg";
-import BsSlashSquareIcon from "../../public/BsSlashSquare.svg";
-import FaRegWindowCloseIcon from "../../public/FaRegWindowClose.svg";
+import CgSearchIcon from "../../../public/CgSearch.svg";
+import BsSlashSquareIcon from "../../../public/BsSlashSquare.svg";
+import FaRegWindowCloseIcon from "../../../public/FaRegWindowClose.svg";
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "react-with-native-router";
+import { getQueryStrings, shallowPush } from "../../util/util";
 
 const Search = () => {
+  const router = useRouter();
+  const { search } = getQueryStrings(router.query);
+
   const [focusIcon, setFocusIcon] = useState(true);
-  const { searchString, setSearch } = useSiteParams();
-  const hasSearchEntered = searchString.length > 0;
+  const hasSearchEntered = search && search.length > 0;
   const inputRef = useRef<HTMLInputElement>(null);
 
   const focusListener = (event: KeyboardEvent) => {
@@ -31,8 +34,8 @@ const Search = () => {
       <input
         id="searchbar"
         ref={inputRef}
-        value={searchString}
-        onChange={(e) => setSearch(e.target.value)}
+        value={search}
+        onChange={(e) => shallowPush(router, "search", e.target.value)}
         onFocus={() => setFocusIcon(false)}
         onBlur={() => setFocusIcon(true)}
         className="w-full p-3 text-md bg-transparent focus:outline-none"
@@ -41,7 +44,7 @@ const Search = () => {
       {focusIcon || hasSearchEntered ? (
         <div
           className={hasSearchEntered ? "cursor-pointer" : undefined}
-          onClick={() => setSearch("")}
+          onClick={() => shallowPush(router, "search", "")}
         >
           <Svg
             src={hasSearchEntered ? FaRegWindowCloseIcon : BsSlashSquareIcon}

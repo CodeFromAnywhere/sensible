@@ -1,38 +1,43 @@
 import type { NextPage } from "next";
 import { ActivityIndicator } from "react-with-native";
 import { useEffect } from "react";
-import useStore from "../store";
+import useStore from "../../store";
 import "react-toastify/dist/ReactToastify.css";
-import Model from "../components/Model";
-import SideBar from "../components/sidebar/SideBar";
-import { useSiteParams } from "../hooks/useSiteParams";
-import { useScrollTo } from "../hooks/useScrollTo";
-import { Layout } from "../components/Layout";
-import { useCoreQuery, useOtherQuery } from "../hooks/useQueryHooks";
-import { api } from "ui";
+import Model from "../../components/Model";
+import { useScrollTo } from "../../util/useScrollTo";
+import { useCoreQuery, useOtherQuery } from "../../util/useQueryHooks";
+import { useRouter } from "react-with-native-router";
+import { getQueryStrings } from "../../util/util";
+import { NO_API_SELECTED } from "../../constants";
 
 const hasError = (docs: any) => docs.data?.error;
 
 const Home: NextPage = () => {
-  const { urlUrl, locationString } = useSiteParams();
-  const scrollTo = useScrollTo();
+  const router = useRouter();
+  const { url, location } = getQueryStrings(router.query);
+  // const scrollTo = useScrollTo();
   const [recentSites, setRecentSites] = useStore("recentSites");
   const core = useCoreQuery();
   const other = useOtherQuery();
   const constants = other.data?.constants;
-  const [showMenuMobile, setShowMenuMobile] = useStore("showMenuMobile");
-  useEffect(() => {
-    if (core.data?.success && locationString) {
-      scrollTo(locationString);
-    }
-  }, [core.dataUpdatedAt, locationString]);
+  // this results in unwanted scrollling
+  // useEffect(() => {
+  //   if (core.data?.success && location) {
+  //     scrollTo(location);
+  //   }
+  // }, [core.dataUpdatedAt, location]);
 
+  // adding the site from your link to the recent sites, if not already there
   useEffect(() => {
-    if (urlUrl && !recentSites.find((x) => x.apiUrl === urlUrl)) {
+    if (
+      url &&
+      !recentSites.find((x) => x.apiUrl === url) &&
+      url !== NO_API_SELECTED.slug
+    ) {
       setRecentSites(
         recentSites.concat([
           {
-            apiUrl: urlUrl,
+            apiUrl: url,
             appName: constants?.appName,
             domain: constants?.domain,
             email: constants?.email,
@@ -43,10 +48,10 @@ const Home: NextPage = () => {
   }, []);
 
   useEffect(() => {
-    if (urlUrl) {
+    if (url) {
       core.refetch();
     }
-  }, [urlUrl]);
+  }, [url]);
 
   const renderModelObject = () => {
     const models = core.data?.models;
@@ -70,32 +75,16 @@ const Home: NextPage = () => {
   };
 
   return (
-    <Layout>
-      <div
-        className={`lg:w-80 lg:block w-full overflow-y-scroll ${
-          showMenuMobile ? "block" : "hidden"
-        }`}
-      >
-        <SideBar />
-      </div>
-
-      <div
-        className={`flex-1 w-full overflow-y-scroll px-8 ${
-          showMenuMobile ? "hidden" : "block"
-        } lg:block`}
-      >
-        {/* {!!getDocs(docs)?.schema ? <Search /> : null} */}
-
-        {hasError(core) ? <p>{core.data?.response}</p> : null}
-        {core.isLoading ? (
-          <div>
-            <p>Fetching the newest docs</p>
-            <ActivityIndicator className="w-4 h-4" />
-          </div>
-        ) : null}
-        {renderModelObject()}
-      </div>
-    </Layout>
+    <div>
+      {hasError(core) ? <p>{core.data?.response}</p> : null}
+      {core.isLoading ? (
+        <div>
+          <p>Fetching the newest docs</p>
+          <ActivityIndicator className="w-4 h-4" />
+        </div>
+      ) : null}
+      {renderModelObject()}
+    </div>
   );
 };
 

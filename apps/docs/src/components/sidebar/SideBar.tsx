@@ -1,9 +1,11 @@
 import React from "react";
 import Menu, { Section } from "./Menu";
-import Search from "../Search";
-import { useCoreQuery } from "../../hooks/useQueryHooks";
-import { getFirstEnum, isEndpoint, notEmpty } from "../../util";
+import Search from "./Search";
+import { useCoreQuery } from "../../util/useQueryHooks";
+import { getFirstEnum, isEndpoint, notEmpty } from "../../util/util";
 import { getDefinition } from "sensible-core";
+import ChooseSite from "./ChooseSite";
+import ChooseSection from "./ChooseSection";
 
 const SideBar = () => {
   const core = useCoreQuery();
@@ -63,6 +65,8 @@ const SideBar = () => {
   return (
     <div className="relative border-r border-gray-100 w-full block z-20 pl-4 pr-6">
       <div className="sticky top-0 pt-0 bg-white z-10">
+        <ChooseSite />
+        <ChooseSection />
         <Search />
       </div>
       <Menu sections={sections} />

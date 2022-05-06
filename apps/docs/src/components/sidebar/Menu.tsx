@@ -3,8 +3,8 @@ import { useRouter } from "react-with-native-router";
 import useStore from "../../store";
 import { Svg } from "react-with-native";
 import BsChevronUpIcon from "../../../public/BsChevronUp.svg";
-import { useScrollTo } from "../../hooks/useScrollTo";
-import { useSiteParams } from "../../hooks/useSiteParams";
+import { useScrollTo } from "../../util/useScrollTo";
+import { getQueryStrings } from "../../util/util";
 
 export type Section = {
   title: string;
@@ -23,29 +23,30 @@ const Menu = ({
   stack?: string[];
   sections: Section[];
 }) => {
+  const router = useRouter();
+  const { search, url } = getQueryStrings(router.query);
+
   const scrollTo = useScrollTo();
   const [showMenuMobile, setShowMenuMobile] = useStore("showMenuMobile");
-  const { urlUrl } = useSiteParams();
   const [collapsedMenus, setCollapsedMenus] = useStore("collapsedMenus");
-  const { searchString } = useSiteParams();
-  const isSearching = searchString.length > 0;
+  const isSearching = search && search.length > 0;
 
   return (
     <ul className="ml-4 select-none">
       {sections.map((section, index) => {
-        const isCollapsed = urlUrl
-          ? !!collapsedMenus[urlUrl]?.find((x) => x === section.key)
+        const isCollapsed = url
+          ? !!collapsedMenus[url]?.find((x) => x === section.key)
           : false;
 
         const toggle = () => {
-          if (urlUrl) {
+          if (url) {
             const newCollapsedModels = isCollapsed
-              ? collapsedMenus[urlUrl].filter((x) => x !== section.key)
-              : (collapsedMenus[urlUrl] || []).concat([section.key]);
+              ? collapsedMenus[url].filter((x) => x !== section.key)
+              : (collapsedMenus[url] || []).concat([section.key]);
 
             setCollapsedMenus({
               ...collapsedMenus,
-              [urlUrl]: newCollapsedModels,
+              [url]: newCollapsedModels,
             });
           }
         };
@@ -66,8 +67,9 @@ const Menu = ({
         })
           ? section.sections
           : section.sections
-          ? section.sections.filter((x) =>
-              x.title.toLowerCase().includes(searchString.toLowerCase())
+          ? section.sections.filter(
+              (x) =>
+                search && x.title.toLowerCase().includes(search.toLowerCase())
             )
           : [];
 

@@ -1,7 +1,7 @@
 import { DefinitionObject, getDefinition } from "sensible-core";
 import { Definition } from "typescript-json-schema";
-import { useScrollTo } from "../hooks/useScrollTo";
-import { getRefLink, getType, getTypeDefinitionString } from "../util";
+import { useScrollTo } from "../util/useScrollTo";
+import { getRefLink, getType, getTypeDefinitionString } from "../util/util";
 
 const TypeDefinition = ({
   title,

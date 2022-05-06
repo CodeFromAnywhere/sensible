@@ -5,13 +5,13 @@ import { toast } from "react-with-native-notification";
 import "react-toastify/dist/ReactToastify.css";
 import BsCodeIcon from "../../public/BsCode.svg";
 import VscTerminalCmdIcon from "../../public/VscTerminalCmd.svg";
-import { toQueryString } from "../util";
+import { getQueryStrings, toQueryString } from "../util/util";
 import BsChevronUpIcon from "../../public/BsChevronUp.svg";
 import useStore from "../store";
-import { useSiteParams } from "../hooks/useSiteParams";
 
 import TypeDefinition from "./TypeDefinition";
 import { DefinitionObject, getDefinition } from "sensible-core";
+import { useRouter } from "react-with-native-router";
 const Endpoint = ({
   definition,
   id,
@@ -23,7 +23,8 @@ const Endpoint = ({
   allDefinitions: DefinitionObject;
   model: string;
 }) => {
-  const { urlUrl, searchString, locationString } = useSiteParams();
+  const router = useRouter();
+  const { search, location, url } = getQueryStrings(router.query);
 
   const getFirstEnum = (key: string): string | undefined =>
     getDefinition(definition?.properties?.[key])?.enum?.[0] as
@@ -36,19 +37,19 @@ const Endpoint = ({
 
   const [expandedTypes, setExpandedTypes] = useStore("expandedTypes");
 
-  const isExpanded = urlUrl
-    ? !!expandedTypes[urlUrl]?.find((x) => x === identifier)
+  const isExpanded = url
+    ? !!expandedTypes[url]?.find((x) => x === identifier)
     : false;
 
   const toggle = () => {
-    if (urlUrl) {
+    if (url) {
       const newExpandedTypes = isExpanded
-        ? expandedTypes[urlUrl].filter((x) => x !== identifier)
-        : (expandedTypes[urlUrl] || []).concat([identifier]);
+        ? expandedTypes[url].filter((x) => x !== identifier)
+        : (expandedTypes[url] || []).concat([identifier]);
 
       setExpandedTypes({
         ...expandedTypes,
-        [urlUrl]: newExpandedTypes,
+        [url]: newExpandedTypes,
       });
     }
   };
@@ -96,7 +97,7 @@ const Endpoint = ({
         e.stopPropagation();
 
         const query = {
-          search: searchString,
+          search,
           location: identifier,
         };
 
@@ -141,7 +142,7 @@ const Endpoint = ({
       onClick={(e) => {
         e.stopPropagation();
 
-        const fullPath = urlUrl + "/" + getFirstEnum("path") + query;
+        const fullPath = url + "/" + getFirstEnum("path") + query;
         const command = `curl${methodOptions}${bodyOptions} '${fullPath}'`;
         navigator.clipboard.writeText(command);
         toast({
@@ -197,7 +198,7 @@ const Endpoint = ({
     </div>
   );
 
-  const isSelected = locationString === identifier;
+  const isSelected = location === identifier;
   return (
     <div
       id={identifier}

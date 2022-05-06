@@ -6,10 +6,10 @@ LEARNING: Stop thinking about cool far-ahead ideas. Start **doing** what's most 
 
 **Secondly, improve docs frontend**
 
-- [ ] setup new page structure based on new endpoints
-- [ ] fetch data in the right places and way
-- [ ] use definitions from core
-- [ ] fix all errors because of the new type definition
+- [ ] make docs endpoint to findAllMd again to get menu, but only find the files, not parsing them. Just alter the filename to Camel Case for now. For now, just title it with the title of the md and don't do any recursive stuff.
+- [ ] new menu structure: apps, models, docs, errors, examples, recent, ui. once you clicked,
+- [ ] new way to select app: selectbox. then, select box to select one of the 7 things above.
+
 - [ ] store core endpoint result in persistent store for every project added
 - [ ] create possibility to search through multiple core's at once so they can be compared
 - [ ] for every definition, add a link to github to the exact file, and a `code /relative/path` copy button so you can easily open the file

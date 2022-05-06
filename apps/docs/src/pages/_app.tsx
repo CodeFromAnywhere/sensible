@@ -6,11 +6,13 @@ import { QueryClient, QueryClientProvider } from "react-query";
 import { createWebStoragePersistor } from "react-query/createWebStoragePersistor-experimental";
 import { persistQueryClient } from "react-query/persistQueryClient-experimental";
 
-import { StoreProvider } from "../store";
+import useStore, { StoreProvider } from "../store";
 import { ToastContainer } from "react-with-native-notification";
 import Head from "next/head";
 import nightwind from "nightwind/helper";
 import { ThemeProvider } from "next-themes";
+import { Layout } from "../components/Layout";
+import SideBar from "../components/sidebar/SideBar";
 
 const progress = new ProgressBar();
 
@@ -29,6 +31,30 @@ const queryClient = new QueryClient({
   },
 });
 
+const AppWithProviders = ({ component }: { component: any }) => {
+  const [showMenuMobile, setShowMenuMobile] = useStore("showMenuMobile");
+
+  return (
+    <Layout>
+      <div
+        className={`lg:w-80 lg:block w-full overflow-y-scroll ${
+          showMenuMobile ? "block" : "hidden"
+        }`}
+      >
+        <SideBar />
+      </div>
+
+      <div
+        className={`flex-1 w-full overflow-y-scroll px-8 ${
+          showMenuMobile ? "hidden" : "block"
+        } lg:block`}
+      >
+        {component}
+      </div>
+    </Layout>
+  );
+};
+
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     <QueryClientProvider client={queryClient}>
@@ -42,7 +68,7 @@ function MyApp({ Component, pageProps }: AppProps) {
           storageKey="nightwind-mode"
           defaultTheme="system" // default "light"
         >
-          <Component {...pageProps} />
+          <AppWithProviders component={<Component {...pageProps} />} />
         </ThemeProvider>
       </StoreProvider>
     </QueryClientProvider>
