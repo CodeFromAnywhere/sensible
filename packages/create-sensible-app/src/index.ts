@@ -330,7 +330,7 @@ const main = async () => {
     isDisabled: !isNewDefaults,
   };
 
-  const selectedApps = ["app", "web"];
+  const selectedApps = ["app", "web", "computer"];
   const commandsWithoutCache: CommandsObject[] = [
     {
       dir: targetDir,

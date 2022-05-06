@@ -350,7 +350,7 @@ var main = function () { return __awaiter(void 0, void 0, void 0, function () {
                     description: "Save new setttings",
                     isDisabled: !isNewDefaults,
                 };
-                selectedApps = ["app", "web"];
+                selectedApps = ["app", "web", "computer"];
                 commandsWithoutCache = __spreadArray(__spreadArray([
                     {
                         dir: targetDir,
