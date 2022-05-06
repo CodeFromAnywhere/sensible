@@ -1,2 +1,4 @@
 node_modules/
-schemas/
+third-party/*/
+apps/*/.turbo/
+packages/*/.turbo/
