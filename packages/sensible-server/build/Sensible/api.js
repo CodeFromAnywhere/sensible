@@ -11,7 +11,7 @@ const createMakeEndpoint_1 = require("../createMakeEndpoint");
 const getCachedApps_1 = require("../getCachedApps");
 const getCachedFrontend_1 = require("../getCachedFrontend");
 const getCachedSchema_1 = require("../getCachedSchema");
-const parseMd_1 = require("../util/parseMd");
+const sensible_files_1 = require("sensible-files");
 const { get } = server_1.default.router;
 const makeSensibleEndpoints = (basePath, appPaths, interpretableTypes, constants) => {
     const schemasFolderPath = path_1.default.join(basePath, "..", "schemas");
@@ -38,7 +38,7 @@ const makeSensibleEndpoints = (basePath, appPaths, interpretableTypes, constants
         makeEndpoint("sensible/doc", "GET", async (ctx) => {
             const { slug, pathToDoc } = ctx.body;
             //const md = findAllMd(basePath, true);
-            const doc = pathToDoc ? (0, parseMd_1.parseMd)(pathToDoc) : undefined;
+            const doc = pathToDoc ? (0, sensible_files_1.parseMd)(pathToDoc) : undefined;
             return {
                 doc,
                 response: doc ? "Success" : "Couldn't find document",

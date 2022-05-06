@@ -27,7 +27,7 @@ const sensible_core_1 = require("sensible-core");
 const path_1 = __importDefault(require("path"));
 const TJS = __importStar(require("typescript-json-schema"));
 const fs_1 = __importDefault(require("fs"));
-const files_1 = require("./util/files");
+const sensible_files_1 = require("sensible-files");
 // optionally pass argument to schema generator
 const settings = {
     required: true,
@@ -92,13 +92,13 @@ const getCachedSchema = (typeFilesObject, schemasFolderPath) => {
         const endpointSchemaFilePath = path_1.default.join(schemasFolderPath, key, "endpoints.json");
         const typeSchemaFilePath = path_1.default.join(schemasFolderPath, key, "types.json");
         //TODO: if the user makes a mistake in the type definition, crashes will happen down the line now. I think the guard should be improved
-        const typeExamples = (0, files_1.importFromFiles)({
+        const typeExamples = (0, sensible_files_1.importFromFiles)({
             files: typeFiles.typeExamples,
-            guard: files_1.isArrayGuard,
+            guard: sensible_files_1.isArrayGuard,
         }).flat();
-        const endpointExamples = (0, files_1.importFromFiles)({
+        const endpointExamples = (0, sensible_files_1.importFromFiles)({
             files: typeFiles.endpointExamples,
-            guard: files_1.isArrayGuard,
+            guard: sensible_files_1.isArrayGuard,
         }).flat();
         const types = (0, exports.generateOrRequireSchema)({
             typeFiles: typeFiles.types,

@@ -1,4 +1,4 @@
-import { Md, Path } from "sensible-core";
+import { Md, Path } from "./types";
 import { findFilesRecursively } from "./files";
 import { parseMd } from "./parseMd";
 

@@ -8,6 +8,7 @@ There, select the following option:
 
 Also make sure that you set your root directory to the root folder of the workspace.
 
+![](./deploying-on-vercel.png)
 PS: It's also possible to do it the other way around, of course: set your root directory to `apps/web` and just `cd ../..` first for installing and building, but the first option is easier to set up.
 
 That's it! It should now build fine. :)

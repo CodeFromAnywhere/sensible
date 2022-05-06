@@ -8,7 +8,7 @@ import {
   TypeExample,
   InterpretableTypes,
 } from "sensible-core";
-import { importFromFiles, isArrayGuard } from "./util/files";
+import { importFromFiles, isArrayGuard } from "sensible-files";
 
 // optionally pass argument to schema generator
 const settings: TJS.PartialArgs = {

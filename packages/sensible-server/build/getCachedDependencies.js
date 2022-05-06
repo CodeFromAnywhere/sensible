@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getCachedDependencies = exports.getDependencyObject = void 0;
 const path_1 = __importDefault(require("path"));
 const sensible_core_1 = require("sensible-core");
-const findAllMd_1 = require("./util/findAllMd");
+const sensible_files_1 = require("sensible-files");
 const getRelevantPackageInfo_1 = require("./util/getRelevantPackageInfo");
 const getRepo_1 = require("./util/getRepo");
 const getDependencyObject = (dependencyName, currentVersion, dependencyPath) => {
@@ -15,7 +15,7 @@ const getDependencyObject = (dependencyName, currentVersion, dependencyPath) => 
         console.warn(`Couldn't find package.json for dependency ${dependencyPath}`);
         return null;
     }
-    const md = (0, findAllMd_1.findAllMd)(dependencyPath);
+    const md = (0, sensible_files_1.findAllMd)(dependencyPath);
     return {
         name: dependencyName,
         version: currentVersion,

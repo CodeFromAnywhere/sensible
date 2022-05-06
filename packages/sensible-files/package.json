@@ -1,7 +1,7 @@
 {
-  "name": "sensible-core",
-  "version": "1.0.51",
-  "description": "All types and util functions used in any sensible project",
+  "name": "sensible-files",
+  "version": "1.0.1",
+  "description": "",
   "main": "build/index.js",
   "source": "src/index.ts",
   "scripts": {
@@ -13,6 +13,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "typescript-json-schema": "^0.53.0"
+    "gray-matter": "^4.0.3"
   }
 }

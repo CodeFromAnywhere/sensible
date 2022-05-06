@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { findFilesRecursively } from "sensible-server";
+import { findFilesRecursively } from "sensible-files";
 /*
 As long as there are no .template files present in the template folder that DONT need to be changed, it is fine.
 If there are, we should warn people.

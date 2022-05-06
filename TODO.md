@@ -1,19 +1,13 @@
 # TODO
 
-LEARNING: the end user is not connected to any sensible-server, yet they want to have the sensible-core types. However they don't want the type interfaces they don't have access to. Therefore there MUST be an additional core package that adds the SensibleTypes with the other types that are sensible-backend specific.
+Goal: have a stable version of sensible that I can demo.
 
-LEARNING: Stop thinking about cool far-ahead ideas. Start **doing** what's most important.
+Quick wins:
 
-**Secondly, improve docs frontend**
+- Extrahere all file transformation, search, parsing, etc into `sensible-files`
+- Fetch all markdown files from `/docs` at build-time and create static pages from them.
 
 - [ ] make docs endpoint to findAllMd again to get menu, but only find the files, not parsing them. Just alter the filename to Camel Case for now. For now, just title it with the title of the md and don't do any recursive stuff.
-- [ ] new menu structure: apps, models, docs, errors, examples, recent, ui. once you clicked,
-- [ ] new way to select app: selectbox. then, select box to select one of the 7 things above.
-
-- [ ] store core endpoint result in persistent store for every project added
-- [ ] create possibility to search through multiple core's at once so they can be compared
-- [ ] for every definition, add a link to github to the exact file, and a `code /relative/path` copy button so you can easily open the file
-- [ ] publish all packages and deploy docs, server and web of sensible without bugs :-)
 
 **Most effective to do**
 
@@ -53,3 +47,9 @@ make /sensible.json in root
 
 - docs-config: links, menu
 - sensible-config: name, email, domain, api[]
+
+LEARNING: the end user is not connected to any sensible-server, yet they want to have the sensible-core types. However they don't want the type interfaces they don't have access to. Therefore there MUST be an additional core package that adds the SensibleTypes with the other types that are sensible-backend specific.
+
+LEARNING: Stop thinking about cool far-ahead ideas. Start **doing** what's most important.
+
+LEARNING: Stop thinking about painpoints, see how I can improve this!!! Ship it!

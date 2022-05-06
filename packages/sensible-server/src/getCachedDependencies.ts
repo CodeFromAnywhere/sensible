@@ -1,7 +1,7 @@
 import { Dependency, PackageInfoObject } from "sensible-core";
 import path from "path";
 import { notEmpty } from "sensible-core";
-import { findAllMd } from "./util/findAllMd";
+import { findAllMd } from "sensible-files";
 import { getRelevantPackageInfo } from "./util/getRelevantPackageInfo";
 import { getRepo } from "./util/getRepo";
 

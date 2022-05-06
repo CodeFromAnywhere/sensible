@@ -1,11 +1,10 @@
 import * as TJS from "typescript-json-schema";
 import { Endpoint } from "../types";
-
+import { Path } from "sensible-files";
 //////////// Here the Sensible API types and all types related to that ///////////////
 
 export type RootModel = "root";
 export type AllEndpointsModel = "AllEndpoints";
-export type Path = string;
 export type FolderPath = { relativeFolder: string | undefined; path: Path };
 
 export type InterpretableTypes = {
@@ -87,24 +86,6 @@ export interface Dependency {
   md: Md[];
   repo?: string;
   homepage?: string;
-}
-export type UnixTimestamp = number;
-
-export type MarkdownContent = string;
-
-export interface Md {
-  fileName: string;
-  params: {
-    title?: string;
-    author?: string;
-  } & {
-    [key: string]: string;
-  };
-  createdAt: UnixTimestamp;
-  updatedAt: UnixTimestamp;
-  modifiedAt: UnixTimestamp;
-  openedAt: UnixTimestamp;
-  content: MarkdownContent;
 }
 
 export type FileOrFolder = string;

@@ -10,12 +10,8 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.makeSensibleEndpoints = void 0;
-const api_1 = require("./Sensible/api");
-Object.defineProperty(exports, "makeSensibleEndpoints", { enumerable: true, get: function () { return api_1.makeSensibleEndpoints; } });
-__exportStar(require("./createMakeEndpoint"), exports);
-__exportStar(require("./DefaultModel"), exports);
+__exportStar(require("./files"), exports);
+__exportStar(require("./findAllMd"), exports);
+__exportStar(require("./parseMd"), exports);
 __exportStar(require("./types"), exports);
-//util functions
-__exportStar(require("./util/sequelize"), exports);
 //# sourceMappingURL=index.js.map
