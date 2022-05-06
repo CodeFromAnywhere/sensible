@@ -2,10 +2,8 @@ Sensible is built on top of a yarn workspace. Your Next.js frontend relies on ot
 
 To setup Vercel deployment correctly, select your project, go to `settings`, `general`, `build & development settings`.
 
-There, select the following options:
+There, select the following option:
 
-- build command: `yarn`
-- output directory: `apps/web` (or whatever your next.js project is called)
-- install command: `yarn`
+- output directory: `apps/[your next project app folder]`
 
-That's it! It should now build fine.
+That's it! It should now build fine. :)
