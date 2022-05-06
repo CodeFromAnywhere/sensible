@@ -1,10 +1,8 @@
-import { Endpoint, Path } from "sensible-core";
-import server from "server";
-import { getCachedSchema } from "./getCachedSchema";
-import * as TJS from "typescript-json-schema";
 import Ajv from "ajv";
-import { InterpretableTypes } from "sensible-core";
+import { Endpoint, InterpretableTypes, Path } from "sensible-core";
+import server from "server";
 import { Middleware } from "server/typings/common";
+import * as TJS from "typescript-json-schema";
 import {
   CreateMakeEndpointType,
   EndpointFunctionType,
@@ -12,6 +10,7 @@ import {
   Keys,
   MakeEndpointType,
 } from ".";
+import { getCachedSchema } from "./getCachedSchema";
 
 export const ajv = new Ajv({
   allErrors: true,
@@ -41,6 +40,12 @@ export const typeHasIncorrectInterface = (
   return !isValid; //always false
 };
 
+/**
+ * This function is provided the schema info from core and creates a typed function that can be used on the server to make endpoints
+ * @param interpretableTypes
+ * @param schemasFolderPath
+ * @returns
+ */
 export const createMakeEndpoint: CreateMakeEndpointType = <
   TAllEndpoints extends { [key in Keys<TAllEndpoints>]: Endpoint }
 >(

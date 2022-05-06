@@ -1,4 +1,4 @@
-import { InterpretableTypes, ModelSchemaObject, Path, ProjectType, App } from "sensible-core";
+import { App, AppsObject, InterpretableTypes, Path, ProjectType } from "sensible-core";
 export declare const getAppType: (projectType: ProjectType, folder: string) => "server" | "frontend" | "core" | null;
 /**
  *
@@ -6,6 +6,6 @@ export declare const getAppType: (projectType: ProjectType, folder: string) => "
  * @param modelSchemaObject only needed for core folder
  * @returns App | null
  */
-export declare const getAppInfo: (folderPath: Path, modelSchemaObject: ModelSchemaObject) => App | null;
-export declare const getCachedApps: (appPaths: Path[], interpretableTypes: InterpretableTypes, schemasFolderPath: Path) => App[];
+export declare const getAppInfo: (folderPath: Path) => App | null;
+export declare const getCachedApps: (appPaths: Path[], interpretableTypes: InterpretableTypes, schemasFolderPath: Path) => AppsObject;
 //# sourceMappingURL=getCachedApps.d.ts.map

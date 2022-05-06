@@ -2,17 +2,17 @@
  * This file was auto-generated using the Sensible Boilerplate Creator (npx create-sensible-app).
  * You can edit it in what ever way you see fit.
  */
-import { Middleware } from "server/typings/common";
+import { PublicConstants } from "core";
 import fs from "fs";
+import path, { resolve } from "path";
+import { Path } from "sensible-core";
 import {
   findFiles,
   importFromFiles,
-  makeDefaultEndpoints,
+  makeSensibleEndpoints,
 } from "sensible-server";
+import { Middleware } from "server/typings/common";
 import { interpretableTypes } from "./typeFiles";
-import { PublicConstants } from "core";
-import path, { resolve } from "path";
-import { Path } from "sensible-core";
 
 export const getServerEndpoints = (): Middleware[] => {
   const imports = importFromFiles({
@@ -39,11 +39,11 @@ export const getAppPaths = (basePath: Path): Path[] => {
 export const getAllEndpoints = (): Middleware[] => {
   const basePath = resolve("..");
   const appPaths = getAppPaths(basePath);
-  const defaultEndpoints = makeDefaultEndpoints(
+  const sensibleEndpoints = makeSensibleEndpoints(
     basePath,
     appPaths,
     interpretableTypes,
     PublicConstants
   );
-  return getServerEndpoints().concat(defaultEndpoints);
+  return getServerEndpoints().concat(sensibleEndpoints);
 };

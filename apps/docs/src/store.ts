@@ -27,7 +27,6 @@ export const initialValues: StoreType = {
 
 export const StoreProvider = createStoreProvider({
   initialValues,
-  baseKey: "sensibledocs3",
 });
 export const useStore = createUseStore(initialValues);
 export default useStore;

@@ -2,13 +2,13 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getCachedFrontend = void 0;
 //just generate the frontendFile[] once every server restart because there can't be any changes without the server restarting.
-let cachedFrontend = [];
+let cachedFrontend = {};
 const getCachedFrontend = (folderPath) => {
-    if (cachedFrontend.length > 0) {
+    if (Object.keys(cachedFrontend).length > 0) {
         return cachedFrontend;
     }
     //should introspect frontend files. All ts and tsx files and their exports.
-    const frontend = [];
+    const frontend = {};
     cachedFrontend = frontend;
     return frontend;
 };

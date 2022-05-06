@@ -9,7 +9,7 @@ import { Path } from "sensible-core";
 import {
   findFiles,
   importFromFiles,
-  makeDefaultEndpoints,
+  makeSensibleEndpoints,
 } from "sensible-server";
 import { Middleware } from "server/typings/common";
 import { interpretableTypes } from "./typeFiles";
@@ -41,11 +41,11 @@ export const getAllEndpoints = (): Middleware[] => {
   const packagesPath = resolve("../../packages");
 
   const appPaths = getAppPaths(appsPath).concat(getAppPaths(packagesPath));
-  const defaultEndpoints = makeDefaultEndpoints(
+  const sensibleEndpoints = makeSensibleEndpoints(
     appsPath,
     appPaths,
     interpretableTypes,
     PublicConstants
   );
-  return getServerEndpoints().concat(defaultEndpoints);
+  return getServerEndpoints().concat(sensibleEndpoints);
 };

@@ -1,13 +1,13 @@
 import React from "react";
 import Menu, { Section } from "./Menu";
 import Search from "../Search";
-import { useDocsQuery } from "../../hooks/useDocsQuery";
-import { getDocs, getFirstEnum, isEndpoint, notEmpty } from "../../util";
+import { useCoreQuery } from "../../hooks/useQueryHooks";
+import { getFirstEnum, isEndpoint, notEmpty } from "../../util";
 import { getDefinition } from "sensible-core";
 
 const SideBar = () => {
-  const docs = useDocsQuery();
-  const schema = getDocs(docs)?.schema;
+  const core = useCoreQuery();
+  const schema = core.data?.models;
   const modelKeys = schema ? Object.keys(schema) : [];
   const sections = modelKeys.map((modelKey) => {
     const model = schema?.[modelKey];

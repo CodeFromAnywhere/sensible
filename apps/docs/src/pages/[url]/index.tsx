@@ -2,29 +2,30 @@ import type { NextPage } from "next";
 import { ActivityIndicator } from "react-with-native";
 import { useEffect } from "react";
 import useStore from "../store";
-import { getDocs, isDocs } from "../util";
 import "react-toastify/dist/ReactToastify.css";
 import Model from "../components/Model";
 import SideBar from "../components/sidebar/SideBar";
 import { useSiteParams } from "../hooks/useSiteParams";
 import { useScrollTo } from "../hooks/useScrollTo";
 import { Layout } from "../components/Layout";
-import { useDocsQuery } from "../hooks/useDocsQuery";
+import { useCoreQuery, useOtherQuery } from "../hooks/useQueryHooks";
+import { api } from "ui";
 
 const hasError = (docs: any) => docs.data?.error;
+
 const Home: NextPage = () => {
   const { urlUrl, locationString } = useSiteParams();
   const scrollTo = useScrollTo();
   const [recentSites, setRecentSites] = useStore("recentSites");
-  const docs = useDocsQuery();
-  const constants = getDocs(docs)?.constants;
+  const core = useCoreQuery();
+  const other = useOtherQuery();
+  const constants = other.data?.constants;
   const [showMenuMobile, setShowMenuMobile] = useStore("showMenuMobile");
   useEffect(() => {
-    const dataIsDocs = isDocs(docs.data);
-    if (dataIsDocs && locationString) {
+    if (core.data?.success && locationString) {
       scrollTo(locationString);
     }
-  }, [docs.dataUpdatedAt, locationString]);
+  }, [core.dataUpdatedAt, locationString]);
 
   useEffect(() => {
     if (urlUrl && !recentSites.find((x) => x.apiUrl === urlUrl)) {
@@ -43,18 +44,18 @@ const Home: NextPage = () => {
 
   useEffect(() => {
     if (urlUrl) {
-      docs.refetch();
+      core.refetch();
     }
   }, [urlUrl]);
 
   const renderModelObject = () => {
-    const schema = getDocs(docs)?.schema;
+    const models = core.data?.models;
 
     return (
-      schema && (
+      models && (
         <div>
-          {Object.keys(schema).map((modelKey) => {
-            const sections = schema[modelKey];
+          {Object.keys(models).map((modelKey) => {
+            const sections = models[modelKey];
             return (
               <Model
                 modelKey={modelKey}
@@ -85,8 +86,8 @@ const Home: NextPage = () => {
       >
         {/* {!!getDocs(docs)?.schema ? <Search /> : null} */}
 
-        {hasError(docs) ? <p>{docs.data?.response}</p> : null}
-        {docs.isLoading ? (
+        {hasError(core) ? <p>{core.data?.response}</p> : null}
+        {core.isLoading ? (
           <div>
             <p>Fetching the newest docs</p>
             <ActivityIndicator className="w-4 h-4" />

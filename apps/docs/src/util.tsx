@@ -1,27 +1,7 @@
 import * as TJS from "typescript-json-schema";
 import TypeDefinition from "./components/TypeDefinition";
-import { DocsEndpoint, getDefinition } from "sensible-core";
+import { DefinitionObject, DocsEndpoint, getDefinition } from "sensible-core";
 export type Method = "GET" | "POST";
-
-export type EndpointExample = {
-  type: "endpoint";
-  path: `${Method}:${string}`;
-  id: number;
-  body: object;
-  response: object;
-};
-
-export type TypeExample = {
-  type: "type";
-  typeInterfaceName: string;
-  value: any;
-};
-
-export type DefinitionObject = {
-  [key: string]: TJS.DefinitionOrBoolean;
-};
-
-export type Docs = DocsEndpoint["response"];
 
 export type EndpointDefinition = TJS.Definition & {
   properties: {
@@ -32,14 +12,6 @@ export type EndpointDefinition = TJS.Definition & {
   };
 };
 
-export type DocsResult =
-  | Docs
-  | {
-      success: false;
-      error: boolean;
-      response: string;
-    }
-  | undefined;
 export const isEndpoint = (
   definition: TJS.Definition | null
 ): definition is EndpointDefinition => {
@@ -83,13 +55,6 @@ export const getFirstEnum = (
 
 export const getRefLink = (ref?: string) => {
   return ref?.split("/").pop();
-};
-export const isDocs = (docs: any): docs is Docs => {
-  return docs?.schema && !!docs?.response && docs?.success ? true : false;
-};
-
-export const getDocs = (docsQuery: any): Docs | null => {
-  return isDocs(docsQuery?.data) ? docsQuery.data : null;
 };
 
 type ArrayType = {

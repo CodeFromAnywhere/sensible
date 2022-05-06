@@ -4,9 +4,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createMakeEndpoint = exports.typeHasIncorrectInterface = exports.ajv = void 0;
+const ajv_1 = __importDefault(require("ajv"));
 const server_1 = __importDefault(require("server"));
 const getCachedSchema_1 = require("./getCachedSchema");
-const ajv_1 = __importDefault(require("ajv"));
 exports.ajv = new ajv_1.default({
     allErrors: true,
     coerceTypes: true,
@@ -26,6 +26,12 @@ const typeHasIncorrectInterface = (typeName, data, schema) => {
     return !isValid; //always false
 };
 exports.typeHasIncorrectInterface = typeHasIncorrectInterface;
+/**
+ * This function is provided the schema info from core and creates a typed function that can be used on the server to make endpoints
+ * @param interpretableTypes
+ * @param schemasFolderPath
+ * @returns
+ */
 const createMakeEndpoint = (interpretableTypes, schemasFolderPath) => {
     const makeEndpoint = (path, method, endpoint) => {
         const callMethod = method === "GET" ? "get" : "post";

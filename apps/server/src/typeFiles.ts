@@ -4,8 +4,14 @@ import { findFiles } from "sensible-server";
 
 // the next line resolves the address of the core folder. We know this is there because of the sensible convention
 const basePath = resolve("../../packages/core/src");
-export const endpoints = findFiles("endpoint", basePath);
-export const types = findFiles("type", basePath);
+const sensibleServerBasePath = resolve("../../node_modules/sensible-core/src");
+export const endpoints = findFiles("endpoint", basePath).concat(
+  findFiles("endpoint", sensibleServerBasePath)
+);
+
+export const types = findFiles("type", basePath).concat(
+  findFiles("type", sensibleServerBasePath)
+);
 export const endpointExamples = findFiles("endpoint.example", basePath);
 export const typeExamples = findFiles("type.example", basePath);
 

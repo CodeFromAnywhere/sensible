@@ -1,21 +1,8 @@
 # TODO
 
-Stop thinking about cool far-ahead ideas. Start doing what's most important.
+LEARNING: the end user is not connected to any sensible-server, yet they want to have the sensible-core types. However they don't want the type interfaces they don't have access to. Therefore there MUST be an additional core package that adds the SensibleTypes with the other types that are sensible-backend specific.
 
-**Firstly, improve endpoints within sensible-server:**
-
-- [ ] Create these endpoints but don't spend too much time on new stuff
-
-/sensible/core[/$model/type/endpoint-definition]
-/sensible/ui[/$app]
-/sensible/apps[/$app]
-/sensible/recent[/$endpoint]
-/sensible/errors[/$app/$endpoint] --> app can be any frontend app or the server. for server, endpoint can be specified.
-/sensible/examples[/$model/type/endpoint]
-/sensible/docs/[framework/package/app]/path/to/doc --> returns markdown
-/sensible/docs/[framework/package/app]/menu --> returns menu.json
-
-- [ ] Put all type interfaces in `core`
+LEARNING: Stop thinking about cool far-ahead ideas. Start **doing** what's most important.
 
 **Secondly, improve docs frontend**
 

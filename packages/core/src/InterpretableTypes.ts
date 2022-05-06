@@ -5,7 +5,6 @@
 
 export * from "./User/endpoints";
 export * from "./User/types";
-
 import { UserEndpoints } from "./User/endpoints";
-
-export type AllEndpoints = UserEndpoints;
+import { AllSensibleEndpoints } from "sensible-core";
+export type AllEndpoints = UserEndpoints & AllSensibleEndpoints;

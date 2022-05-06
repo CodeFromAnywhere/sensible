@@ -2,11 +2,12 @@ import * as TJS from "typescript-json-schema";
 import { Svg } from "react-with-native";
 import { toast } from "react-with-native-notification";
 import BsCodeIcon from "../../public/BsCode.svg";
-import { DefinitionObject, getTypeDefinitionString } from "../util";
+import { getTypeDefinitionString } from "../util";
 import BsChevronUpIcon from "../../public/BsChevronUp.svg";
 import useStore from "../store";
 import { useSiteParams } from "../hooks/useSiteParams";
 import TypeDefinition from "./TypeDefinition";
+import { DefinitionObject } from "sensible-core";
 
 const TypeDefinitionContainer = ({
   definition,

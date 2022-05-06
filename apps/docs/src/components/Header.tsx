@@ -1,37 +1,33 @@
 import Head from "next/head";
 import Link from "next/link";
-import { useDocsQuery } from "../hooks/useDocsQuery";
 import { useSiteParams } from "../hooks/useSiteParams";
-import { getDocs } from "../util";
 import DarkModeToggle from "./DarkModeToggle";
 import FiMenuIcon from "../../public/FiMenu.svg";
 import { Svg } from "react-with-native";
 import useStore from "../store";
+import { useOtherQuery } from "../hooks/useQueryHooks";
 
 const Header = () => {
   const { urlUrl } = useSiteParams();
-  const docs = useDocsQuery();
-  const constants = getDocs(docs)?.constants;
+  const other = useOtherQuery();
+  const constants = other.data?.constants;
+
   const [showMenuMobile, setShowMenuMobile] = useStore("showMenuMobile");
+
+  const appName = constants?.appName;
   const title = (
     <div className="ml-4">
-      <h1 className="text-xl font-bold">
-        {constants?.appName || "Sensible Docs"}
-      </h1>
-      <p
-        onClick={() => {
-          window.open("https://sensibleframework.co", "_blank")?.focus();
-        }}
+      <h1 className="text-xl font-bold">{appName || "Sensible Docs"}</h1>
+      <a
+        href="https://sensibleframework.co"
         className="text-sm cursor-pointer hover:underline"
       >
-        {constants?.appName && "Sensible Docs"}
-      </p>
+        {appName && "Sensible Docs"}
+      </a>
     </div>
   );
 
-  const headTitle = `${
-    constants?.appName ? constants.appName + " - " : ""
-  }Sensible Docs`;
+  const headTitle = `${appName ? appName + " - " : ""}Sensible Docs`;
 
   const description =
     "Sensible is the fastest way to make an app. Check it out!";

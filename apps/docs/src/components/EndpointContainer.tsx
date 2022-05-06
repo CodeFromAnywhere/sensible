@@ -5,13 +5,13 @@ import { toast } from "react-with-native-notification";
 import "react-toastify/dist/ReactToastify.css";
 import BsCodeIcon from "../../public/BsCode.svg";
 import VscTerminalCmdIcon from "../../public/VscTerminalCmd.svg";
-import { DefinitionObject, toQueryString } from "../util";
+import { toQueryString } from "../util";
 import BsChevronUpIcon from "../../public/BsChevronUp.svg";
 import useStore from "../store";
 import { useSiteParams } from "../hooks/useSiteParams";
 
 import TypeDefinition from "./TypeDefinition";
-import { getDefinition } from "sensible-core";
+import { DefinitionObject, getDefinition } from "sensible-core";
 const Endpoint = ({
   definition,
   id,
