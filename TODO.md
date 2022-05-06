@@ -1,5 +1,7 @@
 # TODO
 
+Stop thinking about cool far-ahead ideas. Start doing what's most important.
+
 **Firstly, improve endpoints within sensible-server:**
 
 - [ ] Create these endpoints but don't spend too much time on new stuff
@@ -21,6 +23,21 @@
 - [ ] fetch data in the right places and way
 - [ ] use definitions from core
 - [ ] fix all errors because of the new type definition
+- [ ] store core endpoint result in persistent store for every project added
+- [ ] create possibility to search through multiple core's at once so they can be compared
+- [ ] for every definition, add a link to github to the exact file, and a `code /relative/path` copy button so you can easily open the file
+- [ ] publish all packages and deploy docs, server and web of sensible without bugs :-)
+
+**Most effective to do**
+
+- [ ] create function that takes a type definition and generates model, api, and frontend for it.
+- [ ] make a good guide on all the specific steps to bring something to production (and try to automate it)
+- [ ] improve developer onboarding by integrating cfa-workspace and document, simplify or automate server setup
+- [ ] see if github actions are easy to setup and automate so we got auto-deploy on ship. another way would be just inside a sensible cli command, since we're moving away from github in the future anyway.
+
+**demo-time**
+
+Once the above is done, and it should not take more than a few days, sensible is demo-able, and I can create many apps, quickly. The first step would be to create some new apps in demo-videos and meetings and save lots of plugins to `sensible-plugin-*`. From that point onwards, I can create sick stuff, quickly.
 
 ## documentations
 
