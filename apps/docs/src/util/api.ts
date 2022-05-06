@@ -11,6 +11,7 @@ import { NO_API_SELECTED } from "../constants";
  * NB: if localhost ever changes their protocol or there will be a successor of https,
  * we need to make sure that we don't hardcode the protocols!
  */
+//
 export const api = (queryUrl: string) => {
   const isSensibleOnly = NO_API_SELECTED.slug === queryUrl;
   const isLocalhost = queryUrl.startsWith("localhost:");
