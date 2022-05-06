@@ -1,15 +1,15 @@
 {
-  "name": "sensible-monorepo",
+  "name": "sensible",
   "version": "0.0.0",
   "private": true,
   "workspaces": [
     "apps/*",
-    "packages/*"
+    "packages/*",
+    "third-party/*/packages/*"
   ],
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev --parallel",
-    "dev2": "turbo run dev",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
@@ -18,7 +18,8 @@
     "turbo": "latest"
   },
   "engines": {
-    "npm": ">=7.0.0"
+    "npm": ">=7.0.0",
+    "node": ">=14.0.0"
   },
   "packageManager": "yarn@1.22.17"
 }
