@@ -53,3 +53,7 @@ Create a turbo.json with this in your project root directory:
 Add the following dependencies to your apps and packages, where needed: core, ui
 And the following to devDependencies: config, tsconfig
 With version `"*"`
+
+### There's more.
+
+This is the most important part but there are probably more things, depending on your codebase. Let us help you! Contact us to discuss this.

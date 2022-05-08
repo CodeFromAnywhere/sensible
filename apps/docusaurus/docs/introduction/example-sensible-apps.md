@@ -1,3 +1,7 @@
+---
+sidebar_position: 3
+---
+
 # Example Sensible Apps
 
 The following is a short list of apps created with Sensible:
@@ -11,4 +15,5 @@ The following is a short list of apps created with Sensible:
 5. React with Native ([website](https://reactwithnative.com), [docs](https://docs.sensibleframework.co/rwn.leckrapi.xyz), [code](https://github.com/Code-From-Anywhere/react-with-native))
 
 ## By you
+
 We don't know about anyone else using Sensible yet. Let us know!

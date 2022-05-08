@@ -191,6 +191,7 @@ var makeApi = function (config) {
             console.warn(error);
             return {
                 success: false,
+                error: true,
                 response: "The API didn't resolve: " + error, //error + error.status +
             };
         });

@@ -1,5 +1,6 @@
 import { Path } from "sensible-files";
 import * as TJS from "typescript-json-schema";
+import { ModelSchemaObject, InterpretableTypes } from "sensible-core";
 /**
  * returns unix timestamp (ms) of the last modificationdate of the last modified file
  **/

@@ -22,6 +22,5 @@ export const api = (queryUrl: string) => {
     ? `http://${queryUrl}`
     : `https://${queryUrl}`;
 
-  console.log({ apiUrl });
   return apiUrl ? makeApi<AllEndpoints>({ apiUrl }) : undefined;
 };

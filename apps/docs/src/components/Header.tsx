@@ -8,13 +8,15 @@ import { useOtherQuery } from "../util/useQueryHooks";
 import { getQueryStrings } from "../util/util";
 import { useRouter } from "react-with-native-router";
 import { NO_API_SELECTED, SITE_URL } from "../constants";
+import { useEffect } from "react";
+import { useState } from "react";
 
 const Header = () => {
   const router = useRouter();
   const { url } = getQueryStrings(router.query);
   const other = useOtherQuery();
   const constants = other.data?.constants;
-
+  const [isOffline, setIsOffline] = useState(false);
   const [showMenuMobile, setShowMenuMobile] = useStore("showMenuMobile");
 
   const appName = constants?.appName;
@@ -33,11 +35,23 @@ const Header = () => {
     "Sensible is the fastest way to make an app. Check it out!";
 
   const imageUrl =
-    url === NO_API_SELECTED.slug
+    url === NO_API_SELECTED.slug || isOffline
       ? "/logo.png"
       : url?.startsWith("localhost:")
       ? `http://${url}/logo.png`
       : `https://${url}/logo.png`;
+
+  useEffect(() => {
+    fetch(imageUrl)
+      .then((res) => {
+        if (!res.ok) {
+          setIsOffline(true);
+        }
+      })
+      .catch((reason) => {
+        setIsOffline(true);
+      });
+  }, []);
 
   return (
     <div className="w-full px-4 border-b border-gray-100">
@@ -73,8 +87,16 @@ const Header = () => {
             {/* should be there because we are here */}
             <Link passHref href={"#"}>
               <div className="py-2 px-3 mr-4 bg-gray-100 rounded-md font-semibold cursor-pointer">
-                Docs
+                Defs
               </div>
+            </Link>
+
+            <Link passHref href={"https://doc.sensible.to"}>
+              <a target="_blank">
+                <div className="py-2 px-3 mr-4 font-semibold cursor-pointer">
+                  Docs
+                </div>
+              </a>
             </Link>
 
             {constants?.domain ? (

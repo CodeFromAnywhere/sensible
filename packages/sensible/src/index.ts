@@ -9,7 +9,7 @@ import { homedir } from "os";
 import { findAndRenameTemplateFiles } from "./util.templates";
 import { log } from "./util.log";
 import commandExists from "command-exists";
-
+// import latestVersion from "latest-version";
 //TYPE INTERFACES
 
 type OSOrDefault = NodeJS.Platform | "default";
@@ -177,8 +177,7 @@ const getApps = async (): Promise<string[]> => {
     },
   ];
 
-  const appsString = await getArgumentOrAsk(
-    1,
+  const appsString = await ask(
     `Which apps do you want to create boilerplates for? Just press enter for all of them 
     
 ${possibleApps
@@ -239,7 +238,7 @@ const askOpenDocs = async (): Promise<void> => {
     executeCommand(
       {
         description: "Opening docs",
-        command: "open https://docs.sensible.to",
+        command: "open https://doc.sensible.to",
       },
       __dirname,
       false
@@ -523,6 +522,11 @@ const getOpenVSCodeCommand = (appName: string) => ({
   description: "Opening your project in VSCode",
 });
 
+const openDocsCommand = {
+  command: `open https://docs.sensibleframework.co/localhost:4000`,
+  description: "Opening the docs for your project",
+};
+
 const setNewDefaults: Command = {
   command: `echo ${flagArgumentsString} > ${settingsLocation}`,
   description: "Save new setttings",
@@ -587,10 +591,13 @@ const getCommandsWithoutCache = ({
 
   // only install selected apps
   ...selectedApps.map((app) => {
-    const fileString = fs.readFileSync(
-      path.join(sensibleDir, `templates/apps/${app}.install.json`),
-      { encoding: "utf8" }
+    const installPath = path.join(
+      sensibleDir,
+      `templates/apps/${app}.install.json`
     );
+    const fileString = fs.existsSync(installPath)
+      ? fs.readFileSync(installPath, { encoding: "utf8" })
+      : "";
 
     const appsCommands: InstallObject =
       fileString && fileString.length > 0
@@ -616,7 +623,7 @@ const getCommandsWithoutCache = ({
 
   {
     dir: `${targetDir}/${appName}`,
-    commands: [getOpenVSCodeCommand(appName)],
+    commands: [getOpenVSCodeCommand(appName), openDocsCommand],
   },
 
   getPushToGitCommands(appName, remote),
@@ -664,6 +671,7 @@ const getCacheCommands = ({
         description: "Copying sensible from cache",
       },
       getOpenVSCodeCommand(appName),
+      openDocsCommand,
       setNewDefaults,
     ],
   },
@@ -671,7 +679,74 @@ const getCacheCommands = ({
   getPushToGitCommands(appName, remote),
 ];
 
+const getVersionParts = (versionString: string) => {
+  const [major, minor, patch] = versionString.split(".").map(Number);
+  return { major, minor, patch };
+};
+
+const getPackageVersions = async (name: string) => {
+  const latest = ""; //await latestVersion(name);
+  const current: string = JSON.parse(
+    fs.readFileSync(path.resolve(sensibleDir, "package.json"), "utf8")
+  ).version;
+  return { latest, current };
+};
+
+const getUpdateSeverity = async ({
+  latest,
+  current,
+}: {
+  latest: string;
+  current: string;
+}) => {
+  const latestParts = getVersionParts(latest);
+  const currentParts = getVersionParts(current);
+
+  if (latestParts.major > currentParts.major) return "major";
+  if (latestParts.minor > currentParts.minor) return "minor";
+  if (latestParts.patch > currentParts.patch) return "patch";
+  return false;
+};
+
+const handleVersionUpdates = async () => {
+  const { latest, current } = await getPackageVersions("sensible");
+  const updateSeverity = await getUpdateSeverity({ latest, current });
+
+  if (!updateSeverity) return;
+
+  if (updateSeverity === "patch") {
+    return log(
+      `There's a new version of sensible with version ${latest}. You are now on version ${current}.`,
+      "FgYellow"
+    );
+  }
+
+  const shouldUpdate = await askOk(
+    `Theres a new ${updateSeverity} version available for Sensible (${latest}). You're now on version ${current}. Shall we update? yes/no`
+  );
+
+  if (shouldUpdate) {
+    await executeCommand(
+      {
+        description: "Updating sensible",
+        command: "npm install --glopbal sensible@latest",
+      },
+      targetDir,
+      !!isDebug
+    );
+
+    return process.exit(0);
+  }
+
+  return log(
+    `Continuing on an older ${updateSeverity} version. Probably mostly harmless.`,
+    "FgGreen"
+  );
+};
+
 const main = async () => {
+  //problem with imports package.json ect. do some research to solve this.
+  //await handleVersionUpdates();
   await installRequiredStuff();
   const command = argumentsWithoutFlags[2];
 
@@ -679,6 +754,9 @@ const main = async () => {
     const appName = await getName();
     const remote = await getRemote(appName);
     const selectedApps = await getApps();
+
+    // console.log({ selectedApps });
+
     await askOpenDocs();
 
     const commandsFromFolders = shouldGetCache

@@ -39,6 +39,10 @@ export interface DefaultResponse {
      */
     success: boolean;
     /**
+     * a boolean indicating there's an error and something is wrong, either on the server or on the frontend.
+     */
+    error?: boolean;
+    /**
      * A message indicating the reason of failure (optionally this can be shown to the user)
      */
     response: string;

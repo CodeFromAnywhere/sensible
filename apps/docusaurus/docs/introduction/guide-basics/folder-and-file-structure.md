@@ -1,3 +1,7 @@
+---
+sidebar_position: 2
+---
+
 # Folder structure
 
 Every Sensible project must adhere the following structure:
@@ -20,7 +24,7 @@ There are some reserved keywords in the filename. In core those reserved keyword
 
 The following should be known about those reserved filenames:
 
-* type files should only contain types
-* endpoint files should only contain endpoint definitions (that implement the types)
-* model files should only contain models (that implement the types)
-* api files should only contain apis (that implement the endpoint defenitions)
+- type files should only contain types
+- endpoint files should only contain endpoint definitions (that implement the types)
+- model files should only contain models (that implement the types)
+- api files should only contain apis (that implement the endpoint defenitions)
