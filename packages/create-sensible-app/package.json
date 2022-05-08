@@ -1,21 +1,14 @@
 {
   "name": "create-sensible-app",
-  "version": "1.0.21",
+  "version": "1.1.4",
   "description": "A cli to create a new sensible app for you",
   "bin": {
-    "create-sensible-app": "./build/index.js",
-    "make-sense": "./build/index.js",
-    "sense": "./build/index.js",
-    "sensible": "./build/index.js",
-    "s": "./build/index.js"
+    "create-sensible-app": "./index.js"
   },
-  "main": "build/index.js",
-  "source": "src/index.ts",
+  "main": "index.js",
   "scripts": {
     "initpub": "npm publish --access public",
-    "pub": "npm version patch --force && npm publish",
-    "dev": "tsc -w",
-    "build": "tsc"
+    "pub": "npm version patch --force && npm publish"
   },
   "repository": {
     "type": "git",
@@ -34,11 +27,5 @@
   "bugs": {
     "url": "https://github.com/Code-From-Anywhere/sensible/issues"
   },
-  "homepage": "https://github.com/Code-From-Anywhere/sensible#readme",
-  "dependencies": {
-    "@types/command-exists": "^1.2.0",
-    "command-exists": "^1.2.9",
-    "sensible-files": "^1.0.1",
-    "sensible-server": "*"
-  }
+  "homepage": "https://github.com/Code-From-Anywhere/sensible#readme"
 }

@@ -200,7 +200,7 @@ var getName = function () { return __awaiter(void 0, void 0, void 0, function ()
     var name, appName, n, fullAppName;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, getArgumentOrAsk(1, "What should your sensible app be called? (default: ".concat(defaultAppName, ")\n"))];
+            case 0: return [4 /*yield*/, getArgumentOrAsk(2, "What should your sensible app be called? (default: ".concat(defaultAppName, ")\n"))];
             case 1:
                 name = _a.sent();
                 appName = name.length > 0 ? slugify(name) : defaultAppName;
@@ -221,7 +221,7 @@ var getRemote = function (name) { return __awaiter(void 0, void 0, void 0, funct
     var remote;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, getArgumentOrAsk(2, "Where should ".concat(name, " be hosted? Provide an URL or a GitHub slug (either \"org/repo\" or \"username/repo\")\n"))];
+            case 0: return [4 /*yield*/, getArgumentOrAsk(3, "Where should ".concat(name, " be hosted? Provide an URL or a GitHub slug (either \"org/repo\" or \"username/repo\")\n"))];
             case 1:
                 remote = _a.sent();
                 return [2 /*return*/, remote.length > 0
@@ -631,12 +631,14 @@ var getCacheCommands = function (_a) {
     ];
 };
 var main = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var appName, remote, selectedApps, commandsFromFolders;
+    var command, appName, remote, selectedApps, commandsFromFolders;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0: return [4 /*yield*/, installRequiredStuff()];
             case 1:
                 _a.sent();
+                command = argumentsWithoutFlags[2];
+                if (!(command === "init")) return [3 /*break*/, 7];
                 return [4 /*yield*/, getName()];
             case 2:
                 appName = _a.sent();
@@ -664,7 +666,11 @@ var main = function () { return __awaiter(void 0, void 0, void 0, function () {
                     }); }, Promise.resolve())];
             case 6:
                 _a.sent();
-                return [2 /*return*/];
+                return [3 /*break*/, 8];
+            case 7:
+                console.log('please run "sensible init" to use this cli.');
+                _a.label = 8;
+            case 8: return [2 /*return*/];
         }
     });
 }); };

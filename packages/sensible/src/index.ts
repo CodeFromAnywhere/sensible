@@ -199,7 +199,7 @@ ${possibleApps
 
 const getName = async (): Promise<string> => {
   const name = await getArgumentOrAsk(
-    1,
+    2,
     `What should your sensible app be called? (default: ${defaultAppName})\n`
   );
   const appName = name.length > 0 ? slugify(name) : defaultAppName;
@@ -221,7 +221,7 @@ const getName = async (): Promise<string> => {
 
 const getRemote = async (name: string): Promise<string | null> => {
   const remote = await getArgumentOrAsk(
-    2,
+    3,
     `Where should ${name} be hosted? Provide an URL or a GitHub slug (either "org/repo" or "username/repo")\n`
   );
   return remote.length > 0
@@ -676,24 +676,30 @@ const getCacheCommands = ({
 
 const main = async () => {
   await installRequiredStuff();
-  const appName = await getName();
-  const remote = await getRemote(appName);
-  const selectedApps = await getApps();
-  await askOpenDocs();
+  const command = argumentsWithoutFlags[2];
 
-  const commandsFromFolders = shouldGetCache
-    ? getCacheCommands({ appName, remote })
-    : getCommandsWithoutCache({ appName, remote, selectedApps });
+  if (command === "init") {
+    const appName = await getName();
+    const remote = await getRemote(appName);
+    const selectedApps = await getApps();
+    await askOpenDocs();
 
-  await commandsFromFolders.reduce(
-    async (previous: Promise<void>, commandsObject: CommandsObject) => {
-      await previous;
-      return commandsObject.commands.reduce(
-        getSpawnCommandsReducer(commandsObject.dir, !!isDebug),
-        Promise.resolve()
-      );
-    },
-    Promise.resolve()
-  );
+    const commandsFromFolders = shouldGetCache
+      ? getCacheCommands({ appName, remote })
+      : getCommandsWithoutCache({ appName, remote, selectedApps });
+
+    await commandsFromFolders.reduce(
+      async (previous: Promise<void>, commandsObject: CommandsObject) => {
+        await previous;
+        return commandsObject.commands.reduce(
+          getSpawnCommandsReducer(commandsObject.dir, !!isDebug),
+          Promise.resolve()
+        );
+      },
+      Promise.resolve()
+    );
+  } else {
+    console.log('please run "sensible init" to use this cli.');
+  }
 };
 main();
