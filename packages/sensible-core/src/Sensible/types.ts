@@ -1,6 +1,6 @@
 import * as TJS from "typescript-json-schema";
 import { Endpoint } from "../types";
-import { Path } from "sensible-files";
+import { Path, Markdown } from "sensible-files";
 //////////// Here the Sensible API types and all types related to that ///////////////
 
 export type RootModel = "root";
@@ -83,7 +83,7 @@ export interface Dependency {
   version: string;
   latestVersion: string;
   description?: string;
-  md: Md[];
+  md: Markdown[];
   repo?: string;
   homepage?: string;
 }

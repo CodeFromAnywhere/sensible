@@ -1,6 +1,6 @@
 export declare type UnixTimestamp = number;
 export declare type MarkdownContent = string;
-export interface Md {
+export interface Markdown {
     fileName: string;
     params: {
         title?: string;

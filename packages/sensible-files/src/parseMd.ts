@@ -1,4 +1,4 @@
-import { Md, Path } from "./types";
+import { Markdown, Path } from "./types";
 import fs from "fs";
 import matter from "gray-matter";
 
@@ -7,7 +7,7 @@ import matter from "gray-matter";
  * @param mdFilePath path to a md file
  * @returns Md
  */
-export const parseMd = (mdFilePath: Path): Md => {
+export const parseMd = (mdFilePath: Path): Markdown => {
   const fileContents = fs.readFileSync(mdFilePath, "utf8");
   const fileStats = fs.statSync(mdFilePath);
 

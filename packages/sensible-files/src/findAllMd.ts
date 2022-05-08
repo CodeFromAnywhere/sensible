@@ -1,11 +1,11 @@
-import { Md, Path } from "./types";
+import { Markdown, Path } from "./types";
 import { findFilesRecursively } from "./files";
 import { parseMd } from "./parseMd";
 
 export const findAllMd = (
   folderPath: Path,
   onlyInCurrentFolder?: boolean
-): Md[] => {
+): Markdown[] => {
   //1. find all md file paths recursively in this folder, but don't look in node_modules
 
   const fileFolderPaths = findFilesRecursively({

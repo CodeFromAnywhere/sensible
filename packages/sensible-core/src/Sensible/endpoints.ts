@@ -6,7 +6,7 @@ import {
   EndpointExample,
   ErrorResponse,
   FrontendFile,
-  Md,
+  Markdown,
   Menu,
   RecentType,
   TypeExample,
@@ -51,7 +51,7 @@ export interface DocEndpoint extends Endpoint {
     pathToDoc?: string;
   };
   response: DefaultResponse & {
-    doc?: Md;
+    doc?: Markdown;
   };
 }
 

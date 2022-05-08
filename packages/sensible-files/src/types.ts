@@ -2,7 +2,7 @@ export type UnixTimestamp = number;
 
 export type MarkdownContent = string;
 
-export interface Md {
+export interface Markdown {
   fileName: string;
   params: {
     title?: string;
