@@ -3,7 +3,7 @@
 <img src="./assets/icon2.png" width="250" /><br />
 website
 </a> |
-<a href="https://github.com/Code-From-Anywhere/sensible/tree/main/docs">docs</a> | <a href="https://github.com/Code-From-Anywhere/sensible/tree/main/packages">packages</a>
+<a href="https://doc.sensible.to">docs</a>
 </p>
 
 # Welcome
@@ -63,5 +63,5 @@ If you need more help, just look in the auto-generated docs!
 <img src="./assets/icon2.png" width="250" /><br />
 website
 </a> |
-<a href="https://github.com/Code-From-Anywhere/sensible/tree/main/docs">docs</a> | <a href="https://github.com/Code-From-Anywhere/sensible/tree/main/packages">packages</a>
+<a href="https://doc.sensible.to">docs</a>
 </p>
