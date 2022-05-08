@@ -1,4 +1,3 @@
-/// <reference types="node" />
 import http = require("http");
 import * as express from "express";
 import * as session from "express-session";
