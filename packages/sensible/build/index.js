@@ -49,7 +49,7 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-var _a, _b;
+var _a, _b, _c;
 Object.defineProperty(exports, "__esModule", { value: true });
 var readline_1 = __importDefault(require("readline"));
 var path_1 = __importDefault(require("path"));
@@ -58,25 +58,32 @@ var fs_1 = __importDefault(require("fs"));
 var os_1 = require("os");
 var util_templates_1 = require("./util.templates");
 var util_log_1 = require("./util.log");
+var util_platform_1 = require("./util.platform");
 var command_exists_1 = __importDefault(require("command-exists"));
-//Platforms
-var platformIds = {
-    macOS: 0,
-    windows: 1,
-    linux: 2,
-};
-var platformNames = (_a = {},
-    _a[platformIds.macOS] = "MacOS",
-    _a[platformIds.windows] = "Windows",
-    _a[platformIds.linux] = "Linux",
-    _a);
 //InstallHelper
-var installHelper = (_b = {},
-    _b[platformIds.macOS] = "brew",
-    _b[platformIds.windows] = "choco",
-    _b[platformIds.linux] = "brew",
+var installHelper = (_a = {},
+    _a[util_platform_1.platformIds.macOS] = "brew",
+    _a[util_platform_1.platformIds.windows] = "choco",
+    _a[util_platform_1.platformIds.linux] = "brew",
+    _a);
+var openUrlHelper = (_b = {},
+    _b[util_platform_1.platformIds.macOS] = "open",
+    _b[util_platform_1.platformIds.windows] = "start",
+    _b[util_platform_1.platformIds.linux] = "open",
     _b);
+var copyCommandHelper = (_c = {},
+    _c[util_platform_1.platformIds.macOS] = function (source, dest) {
+        return "cp -R ".concat(source, " ").concat(dest);
+    },
+    _c[util_platform_1.platformIds.windows] = function (source, dest) {
+        return "robocopy ".concat(source, " ").concat(dest);
+    },
+    _c[util_platform_1.platformIds.linux] = function (source, dest) {
+        return "cp -R ".concat(source, " ").concat(dest);
+    },
+    _c);
 var os = process.platform;
+var currentPlatformId = (0, util_platform_1.getPlatformId)(os);
 //CONSTANTS
 var DEBUG_COMMANDS = false;
 var defaultAppName = "makes-sense";
@@ -199,7 +206,7 @@ var getApps = function () { return __awaiter(void 0, void 0, void 0, function ()
                         description: "Electron app (for Windows, Linux and MacOS) (Experimental)",
                     },
                 ];
-                return [4 /*yield*/, getArgumentOrAsk(1, "Which apps do you want to create boilerplates for? Just press enter for all of them \n    \n".concat(possibleApps
+                return [4 /*yield*/, getArgumentOrAsk(2, "Which apps do you want to create boilerplates for? Just press enter for all of them \n    \n".concat(possibleApps
                         .map(function (possible) { return "- ".concat(possible.slug, ": ").concat(possible.description, "\n"); })
                         .join(""), "\n"))];
             case 1:
@@ -261,7 +268,7 @@ var askOpenDocs = function () { return __awaiter(void 0, void 0, void 0, functio
                 if (openDocs) {
                     executeCommand({
                         description: "Opening docs",
-                        command: "open https://docs.sensible.to",
+                        command: "".concat(openUrlHelper[currentPlatformId], " https://docs.sensible.to"),
                     }, __dirname, false);
                 }
                 return [2 /*return*/];
@@ -461,40 +468,26 @@ var getPushToGitCommands = function (appName, remote) {
         ],
     };
 };
-var getPlatformId = function (platformVariable) {
-    switch (platformVariable) {
-        case "darwin":
-            //its macos
-            return platformIds.macOS;
-        case "linux":
-            return platformIds.linux;
-        case "win32":
-            return platformIds.windows;
-        default:
-            //default is mac
-            return platformIds.macOS;
-    }
-};
 var installRequiredStuff = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var currentPlatformId;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0:
-                currentPlatformId = getPlatformId(process.platform);
-                // console.log(
-                //   "[sensible]: ",
-                //   `making sure you have ${installHelper[currentPlatformId]}`
-                // );
-                return [4 /*yield*/, commandExistsOrInstall({
-                        command: installHelper[currentPlatformId],
-                        installInstructions: "Please install ".concat(installHelper[currentPlatformId], ". Go to \"https://brew.sh\" for instructions"),
-                        installCommand: {
-                            command: '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"',
-                            description: "Installing ".concat(installHelper[currentPlatformId]),
-                        },
-                        exitIfNotInstalled: true,
-                    })];
+            case 0: 
+            //making sure you have brew, node, npm, yarn, code, git, jq, watchman
+            // console.log(
+            //   "[sensible]: ",
+            //   `making sure you have ${installHelper[currentPlatformId]}`
+            // );
+            return [4 /*yield*/, commandExistsOrInstall({
+                    command: installHelper[currentPlatformId],
+                    installInstructions: "Please install ".concat(installHelper[currentPlatformId], ". Go to \"https://brew.sh\" for instructions"),
+                    installCommand: {
+                        command: '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"',
+                        description: "Installing ".concat(installHelper[currentPlatformId]),
+                    },
+                    exitIfNotInstalled: true,
+                })];
             case 1:
+                //making sure you have brew, node, npm, yarn, code, git, jq, watchman
                 // console.log(
                 //   "[sensible]: ",
                 //   `making sure you have ${installHelper[currentPlatformId]}`
@@ -586,6 +579,7 @@ var setNewDefaults = {
 };
 var getCommandsWithoutCache = function (_a) {
     var appName = _a.appName, selectedApps = _a.selectedApps, remote = _a.remote;
+    console.log("[sensible]: ", "getting commands without cache");
     return __spreadArray(__spreadArray([
         {
             dir: targetDir,
@@ -596,7 +590,8 @@ var getCommandsWithoutCache = function (_a) {
                 },
                 {
                     //NB: "*" doesn't match hidden files, so we use "." here
-                    command: "cp -R ".concat(sensibleDir, "/templates/base/. ").concat(targetDir, "/").concat(appName),
+                    //`cp -R ${sensibleDir}/templates/base/. ${targetDir}/${appName}`,
+                    command: copyCommandHelper[currentPlatformId]("".concat(sensibleDir, "/templates/base/."), "".concat(targetDir, "/").concat(appName)),
                     description: "Copying sensible base",
                 },
                 {
@@ -636,7 +631,8 @@ var getCommandsWithoutCache = function (_a) {
         var filledInAppCommands = appsCommands.commands.map(commandReplaceVariables({}));
         var defaultAppsCommands = [
             {
-                command: "cp -R ".concat(sensibleDir, "/templates/apps/").concat(app, "/. ").concat(targetDir, "/").concat(appName, "/apps/").concat(app),
+                //`cp -R ${sensibleDir}/templates/apps/${app}/. ${targetDir}/${appName}/apps/${app}`
+                command: copyCommandHelper[currentPlatformId]("".concat(sensibleDir, "/templates/apps/").concat(app, "/."), "".concat(targetDir, "/").concat(appName, "/apps/").concat(app)),
                 description: "Copying ".concat(app, " template"),
             },
         ];
@@ -659,7 +655,8 @@ var getCommandsWithoutCache = function (_a) {
                     description: "Creating sensible cache folder",
                 },
                 {
-                    command: "cp -R ".concat(targetDir, "/").concat(appName, "/. .sensible/cache"),
+                    //command: `cp -R ${targetDir}/${appName}/. .sensible/cache`,
+                    command: copyCommandHelper[currentPlatformId]("".concat(targetDir, "/").concat(appName, "/."), ".sensible/cache"),
                     description: "Creating cache",
                 },
                 {
@@ -673,6 +670,7 @@ var getCommandsWithoutCache = function (_a) {
 };
 var getCacheCommands = function (_a) {
     var appName = _a.appName, remote = _a.remote;
+    console.log("[sensible]: ", "getting commands from cache");
     return [
         {
             dir: targetDir,
@@ -682,7 +680,8 @@ var getCacheCommands = function (_a) {
                     description: "Creating your app folder",
                 },
                 {
-                    command: "cp -R $HOME/.sensible/cache/. ".concat(targetDir, "/").concat(appName),
+                    //command: `cp -R $HOME/.sensible/cache/. ${targetDir}/${appName}`,
+                    command: copyCommandHelper[currentPlatformId]("$HOME/.sensible/cache/.", "".concat(targetDir, "/").concat(appName)),
                     description: "Copying sensible from cache",
                 },
                 getOpenVSCodeCommand(appName),
@@ -713,12 +712,16 @@ var main = function () { return __awaiter(void 0, void 0, void 0, function () {
                 return [4 /*yield*/, getApps()];
             case 4:
                 selectedApps = _a.sent();
+                console.log("[sensible]: ", "these are the selected apps: " + JSON.stringify(selectedApps));
                 return [4 /*yield*/, askOpenDocs()];
             case 5:
                 _a.sent();
+                console.log("[sensible]: ", "getting commands from folders");
                 commandsFromFolders = shouldGetCache
                     ? getCacheCommands({ appName: appName, remote: remote })
                     : getCommandsWithoutCache({ appName: appName, remote: remote, selectedApps: selectedApps });
+                console.log("[sensible]: ", "these are the commands from folders: " +
+                    JSON.stringify(commandsFromFolders));
                 return [4 /*yield*/, commandsFromFolders.reduce(function (previous, commandsObject) { return __awaiter(void 0, void 0, void 0, function () {
                         return __generator(this, function (_a) {
                             switch (_a.label) {

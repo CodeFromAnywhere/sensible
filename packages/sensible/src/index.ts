@@ -8,26 +8,32 @@ import fs from "fs";
 import { homedir } from "os";
 import { findAndRenameTemplateFiles } from "./util.templates";
 import { log } from "./util.log";
+import { getPlatformId, platformIds, platformNames } from "./util.platform";
 import commandExists from "command-exists";
-
-//Platforms
-const platformIds = {
-  macOS: 0,
-  windows: 1,
-  linux: 2,
-};
-
-const platformNames = {
-  [platformIds.macOS]: "MacOS",
-  [platformIds.windows]: "Windows",
-  [platformIds.linux]: "Linux",
-};
 
 //InstallHelper
 const installHelper = {
   [platformIds.macOS]: "brew",
   [platformIds.windows]: "choco",
   [platformIds.linux]: "brew",
+};
+
+const openUrlHelper = {
+  [platformIds.macOS]: "open",
+  [platformIds.windows]: "start",
+  [platformIds.linux]: "open",
+};
+
+const copyCommandHelper = {
+  [platformIds.macOS]: (source: string, dest: string) => {
+    return `cp -R ${source} ${dest}`;
+  },
+  [platformIds.windows]: (source: string, dest: string) => {
+    return `robocopy ${source} ${dest}`;
+  },
+  [platformIds.linux]: (source: string, dest: string) => {
+    return `cp -R ${source} ${dest}`;
+  },
 };
 
 //TYPE INTERFACES
@@ -53,6 +59,7 @@ type CommandsObject = {
 };
 
 const os = process.platform;
+const currentPlatformId = getPlatformId(os);
 
 type TaskObject = {};
 
@@ -198,7 +205,7 @@ const getApps = async (): Promise<string[]> => {
   ];
 
   const appsString = await getArgumentOrAsk(
-    1,
+    2,
     `Which apps do you want to create boilerplates for? Just press enter for all of them 
     
 ${possibleApps
@@ -259,7 +266,7 @@ const askOpenDocs = async (): Promise<void> => {
     executeCommand(
       {
         description: "Opening docs",
-        command: "open https://docs.sensible.to",
+        command: `${openUrlHelper[currentPlatformId]} https://docs.sensible.to`,
       },
       __dirname,
       false
@@ -471,23 +478,8 @@ const getPushToGitCommands = (appName: string, remote: string | null) => {
     ],
   };
 };
-const getPlatformId = (platformVariable: string) => {
-  switch (platformVariable) {
-    case "darwin":
-      //its macos
-      return platformIds.macOS;
-    case "linux":
-      return platformIds.linux;
-    case "win32":
-      return platformIds.windows;
-    default:
-      //default is mac
-      return platformIds.macOS;
-  }
-};
 const installRequiredStuff = async () => {
   //making sure you have brew, node, npm, yarn, code, git, jq, watchman
-  let currentPlatformId = getPlatformId(process.platform);
   // console.log(
   //   "[sensible]: ",
   //   `making sure you have ${installHelper[currentPlatformId]}`
@@ -591,113 +583,128 @@ const getCommandsWithoutCache = ({
   appName: string;
   selectedApps: string[];
   remote: string | null;
-}) => [
-  {
-    dir: targetDir,
-    commands: [
-      {
-        command: `mkdir ${appName}`,
-        description: "Making folder for your app",
-      },
-      {
-        //NB: "*" doesn't match hidden files, so we use "." here
-        command: `cp -R ${sensibleDir}/templates/base/. ${targetDir}/${appName}`,
-        description: "Copying sensible base",
-      },
+}) => {
+  console.log("[sensible]: ", "getting commands without cache");
+  return [
+    {
+      dir: targetDir,
+      commands: [
+        {
+          command: `mkdir ${appName}`,
+          description: "Making folder for your app",
+        },
+        {
+          //NB: "*" doesn't match hidden files, so we use "." here
+          //`cp -R ${sensibleDir}/templates/base/. ${targetDir}/${appName}`,
+          command: copyCommandHelper[currentPlatformId](
+            `${sensibleDir}/templates/base/.`,
+            `${targetDir}/${appName}`
+          ),
+          description: "Copying sensible base",
+        },
 
-      {
-        nodeFunction: findAndRenameTemplateFiles(`${targetDir}/${appName}`),
-        description: "Rename template files to normal files",
-      },
-    ],
-  },
+        {
+          nodeFunction: findAndRenameTemplateFiles(`${targetDir}/${appName}`),
+          description: "Rename template files to normal files",
+        },
+      ],
+    },
 
-  {
-    dir: `${targetDir}/${appName}/apps/server`,
-    commands: [
-      {
-        command:
-          "yarn add cors dotenv md5 reflect-metadata sequelize sequelize-typescript server sqlite3 typescript",
-        description: "Installing server dependencies",
-      },
-      {
-        command:
-          "yarn add -D @types/node @types/server @types/validator babel-cli eslint ts-node ts-node-dev",
-        description: "Installing server devDependencies",
-      },
-    ],
-  },
+    {
+      dir: `${targetDir}/${appName}/apps/server`,
+      commands: [
+        {
+          command:
+            "yarn add cors dotenv md5 reflect-metadata sequelize sequelize-typescript server sqlite3 typescript",
+          description: "Installing server dependencies",
+        },
+        {
+          command:
+            "yarn add -D @types/node @types/server @types/validator babel-cli eslint ts-node ts-node-dev",
+          description: "Installing server devDependencies",
+        },
+      ],
+    },
 
-  {
-    // download all third-party dependencies that are tightly integrated and probably still require some bugfixing in v1
-    dir: `${targetDir}/${appName}/third-party`,
-    commands: isNoThirdParty
-      ? []
-      : includedRepoSlugs.map((slug) => ({
-          command: `git clone https://github.com/${slug}.git`,
-          description: `Adding third-party repo: ${slug}`,
-        })),
-  },
+    {
+      // download all third-party dependencies that are tightly integrated and probably still require some bugfixing in v1
+      dir: `${targetDir}/${appName}/third-party`,
+      commands: isNoThirdParty
+        ? []
+        : includedRepoSlugs.map((slug) => ({
+            command: `git clone https://github.com/${slug}.git`,
+            description: `Adding third-party repo: ${slug}`,
+          })),
+    },
 
-  // only install selected apps
-  ...selectedApps.map((app) => {
-    const fileString = fs.readFileSync(
-      path.join(sensibleDir, `templates/apps/${app}.install.json`),
-      { encoding: "utf8" }
-    );
+    // only install selected apps
+    ...selectedApps.map((app) => {
+      const fileString = fs.readFileSync(
+        path.join(sensibleDir, `templates/apps/${app}.install.json`),
+        { encoding: "utf8" }
+      );
 
-    const appsCommands: InstallObject =
-      fileString && fileString.length > 0
-        ? JSON.parse(fileString)
-        : { commands: [], tasks: [] };
+      const appsCommands: InstallObject =
+        fileString && fileString.length > 0
+          ? JSON.parse(fileString)
+          : { commands: [], tasks: [] };
 
-    const filledInAppCommands = appsCommands.commands.map(
-      commandReplaceVariables({})
-    );
+      const filledInAppCommands = appsCommands.commands.map(
+        commandReplaceVariables({})
+      );
 
-    const defaultAppsCommands = [
-      {
-        command: `cp -R ${sensibleDir}/templates/apps/${app}/. ${targetDir}/${appName}/apps/${app}`,
-        description: `Copying ${app} template`,
-      },
-    ];
+      const defaultAppsCommands = [
+        {
+          //`cp -R ${sensibleDir}/templates/apps/${app}/. ${targetDir}/${appName}/apps/${app}`
+          command: copyCommandHelper[currentPlatformId](
+            `${sensibleDir}/templates/apps/${app}/.`,
+            `${targetDir}/${appName}/apps/${app}`
+          ),
+          description: `Copying ${app} template`,
+        },
+      ];
 
-    return {
-      dir: `${targetDir}/${appName}/apps`,
-      commands: filledInAppCommands.concat(defaultAppsCommands),
-    };
-  }),
+      return {
+        dir: `${targetDir}/${appName}/apps`,
+        commands: filledInAppCommands.concat(defaultAppsCommands),
+      };
+    }),
 
-  {
-    dir: `${targetDir}/${appName}`,
-    commands: [getOpenVSCodeCommand(appName)],
-  },
+    {
+      dir: `${targetDir}/${appName}`,
+      commands: [getOpenVSCodeCommand(appName)],
+    },
 
-  getPushToGitCommands(appName, remote),
+    getPushToGitCommands(appName, remote),
 
-  {
-    dir: homedir(),
-    commands: [
-      {
-        // NB: -p stands for parents and makes directories recursively
-        command: "rm -rf .sensible/cache && mkdir -p .sensible/cache",
-        description: "Creating sensible cache folder",
-      },
+    {
+      dir: homedir(),
+      commands: [
+        {
+          // NB: -p stands for parents and makes directories recursively
+          command: "rm -rf .sensible/cache && mkdir -p .sensible/cache",
+          description: "Creating sensible cache folder",
+        },
 
-      {
-        command: `cp -R ${targetDir}/${appName}/. .sensible/cache`,
-        description: "Creating cache",
-      },
+        {
+          //command: `cp -R ${targetDir}/${appName}/. .sensible/cache`,
+          command: copyCommandHelper[currentPlatformId](
+            `${targetDir}/${appName}/.`,
+            `.sensible/cache`
+          ),
+          description: "Creating cache",
+        },
 
-      {
-        command: `echo $(node -e 'log(Date.now())') > .sensible/updatedAt.txt`,
-        description: "Add current timestamp to cached files",
-      },
+        {
+          command: `echo $(node -e 'log(Date.now())') > .sensible/updatedAt.txt`,
+          description: "Add current timestamp to cached files",
+        },
 
-      setNewDefaults,
-    ],
-  },
-];
+        setNewDefaults,
+      ],
+    },
+  ];
+};
 
 const getCacheCommands = ({
   appName,
@@ -705,25 +712,32 @@ const getCacheCommands = ({
 }: {
   appName: string;
   remote: string | null;
-}) => [
-  {
-    dir: targetDir,
-    commands: [
-      {
-        command: `mkdir ${appName}`,
-        description: "Creating your app folder",
-      },
-      {
-        command: `cp -R $HOME/.sensible/cache/. ${targetDir}/${appName}`,
-        description: "Copying sensible from cache",
-      },
-      getOpenVSCodeCommand(appName),
-      setNewDefaults,
-    ],
-  },
+}) => {
+  console.log("[sensible]: ", "getting commands from cache");
+  return [
+    {
+      dir: targetDir,
+      commands: [
+        {
+          command: `mkdir ${appName}`,
+          description: "Creating your app folder",
+        },
+        {
+          //command: `cp -R $HOME/.sensible/cache/. ${targetDir}/${appName}`,
+          command: copyCommandHelper[currentPlatformId](
+            `$HOME/.sensible/cache/.`,
+            `${targetDir}/${appName}`
+          ),
+          description: "Copying sensible from cache",
+        },
+        getOpenVSCodeCommand(appName),
+        setNewDefaults,
+      ],
+    },
 
-  getPushToGitCommands(appName, remote),
-];
+    getPushToGitCommands(appName, remote),
+  ];
+};
 
 const main = async () => {
   console.log("[sensible]: ", "running main");
@@ -735,11 +749,23 @@ const main = async () => {
     const appName = await getName();
     const remote = await getRemote(appName);
     const selectedApps = await getApps();
+    console.log(
+      "[sensible]: ",
+      "these are the selected apps: " + JSON.stringify(selectedApps)
+    );
     await askOpenDocs();
+
+    console.log("[sensible]: ", "getting commands from folders");
 
     const commandsFromFolders = shouldGetCache
       ? getCacheCommands({ appName, remote })
       : getCommandsWithoutCache({ appName, remote, selectedApps });
+
+    console.log(
+      "[sensible]: ",
+      "these are the commands from folders: " +
+        JSON.stringify(commandsFromFolders)
+    );
 
     await commandsFromFolders.reduce(
       async (previous: Promise<void>, commandsObject: CommandsObject) => {
