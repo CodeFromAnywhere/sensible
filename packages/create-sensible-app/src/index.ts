@@ -74,7 +74,7 @@ const getFlag = (flag: string): boolean | string => {
 };
 
 const isDebug = getFlag("debug");
-const isInteractive = getFlag("interactive");
+const isNonInteractive = getFlag("non-interactive");
 const isOffline = getFlag("offline");
 const isNoCache = getFlag("no-cache") || true; //doesn't work for some reason
 const isNoThirdParty = getFlag("no-third-party");
@@ -99,6 +99,8 @@ const shouldGetCache =
 
 const mainBranchName =
   typeof mainBranch === "string" && mainBranch.length > 0 ? mainBranch : "live";
+const sensibleDir = path.resolve(__dirname, "..");
+const targetDir = process.cwd();
 
 //UTILITY FUNCTIONS
 
@@ -149,7 +151,7 @@ const getArgumentOrAsk = async (
   let argument = argumentsWithoutFlags[argumentPosition + 1];
   if (argument && argument.length > 0) return argument;
 
-  if (!isInteractive) {
+  if (isNonInteractive) {
     return "";
   }
 
@@ -159,6 +161,40 @@ const getArgumentOrAsk = async (
 const askOk = async (question: string): Promise<boolean> => {
   const answer = await ask(question);
   return ["yes", "y", ""].includes(answer);
+};
+
+const getApps = async (): Promise<string[]> => {
+  const possibleApps: { slug: string; description: string }[] = [
+    { slug: "app", description: "Expo app (for android, iOS, web)" },
+    { slug: "web", description: "Next.js app" },
+    { slug: "webreact", description: "Bare React.js app (Experimental)" },
+    { slug: "chrome", description: "Chrome extension (Experimental)" },
+    { slug: "vscode", description: "VSCode extension (Experimental)" },
+    {
+      slug: "computer",
+      description: "Electron app (for Windows, Linux and MacOS) (Experimental)",
+    },
+  ];
+
+  const appsString = await getArgumentOrAsk(
+    1,
+    `Which apps do you want to create boilerplates for? Just press enter for all of them 
+    
+${possibleApps
+  .map((possible) => `- ${possible.slug}: ${possible.description}\n`)
+  .join("")}\n`
+  );
+
+  const apps =
+    appsString === ""
+      ? possibleApps.map((x) => x.slug)
+      : appsString
+          .replaceAll(" ", ",")
+          .replaceAll(";", ",")
+          .split(",")
+          .filter((x) => !possibleApps.map((x) => x.slug).includes(x));
+
+  return apps;
 };
 
 const getName = async (): Promise<string> => {
@@ -193,6 +229,23 @@ const getRemote = async (name: string): Promise<string | null> => {
       ? remote
       : `https://github.com/${remote}.git`
     : null;
+};
+
+const askOpenDocs = async (): Promise<void> => {
+  const openDocs = await askOk(
+    `That's all we need to know! Do you want to open the docs while waiting?\n`
+  );
+
+  if (openDocs) {
+    executeCommand(
+      {
+        description: "Opening docs",
+        command: "open https://docs.sensible.to",
+      },
+      __dirname,
+      false
+    );
+  }
 };
 
 const isCommandPerOs = (
@@ -344,6 +397,45 @@ const commandReplaceVariables =
     return command;
   };
 
+const getPushToGitCommands = (appName: string, remote: string | null) => {
+  return {
+    dir: `${targetDir}/${appName}`,
+    commands: [
+      {
+        command: "rm -rf .git",
+        description: "Remove previous git",
+      },
+
+      {
+        command: `git init`,
+        description: "Initialising a git repo",
+      },
+
+      {
+        command: `git branch -M ${mainBranchName}`,
+        description: `Move to '${mainBranchName}' branch`,
+      },
+
+      {
+        command: `git add . && git commit -m "${initialCommitMessage}"`,
+        description: "Creating commit",
+      },
+
+      {
+        command: `git remote add origin ${remote}`,
+        description: "Adding remote",
+        isDisabled: !remote,
+      },
+
+      {
+        command: `git push -u origin ${mainBranchName}`,
+        description: "Push",
+        isDisabled: !remote,
+      },
+    ],
+  };
+};
+
 const installRequiredStuff = async () => {
   //making sure you have brew, node, npm, yarn, code, git, jq, watchman
 
@@ -428,188 +520,170 @@ const installRequiredStuff = async () => {
       "Please install watchman, see https://facebook.github.io/watchman/docs/install.html for instructions.",
   });
 };
-const main = async () => {
-  await installRequiredStuff();
 
-  const appName = await getName();
-  const remote = await getRemote(appName);
-  const sensibleDir = path.resolve(__dirname, "..");
-  const targetDir = process.cwd();
+const getOpenVSCodeCommand = (appName: string) => ({
+  command: `code ${targetDir}/${appName} --goto README.md:1:1`,
+  description: "Opening your project in VSCode",
+});
 
-  const pushToGit = {
-    dir: `${targetDir}/${appName}`,
+const setNewDefaults: Command = {
+  command: `echo ${flagArgumentsString} > ${settingsLocation}`,
+  description: "Save new setttings",
+  isDisabled: !isNewDefaults,
+};
+
+const getCommandsWithoutCache = ({
+  appName,
+  selectedApps,
+  remote,
+}: {
+  appName: string;
+  selectedApps: string[];
+  remote: string | null;
+}) => [
+  {
+    dir: targetDir,
     commands: [
       {
-        command: "rm -rf .git",
-        description: "Remove previous git",
+        command: `mkdir ${appName}`,
+        description: "Making folder for your app",
+      },
+      {
+        //NB: "*" doesn't match hidden files, so we use "." here
+        command: `cp -R ${sensibleDir}/templates/base/. ${targetDir}/${appName}`,
+        description: "Copying sensible base",
       },
 
       {
-        command: `git init`,
-        description: "Initialising a git repo",
-      },
-
-      {
-        command: `git branch -M ${mainBranchName}`,
-        description: `Move to '${mainBranchName}' branch`,
-      },
-
-      {
-        command: `git add . && git commit -m "${initialCommitMessage}"`,
-        description: "Creating commit",
-      },
-
-      {
-        command: `git remote add origin ${remote}`,
-        description: "Adding remote",
-        isDisabled: !remote,
-      },
-
-      {
-        command: `git push -u origin ${mainBranchName}`,
-        description: "Push",
-        isDisabled: !remote,
+        nodeFunction: findAndRenameTemplateFiles(`${targetDir}/${appName}`),
+        description: "Rename template files to normal files",
       },
     ],
-  };
+  },
 
-  const openVSCode = {
-    command: `code ${targetDir}/${appName} --goto README.md:1:1`,
-    description: "Opening your project in VSCode",
-  };
-  const setNewDefaults: Command = {
-    command: `echo ${flagArgumentsString} > ${settingsLocation}`,
-    description: "Save new setttings",
-    isDisabled: !isNewDefaults,
-  };
+  {
+    dir: `${targetDir}/${appName}/apps/server`,
+    commands: [
+      {
+        command:
+          "yarn add cors dotenv md5 reflect-metadata sequelize sequelize-typescript server sqlite3 typescript",
+        description: "Installing server dependencies",
+      },
+      {
+        command:
+          "yarn add -D @types/node @types/server @types/validator babel-cli eslint ts-node ts-node-dev",
+        description: "Installing server devDependencies",
+      },
+    ],
+  },
 
-  const selectedApps = ["app", "web"];
-  const commandsWithoutCache: CommandsObject[] = [
-    {
-      dir: targetDir,
-      commands: [
-        {
-          command: `mkdir ${appName}`,
-          description: "Making folder for your app",
-        },
-        {
-          //NB: "*" doesn't match hidden files, so we use "." here
-          command: `cp -R ${sensibleDir}/templates/base/. ${targetDir}/${appName}`,
-          description: "Copying sensible base",
-        },
+  {
+    // download all third-party dependencies that are tightly integrated and probably still require some bugfixing in v1
+    dir: `${targetDir}/${appName}/third-party`,
+    commands: isNoThirdParty
+      ? []
+      : includedRepoSlugs.map((slug) => ({
+          command: `git clone https://github.com/${slug}.git`,
+          description: `Adding third-party repo: ${slug}`,
+        })),
+  },
 
-        {
-          nodeFunction: findAndRenameTemplateFiles(`${targetDir}/${appName}`),
-          description: "Rename template files to normal files",
-        },
-      ],
-    },
+  // only install selected apps
+  ...selectedApps.map((app) => {
+    const fileString = fs.readFileSync(
+      path.join(sensibleDir, `templates/apps/${app}.install.json`),
+      { encoding: "utf8" }
+    );
 
-    {
-      dir: `${targetDir}/${appName}/apps/server`,
-      commands: [
-        {
-          command:
-            "yarn add cors dotenv md5 reflect-metadata sequelize sequelize-typescript server sqlite3 typescript",
-          description: "Installing server dependencies",
-        },
-        {
-          command:
-            "yarn add -D @types/node @types/server @types/validator babel-cli eslint ts-node ts-node-dev",
-          description: "Installing server devDependencies",
-        },
-      ],
-    },
+    const appsCommands: InstallObject =
+      fileString && fileString.length > 0
+        ? JSON.parse(fileString)
+        : { commands: [], tasks: [] };
 
-    {
-      // download all third-party dependencies that are tightly integrated and probably still require some bugfixing in v1
-      dir: `${targetDir}/${appName}/third-party`,
-      commands: isNoThirdParty
-        ? []
-        : includedRepoSlugs.map((slug) => ({
-            command: `git clone https://github.com/${slug}.git`,
-            description: `Adding third-party repo: ${slug}`,
-          })),
-    },
+    const filledInAppCommands = appsCommands.commands.map(
+      commandReplaceVariables({})
+    );
 
-    // only install selected apps
-    ...selectedApps.map((app) => {
-      const appsCommands: InstallObject = JSON.parse(
-        fs.readFileSync(
-          path.join(sensibleDir, `templates/apps/${app}.install.json`),
-          { encoding: "utf8" }
-        )
-      );
+    const defaultAppsCommands = [
+      {
+        command: `cp -R ${sensibleDir}/templates/apps/${app}/. ${targetDir}/${appName}/apps/${app}`,
+        description: `Copying ${app} template`,
+      },
+    ];
 
-      const filledInAppCommands = appsCommands.commands.map(
-        commandReplaceVariables({})
-      );
+    return {
+      dir: `${targetDir}/${appName}/apps`,
+      commands: filledInAppCommands.concat(defaultAppsCommands),
+    };
+  }),
 
-      return {
-        dir: `${targetDir}/${appName}/apps`,
-        commands: filledInAppCommands.concat([
-          {
-            command: `cp -R ${sensibleDir}/templates/apps/${app}/. ${targetDir}/${appName}/apps/${app}`,
-            description: `Copying ${app} template`,
-          },
-        ]),
-      };
-    }),
+  {
+    dir: `${targetDir}/${appName}`,
+    commands: [getOpenVSCodeCommand(appName)],
+  },
 
-    {
-      dir: `${targetDir}/${appName}`,
-      commands: [openVSCode],
-    },
+  getPushToGitCommands(appName, remote),
 
-    pushToGit,
+  {
+    dir: homedir(),
+    commands: [
+      {
+        // NB: -p stands for parents and makes directories recursively
+        command: "rm -rf .sensible/cache && mkdir -p .sensible/cache",
+        description: "Creating sensible cache folder",
+      },
 
-    {
-      dir: homedir(),
-      commands: [
-        {
-          // NB: -p stands for parents and makes directories recursively
-          command: "rm -rf .sensible/cache && mkdir -p .sensible/cache",
-          description: "Creating sensible cache folder",
-        },
+      {
+        command: `cp -R ${targetDir}/${appName}/. .sensible/cache`,
+        description: "Creating cache",
+      },
 
-        {
-          command: `cp -R ${targetDir}/${appName}/. .sensible/cache`,
-          description: "Creating cache",
-        },
+      {
+        command: `echo $(node -e 'console.log(Date.now())') > .sensible/updatedAt.txt`,
+        description: "Add current timestamp to cached files",
+      },
 
-        {
-          command: `echo $(node -e 'console.log(Date.now())') > .sensible/updatedAt.txt`,
-          description: "Add current timestamp to cached files",
-        },
+      setNewDefaults,
+    ],
+  },
+];
 
-        setNewDefaults,
-      ],
-    },
-  ];
+const getCacheCommands = ({
+  appName,
+  remote,
+}: {
+  appName: string;
+  remote: string | null;
+}) => [
+  {
+    dir: targetDir,
+    commands: [
+      {
+        command: `mkdir ${appName}`,
+        description: "Creating your app folder",
+      },
+      {
+        command: `cp -R $HOME/.sensible/cache/. ${targetDir}/${appName}`,
+        description: "Copying sensible from cache",
+      },
+      getOpenVSCodeCommand(appName),
+      setNewDefaults,
+    ],
+  },
 
-  const cacheCommands: CommandsObject[] = [
-    {
-      dir: targetDir,
-      commands: [
-        {
-          command: `mkdir ${appName}`,
-          description: "Creating your app folder",
-        },
-        {
-          command: `cp -R $HOME/.sensible/cache/. ${targetDir}/${appName}`,
-          description: "Copying sensible from cache",
-        },
-        openVSCode,
-        setNewDefaults,
-      ],
-    },
+  getPushToGitCommands(appName, remote),
+];
 
-    pushToGit,
-  ];
+const main = async () => {
+  await installRequiredStuff();
+  const appName = await getName();
+  const remote = await getRemote(appName);
+  const selectedApps = await getApps();
+  await askOpenDocs();
 
   const commandsFromFolders = shouldGetCache
-    ? cacheCommands
-    : commandsWithoutCache;
+    ? getCacheCommands({ appName, remote })
+    : getCommandsWithoutCache({ appName, remote, selectedApps });
 
   await commandsFromFolders.reduce(
     async (previous: Promise<void>, commandsObject: CommandsObject) => {

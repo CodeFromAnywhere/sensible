@@ -86,7 +86,7 @@ var getFlag = function (flag) {
     return flagValue;
 };
 var isDebug = getFlag("debug");
-var isInteractive = getFlag("interactive");
+var isNonInteractive = getFlag("non-interactive");
 var isOffline = getFlag("offline");
 var isNoCache = getFlag("no-cache") || true; //doesn't work for some reason
 var isNoThirdParty = getFlag("no-third-party");
@@ -104,6 +104,8 @@ var firstTimeCli = updatedAt === "0";
 var difference = Date.now() - Number(updatedAt);
 var shouldGetCache = (difference < 86400 * 1000 * cacheDaysNumber || isOffline) && !isNoCache;
 var mainBranchName = typeof mainBranch === "string" && mainBranch.length > 0 ? mainBranch : "live";
+var sensibleDir = path_1.default.resolve(__dirname, "..");
+var targetDir = process.cwd();
 //UTILITY FUNCTIONS
 function slugify(string) {
     var a = "àáâäæãåāăąçćčđďèéêëēėęěğǵḧîïíīįìıİłḿñńǹňôöòóœøōõőṕŕřßśšşșťțûüùúūǘůűųẃẍÿýžźż·/_,:;";
@@ -145,7 +147,7 @@ var getArgumentOrAsk = function (argumentPosition, question) { return __awaiter(
         argument = argumentsWithoutFlags[argumentPosition + 1];
         if (argument && argument.length > 0)
             return [2 /*return*/, argument];
-        if (!isInteractive) {
+        if (isNonInteractive) {
             return [2 /*return*/, ""];
         }
         return [2 /*return*/, ask(question)];
@@ -159,6 +161,38 @@ var askOk = function (question) { return __awaiter(void 0, void 0, void 0, funct
             case 1:
                 answer = _a.sent();
                 return [2 /*return*/, ["yes", "y", ""].includes(answer)];
+        }
+    });
+}); };
+var getApps = function () { return __awaiter(void 0, void 0, void 0, function () {
+    var possibleApps, appsString, apps;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                possibleApps = [
+                    { slug: "app", description: "Expo app (for android, iOS, web)" },
+                    { slug: "web", description: "Next.js app" },
+                    { slug: "webreact", description: "Bare React.js app (Experimental)" },
+                    { slug: "chrome", description: "Chrome extension (Experimental)" },
+                    { slug: "vscode", description: "VSCode extension (Experimental)" },
+                    {
+                        slug: "computer",
+                        description: "Electron app (for Windows, Linux and MacOS) (Experimental)",
+                    },
+                ];
+                return [4 /*yield*/, getArgumentOrAsk(1, "Which apps do you want to create boilerplates for? Just press enter for all of them \n    \n".concat(possibleApps
+                        .map(function (possible) { return "- ".concat(possible.slug, ": ").concat(possible.description, "\n"); })
+                        .join(""), "\n"))];
+            case 1:
+                appsString = _a.sent();
+                apps = appsString === ""
+                    ? possibleApps.map(function (x) { return x.slug; })
+                    : appsString
+                        .replaceAll(" ", ",")
+                        .replaceAll(";", ",")
+                        .split(",")
+                        .filter(function (x) { return !possibleApps.map(function (x) { return x.slug; }).includes(x); });
+                return [2 /*return*/, apps];
         }
     });
 }); };
@@ -195,6 +229,23 @@ var getRemote = function (name) { return __awaiter(void 0, void 0, void 0, funct
                             ? remote
                             : "https://github.com/".concat(remote, ".git")
                         : null];
+        }
+    });
+}); };
+var askOpenDocs = function () { return __awaiter(void 0, void 0, void 0, function () {
+    var openDocs;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: return [4 /*yield*/, askOk("That's all we need to know! Do you want to open the docs while waiting?\n")];
+            case 1:
+                openDocs = _a.sent();
+                if (openDocs) {
+                    executeCommand({
+                        description: "Opening docs",
+                        command: "open https://docs.sensible.to",
+                    }, __dirname, false);
+                }
+                return [2 /*return*/];
         }
     });
 }); };
@@ -339,6 +390,39 @@ var commandReplaceVariables = function (variables) {
         return command;
     };
 };
+var getPushToGitCommands = function (appName, remote) {
+    return {
+        dir: "".concat(targetDir, "/").concat(appName),
+        commands: [
+            {
+                command: "rm -rf .git",
+                description: "Remove previous git",
+            },
+            {
+                command: "git init",
+                description: "Initialising a git repo",
+            },
+            {
+                command: "git branch -M ".concat(mainBranchName),
+                description: "Move to '".concat(mainBranchName, "' branch"),
+            },
+            {
+                command: "git add . && git commit -m \"".concat(initialCommitMessage, "\""),
+                description: "Creating commit",
+            },
+            {
+                command: "git remote add origin ".concat(remote),
+                description: "Adding remote",
+                isDisabled: !remote,
+            },
+            {
+                command: "git push -u origin ".concat(mainBranchName),
+                description: "Push",
+                isDisabled: !remote,
+            },
+        ],
+    };
+};
 var installRequiredStuff = function () { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         switch (_a.label) {
@@ -429,8 +513,125 @@ var installRequiredStuff = function () { return __awaiter(void 0, void 0, void 0
         }
     });
 }); };
+var getOpenVSCodeCommand = function (appName) { return ({
+    command: "code ".concat(targetDir, "/").concat(appName, " --goto README.md:1:1"),
+    description: "Opening your project in VSCode",
+}); };
+var setNewDefaults = {
+    command: "echo ".concat(flagArgumentsString, " > ").concat(settingsLocation),
+    description: "Save new setttings",
+    isDisabled: !isNewDefaults,
+};
+var getCommandsWithoutCache = function (_a) {
+    var appName = _a.appName, selectedApps = _a.selectedApps, remote = _a.remote;
+    return __spreadArray(__spreadArray([
+        {
+            dir: targetDir,
+            commands: [
+                {
+                    command: "mkdir ".concat(appName),
+                    description: "Making folder for your app",
+                },
+                {
+                    //NB: "*" doesn't match hidden files, so we use "." here
+                    command: "cp -R ".concat(sensibleDir, "/templates/base/. ").concat(targetDir, "/").concat(appName),
+                    description: "Copying sensible base",
+                },
+                {
+                    nodeFunction: (0, util_templates_1.findAndRenameTemplateFiles)("".concat(targetDir, "/").concat(appName)),
+                    description: "Rename template files to normal files",
+                },
+            ],
+        },
+        {
+            dir: "".concat(targetDir, "/").concat(appName, "/apps/server"),
+            commands: [
+                {
+                    command: "yarn add cors dotenv md5 reflect-metadata sequelize sequelize-typescript server sqlite3 typescript",
+                    description: "Installing server dependencies",
+                },
+                {
+                    command: "yarn add -D @types/node @types/server @types/validator babel-cli eslint ts-node ts-node-dev",
+                    description: "Installing server devDependencies",
+                },
+            ],
+        },
+        {
+            // download all third-party dependencies that are tightly integrated and probably still require some bugfixing in v1
+            dir: "".concat(targetDir, "/").concat(appName, "/third-party"),
+            commands: isNoThirdParty
+                ? []
+                : includedRepoSlugs.map(function (slug) { return ({
+                    command: "git clone https://github.com/".concat(slug, ".git"),
+                    description: "Adding third-party repo: ".concat(slug),
+                }); }),
+        }
+    ], selectedApps.map(function (app) {
+        var fileString = fs_1.default.readFileSync(path_1.default.join(sensibleDir, "templates/apps/".concat(app, ".install.json")), { encoding: "utf8" });
+        var appsCommands = fileString && fileString.length > 0
+            ? JSON.parse(fileString)
+            : { commands: [], tasks: [] };
+        var filledInAppCommands = appsCommands.commands.map(commandReplaceVariables({}));
+        var defaultAppsCommands = [
+            {
+                command: "cp -R ".concat(sensibleDir, "/templates/apps/").concat(app, "/. ").concat(targetDir, "/").concat(appName, "/apps/").concat(app),
+                description: "Copying ".concat(app, " template"),
+            },
+        ];
+        return {
+            dir: "".concat(targetDir, "/").concat(appName, "/apps"),
+            commands: filledInAppCommands.concat(defaultAppsCommands),
+        };
+    }), true), [
+        {
+            dir: "".concat(targetDir, "/").concat(appName),
+            commands: [getOpenVSCodeCommand(appName)],
+        },
+        getPushToGitCommands(appName, remote),
+        {
+            dir: (0, os_1.homedir)(),
+            commands: [
+                {
+                    // NB: -p stands for parents and makes directories recursively
+                    command: "rm -rf .sensible/cache && mkdir -p .sensible/cache",
+                    description: "Creating sensible cache folder",
+                },
+                {
+                    command: "cp -R ".concat(targetDir, "/").concat(appName, "/. .sensible/cache"),
+                    description: "Creating cache",
+                },
+                {
+                    command: "echo $(node -e 'console.log(Date.now())') > .sensible/updatedAt.txt",
+                    description: "Add current timestamp to cached files",
+                },
+                setNewDefaults,
+            ],
+        },
+    ], false);
+};
+var getCacheCommands = function (_a) {
+    var appName = _a.appName, remote = _a.remote;
+    return [
+        {
+            dir: targetDir,
+            commands: [
+                {
+                    command: "mkdir ".concat(appName),
+                    description: "Creating your app folder",
+                },
+                {
+                    command: "cp -R $HOME/.sensible/cache/. ".concat(targetDir, "/").concat(appName),
+                    description: "Copying sensible from cache",
+                },
+                getOpenVSCodeCommand(appName),
+                setNewDefaults,
+            ],
+        },
+        getPushToGitCommands(appName, remote),
+    ];
+};
 var main = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var appName, remote, sensibleDir, targetDir, pushToGit, openVSCode, setNewDefaults, selectedApps, commandsWithoutCache, cacheCommands, commandsFromFolders;
+    var appName, remote, selectedApps, commandsFromFolders;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0: return [4 /*yield*/, installRequiredStuff()];
@@ -442,150 +643,15 @@ var main = function () { return __awaiter(void 0, void 0, void 0, function () {
                 return [4 /*yield*/, getRemote(appName)];
             case 3:
                 remote = _a.sent();
-                sensibleDir = path_1.default.resolve(__dirname, "..");
-                targetDir = process.cwd();
-                pushToGit = {
-                    dir: "".concat(targetDir, "/").concat(appName),
-                    commands: [
-                        {
-                            command: "rm -rf .git",
-                            description: "Remove previous git",
-                        },
-                        {
-                            command: "git init",
-                            description: "Initialising a git repo",
-                        },
-                        {
-                            command: "git branch -M ".concat(mainBranchName),
-                            description: "Move to '".concat(mainBranchName, "' branch"),
-                        },
-                        {
-                            command: "git add . && git commit -m \"".concat(initialCommitMessage, "\""),
-                            description: "Creating commit",
-                        },
-                        {
-                            command: "git remote add origin ".concat(remote),
-                            description: "Adding remote",
-                            isDisabled: !remote,
-                        },
-                        {
-                            command: "git push -u origin ".concat(mainBranchName),
-                            description: "Push",
-                            isDisabled: !remote,
-                        },
-                    ],
-                };
-                openVSCode = {
-                    command: "code ".concat(targetDir, "/").concat(appName, " --goto README.md:1:1"),
-                    description: "Opening your project in VSCode",
-                };
-                setNewDefaults = {
-                    command: "echo ".concat(flagArgumentsString, " > ").concat(settingsLocation),
-                    description: "Save new setttings",
-                    isDisabled: !isNewDefaults,
-                };
-                selectedApps = ["app", "web"];
-                commandsWithoutCache = __spreadArray(__spreadArray([
-                    {
-                        dir: targetDir,
-                        commands: [
-                            {
-                                command: "mkdir ".concat(appName),
-                                description: "Making folder for your app",
-                            },
-                            {
-                                //NB: "*" doesn't match hidden files, so we use "." here
-                                command: "cp -R ".concat(sensibleDir, "/templates/base/. ").concat(targetDir, "/").concat(appName),
-                                description: "Copying sensible base",
-                            },
-                            {
-                                nodeFunction: (0, util_templates_1.findAndRenameTemplateFiles)("".concat(targetDir, "/").concat(appName)),
-                                description: "Rename template files to normal files",
-                            },
-                        ],
-                    },
-                    {
-                        dir: "".concat(targetDir, "/").concat(appName, "/apps/server"),
-                        commands: [
-                            {
-                                command: "yarn add cors dotenv md5 reflect-metadata sequelize sequelize-typescript server sqlite3 typescript",
-                                description: "Installing server dependencies",
-                            },
-                            {
-                                command: "yarn add -D @types/node @types/server @types/validator babel-cli eslint ts-node ts-node-dev",
-                                description: "Installing server devDependencies",
-                            },
-                        ],
-                    },
-                    {
-                        // download all third-party dependencies that are tightly integrated and probably still require some bugfixing in v1
-                        dir: "".concat(targetDir, "/").concat(appName, "/third-party"),
-                        commands: isNoThirdParty
-                            ? []
-                            : includedRepoSlugs.map(function (slug) { return ({
-                                command: "git clone https://github.com/".concat(slug, ".git"),
-                                description: "Adding third-party repo: ".concat(slug),
-                            }); }),
-                    }
-                ], selectedApps.map(function (app) {
-                    var appsCommands = JSON.parse(fs_1.default.readFileSync(path_1.default.join(sensibleDir, "templates/apps/".concat(app, ".install.json")), { encoding: "utf8" }));
-                    var filledInAppCommands = appsCommands.commands.map(commandReplaceVariables({}));
-                    return {
-                        dir: "".concat(targetDir, "/").concat(appName, "/apps"),
-                        commands: filledInAppCommands.concat([
-                            {
-                                command: "cp -R ".concat(sensibleDir, "/templates/apps/").concat(app, "/. ").concat(targetDir, "/").concat(appName, "/apps/").concat(app),
-                                description: "Copying ".concat(app, " template"),
-                            },
-                        ]),
-                    };
-                }), true), [
-                    {
-                        dir: "".concat(targetDir, "/").concat(appName),
-                        commands: [openVSCode],
-                    },
-                    pushToGit,
-                    {
-                        dir: (0, os_1.homedir)(),
-                        commands: [
-                            {
-                                // NB: -p stands for parents and makes directories recursively
-                                command: "rm -rf .sensible/cache && mkdir -p .sensible/cache",
-                                description: "Creating sensible cache folder",
-                            },
-                            {
-                                command: "cp -R ".concat(targetDir, "/").concat(appName, "/. .sensible/cache"),
-                                description: "Creating cache",
-                            },
-                            {
-                                command: "echo $(node -e 'console.log(Date.now())') > .sensible/updatedAt.txt",
-                                description: "Add current timestamp to cached files",
-                            },
-                            setNewDefaults,
-                        ],
-                    },
-                ], false);
-                cacheCommands = [
-                    {
-                        dir: targetDir,
-                        commands: [
-                            {
-                                command: "mkdir ".concat(appName),
-                                description: "Creating your app folder",
-                            },
-                            {
-                                command: "cp -R $HOME/.sensible/cache/. ".concat(targetDir, "/").concat(appName),
-                                description: "Copying sensible from cache",
-                            },
-                            openVSCode,
-                            setNewDefaults,
-                        ],
-                    },
-                    pushToGit,
-                ];
+                return [4 /*yield*/, getApps()];
+            case 4:
+                selectedApps = _a.sent();
+                return [4 /*yield*/, askOpenDocs()];
+            case 5:
+                _a.sent();
                 commandsFromFolders = shouldGetCache
-                    ? cacheCommands
-                    : commandsWithoutCache;
+                    ? getCacheCommands({ appName: appName, remote: remote })
+                    : getCommandsWithoutCache({ appName: appName, remote: remote, selectedApps: selectedApps });
                 return [4 /*yield*/, commandsFromFolders.reduce(function (previous, commandsObject) { return __awaiter(void 0, void 0, void 0, function () {
                         return __generator(this, function (_a) {
                             switch (_a.label) {
@@ -596,7 +662,7 @@ var main = function () { return __awaiter(void 0, void 0, void 0, function () {
                             }
                         });
                     }); }, Promise.resolve())];
-            case 4:
+            case 6:
                 _a.sent();
                 return [2 /*return*/];
         }
