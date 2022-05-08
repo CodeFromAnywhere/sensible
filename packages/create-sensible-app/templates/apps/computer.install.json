@@ -1,0 +1,29 @@
+{
+  "config": {
+    "tasks": [
+      {
+        "label": "computer packager",
+        "isBackground": true,
+        "options": { "cwd": "${workspaceFolder}/apps/computer" },
+        "presentation": { "group": "run" },
+        "command": "yarn dev",
+        "runOptions": { "runOn": "folderOpen" }
+      }
+    ]
+  },
+  "instructions": "",
+  "commands": [
+    {
+      "command": "mkdir computer",
+      "description": "Creating computer folder"
+    },
+    {
+      "command": "cd computer && yarn init -y",
+      "description": "Creating package.jsons..."
+    },
+    {
+      "command": "cd computer && yarn",
+      "description": "Installing Dependencies..."
+    }
+  ]
+}
