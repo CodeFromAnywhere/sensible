@@ -260,6 +260,7 @@ const getCommand = (command: Command): string | false => {
   if (!command.command) {
     return false;
   }
+  console.log("executing command: " + command.command);
 
   if (isCommandPerOs(command.command)) {
     const cmd = command.command[os] || command.command.default!;
@@ -269,6 +270,7 @@ const getCommand = (command: Command): string | false => {
 };
 
 const executeCommand = (command: Command, dir: string, debug: boolean) => {
+  console.log("[sensible]: ", "executing command");
   // if command is disabled, immediately resolve so it is skippped.
   if (command.isDisabled) {
     return new Promise<void>((resolve) => {
@@ -345,6 +347,20 @@ const getSpawnCommandsReducer =
     return executeCommand(command, dir, debug);
   };
 
+const commandExistsAsync = async (command: string) => {
+  return new Promise((resolve, reject) => {
+    commandExists(command, function (err, commandExists) {
+      if (err) {
+        reject("Some error checking if command exists. Details: " + err);
+      }
+      if (commandExists) {
+        // proceed confidently knowing this command is available
+        resolve(true);
+      }
+      resolve(false);
+    });
+  });
+};
 const commandExistsOrInstall = async ({
   command,
   installCommand,
@@ -356,8 +372,11 @@ const commandExistsOrInstall = async ({
   installInstructions: string;
   exitIfNotInstalled?: boolean;
 }) => {
-  const isAvailable = !!(await commandExists(command));
-
+  console.log("[sensible]: ", `inside making sure you have ${command}`);
+  let isAvailable;
+  const isAvailableResult = await commandExistsAsync(command);
+  isAvailable = !!isAvailableResult;
+  console.log("[sensible]: ", `command ${command} exists: ` + isAvailable);
   const installCommandString = installCommand && getCommand(installCommand);
   if (isAvailable) return true;
 
@@ -435,7 +454,7 @@ const getPushToGitCommands = (appName: string, remote: string | null) => {
 
 const installRequiredStuff = async () => {
   //making sure you have brew, node, npm, yarn, code, git, jq, watchman
-
+  console.log("[sensible]: ", "making sure you have brew");
   await commandExistsOrInstall({
     command: "brew",
     installInstructions:
@@ -447,7 +466,7 @@ const installRequiredStuff = async () => {
     },
     exitIfNotInstalled: true,
   });
-
+  console.log("[sensible]: ", "making sure you have node");
   await commandExistsOrInstall({
     command: "node",
     installInstructions:
@@ -672,7 +691,9 @@ const getCacheCommands = ({
 ];
 
 const main = async () => {
+  console.log("[sensible]: ", "running main");
   await installRequiredStuff();
+  console.log("[sensible]: ", "finished installing required stuff.");
   const command = argumentsWithoutFlags[2];
 
   if (command === "init") {

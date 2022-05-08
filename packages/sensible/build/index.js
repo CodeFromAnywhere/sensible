@@ -260,6 +260,7 @@ var getCommand = function (command) {
     if (!command.command) {
         return false;
     }
+    console.log("executing command: " + command.command);
     if (isCommandPerOs(command.command)) {
         var cmd = command.command[os] || command.command.default;
         return cmd;
@@ -267,6 +268,7 @@ var getCommand = function (command) {
     return command.command;
 };
 var executeCommand = function (command, dir, debug) {
+    console.log("[sensible]: ", "executing command");
     // if command is disabled, immediately resolve so it is skippped.
     if (command.isDisabled) {
         return new Promise(function (resolve) {
@@ -347,15 +349,35 @@ var getSpawnCommandsReducer = function (dir, debug) {
         });
     }); };
 };
+var commandExistsAsync = function (command) { return __awaiter(void 0, void 0, void 0, function () {
+    return __generator(this, function (_a) {
+        return [2 /*return*/, new Promise(function (resolve, reject) {
+                (0, command_exists_1.default)(command, function (err, commandExists) {
+                    if (err) {
+                        reject("Some error checking if command exists. Details: " + err);
+                    }
+                    if (commandExists) {
+                        // proceed confidently knowing this command is available
+                        resolve(true);
+                    }
+                    resolve(false);
+                });
+            })];
+    });
+}); };
 var commandExistsOrInstall = function (_a) {
     var command = _a.command, installCommand = _a.installCommand, installInstructions = _a.installInstructions, exitIfNotInstalled = _a.exitIfNotInstalled;
     return __awaiter(void 0, void 0, void 0, function () {
-        var isAvailable, installCommandString, ok;
+        var isAvailable, isAvailableResult, installCommandString, ok;
         return __generator(this, function (_b) {
             switch (_b.label) {
-                case 0: return [4 /*yield*/, (0, command_exists_1.default)(command)];
+                case 0:
+                    console.log("[sensible]: ", "inside making sure you have ".concat(command));
+                    return [4 /*yield*/, commandExistsAsync(command)];
                 case 1:
-                    isAvailable = !!(_b.sent());
+                    isAvailableResult = _b.sent();
+                    isAvailable = !!isAvailableResult;
+                    console.log("[sensible]: ", "command ".concat(command, " exists: ") + isAvailable);
                     installCommandString = installCommand && getCommand(installCommand);
                     if (isAvailable)
                         return [2 /*return*/, true];
@@ -427,20 +449,21 @@ var getPushToGitCommands = function (appName, remote) {
 var installRequiredStuff = function () { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: 
-            //making sure you have brew, node, npm, yarn, code, git, jq, watchman
-            return [4 /*yield*/, commandExistsOrInstall({
-                    command: "brew",
-                    installInstructions: "Please install brew. Go to https://brew.sh for instructions",
-                    installCommand: {
-                        command: '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"',
-                        description: "Installing brew",
-                    },
-                    exitIfNotInstalled: true,
-                })];
-            case 1:
+            case 0:
                 //making sure you have brew, node, npm, yarn, code, git, jq, watchman
+                console.log("[sensible]: ", "making sure you have brew");
+                return [4 /*yield*/, commandExistsOrInstall({
+                        command: "brew",
+                        installInstructions: "Please install brew. Go to https://brew.sh for instructions",
+                        installCommand: {
+                            command: '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"',
+                            description: "Installing brew",
+                        },
+                        exitIfNotInstalled: true,
+                    })];
+            case 1:
                 _a.sent();
+                console.log("[sensible]: ", "making sure you have node");
                 return [4 /*yield*/, commandExistsOrInstall({
                         command: "node",
                         installInstructions: 'Please run "brew install node" or go to https://formulae.brew.sh/formula/node for instructions',
@@ -635,9 +658,12 @@ var main = function () { return __awaiter(void 0, void 0, void 0, function () {
     var command, appName, remote, selectedApps, commandsFromFolders;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, installRequiredStuff()];
+            case 0:
+                console.log("[sensible]: ", "running main");
+                return [4 /*yield*/, installRequiredStuff()];
             case 1:
                 _a.sent();
+                console.log("[sensible]: ", "finished installing required stuff.");
                 command = argumentsWithoutFlags[2];
                 if (!(command === "init")) return [3 /*break*/, 7];
                 return [4 /*yield*/, getName()];
