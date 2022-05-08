@@ -1,3 +1,5 @@
+import { Markdown } from "sensible-files";
+
 import { DefaultResponse, Endpoint, PublicConstantsType } from "../types";
 import {
   App,
@@ -6,7 +8,6 @@ import {
   EndpointExample,
   ErrorResponse,
   FrontendFile,
-  Markdown,
   Menu,
   RecentType,
   TypeExample,

@@ -1,6 +1,6 @@
 {
   "name": "sensible-files",
-  "version": "1.0.1",
+  "version": "1.0.4",
   "description": "",
   "main": "build/index.js",
   "source": "src/index.ts",

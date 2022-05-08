@@ -4,10 +4,9 @@
  */
 
 import dotenv from "dotenv";
-import { importFromFiles } from "sensible-server";
+import { importFromFiles, findFiles } from "sensible-files";
 dotenv.config();
 import { Sequelize } from "sequelize-typescript";
-import { findFiles } from "sensible-server";
 
 export const getAllModels = () => {
   return importFromFiles({

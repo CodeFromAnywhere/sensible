@@ -1,4 +1,5 @@
-import { App, AppsObject, InterpretableTypes, Path, ProjectType } from "sensible-core";
+import { App, AppsObject, InterpretableTypes, ProjectType } from "sensible-core";
+import { Path } from "sensible-files";
 export declare const getAppType: (projectType: ProjectType, folder: string) => "server" | "frontend" | "core" | null;
 /**
  *

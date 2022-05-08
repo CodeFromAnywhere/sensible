@@ -1,4 +1,4 @@
-import { API } from ".";
+import { API } from "./types";
 export declare function onlyUnique<T extends unknown>(value: T, index: number, self: T[]): boolean;
 /** general purpose function that maps over an array and only returns it as part of the mapped array if the result is truthy */
 export declare const mapOrRemove: <T extends unknown, U extends unknown>(array: T[], mapFn: (item: T) => U | null) => U[];

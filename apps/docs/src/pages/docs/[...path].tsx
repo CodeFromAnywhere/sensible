@@ -1,7 +1,7 @@
 import { GetStaticPathsResult, GetStaticPropsContext } from "next";
-import { Md, findFilesRecursively } from "sensible-files";
+import { Markdown, findFilesRecursively } from "sensible-files";
 import path from "path";
-const DocPage = ({ markdown }: { markdown: Md }) => {
+const DocPage = ({ markdown }: { markdown: Markdown }) => {
   return <div>test</div>;
 };
 

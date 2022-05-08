@@ -1,12 +1,28 @@
 "use strict";
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.importFromFiles = exports.findFiles = exports.isArrayGuard = exports.findFilesRecursively = exports.getExtension = exports.withoutExtension = void 0;
-var sensible_core_1 = require("sensible-core");
+exports.importFromFiles = exports.findFiles = exports.isArrayGuard = exports.findFilesRecursively = exports.getExtension = exports.withoutExtension = exports.mergeObjectsArray = void 0;
 var path_1 = __importDefault(require("path"));
 var fs_1 = __importDefault(require("fs"));
+var mergeObjectsArray = function (objectsArray) {
+    return objectsArray.reduce(function (previous, current) {
+        return __assign(__assign({}, previous), current);
+    }, {});
+};
+exports.mergeObjectsArray = mergeObjectsArray;
 var withoutExtension = function (fileName) {
     var pieces = fileName.split(".");
     pieces.pop();
@@ -82,7 +98,7 @@ var importFromFiles = function (_a) {
         }
         else if (importStrategy === "list") {
             return list
-                ? (0, sensible_core_1.mergeObjectsArray)(list.map(function (item) {
+                ? (0, exports.mergeObjectsArray)(list.map(function (item) {
                     return { item: moduleExports[item] };
                 }))
                 : {};

@@ -1,5 +1,5 @@
-import { FrontendFile, FrontendFileObject, Path } from "sensible-core";
-
+import { FrontendFileObject } from "sensible-core";
+import { Path } from "sensible-files";
 //just generate the frontendFile[] once every server restart because there can't be any changes without the server restarting.
 let cachedFrontend: FrontendFileObject = {};
 

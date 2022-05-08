@@ -5,12 +5,8 @@
 import { PublicConstants } from "core";
 import fs from "fs";
 import path, { resolve } from "path";
-import { Path } from "sensible-core";
-import {
-  findFiles,
-  importFromFiles,
-  makeSensibleEndpoints,
-} from "sensible-server";
+import { Path, findFiles, importFromFiles } from "sensible-files";
+import { makeSensibleEndpoints } from "sensible-server";
 import { Middleware } from "server/typings/common";
 import { interpretableTypes } from "./typeFiles";
 

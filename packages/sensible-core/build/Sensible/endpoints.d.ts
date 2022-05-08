@@ -1,5 +1,6 @@
+import { Markdown } from "sensible-files";
 import { DefaultResponse, Endpoint, PublicConstantsType } from "../types";
-import { App, CoreResponse, Cron, EndpointExample, ErrorResponse, FrontendFile, Md, Menu, RecentType, TypeExample } from "./types";
+import { App, CoreResponse, Cron, EndpointExample, ErrorResponse, FrontendFile, Menu, RecentType, TypeExample } from "./types";
 export interface RecentEndpoint extends Endpoint {
     method: "GET";
     body: {
@@ -37,7 +38,7 @@ export interface DocEndpoint extends Endpoint {
         pathToDoc?: string;
     };
     response: DefaultResponse & {
-        doc?: Md;
+        doc?: Markdown;
     };
 }
 /**

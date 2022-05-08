@@ -15,4 +15,8 @@ export interface Markdown {
     content: MarkdownContent;
 }
 export declare type Path = string;
+export declare type FolderPath = {
+    relativeFolder: string | undefined;
+    path: Path;
+};
 //# sourceMappingURL=types.d.ts.map

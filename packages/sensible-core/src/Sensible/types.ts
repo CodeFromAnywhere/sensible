@@ -5,7 +5,6 @@ import { Path, Markdown } from "sensible-files";
 
 export type RootModel = "root";
 export type AllEndpointsModel = "AllEndpoints";
-export type FolderPath = { relativeFolder: string | undefined; path: Path };
 
 export type InterpretableTypes = {
   [key in RootModel | string]: {

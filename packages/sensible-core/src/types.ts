@@ -1,5 +1,4 @@
 import { SensibleEndpoints } from "./Sensible/endpoints";
-
 export * from "./Sensible/types";
 export * from "./Sensible/endpoints";
 export interface Link {

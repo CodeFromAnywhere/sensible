@@ -1,12 +1,8 @@
 import * as TJS from "typescript-json-schema";
 import { Endpoint } from "../types";
+import { Path, Markdown } from "sensible-files";
 export declare type RootModel = "root";
 export declare type AllEndpointsModel = "AllEndpoints";
-export declare type Path = string;
-export declare type FolderPath = {
-    relativeFolder: string | undefined;
-    path: Path;
-};
 export declare type InterpretableTypes = {
     [key in RootModel | string]: {
         endpoints: Path[];
@@ -73,25 +69,9 @@ export interface Dependency {
     version: string;
     latestVersion: string;
     description?: string;
-    md: Md[];
+    md: Markdown[];
     repo?: string;
     homepage?: string;
-}
-export declare type UnixTimestamp = number;
-export declare type MarkdownContent = string;
-export interface Md {
-    fileName: string;
-    params: {
-        title?: string;
-        author?: string;
-    } & {
-        [key: string]: string;
-    };
-    createdAt: UnixTimestamp;
-    updatedAt: UnixTimestamp;
-    modifiedAt: UnixTimestamp;
-    openedAt: UnixTimestamp;
-    content: MarkdownContent;
 }
 export declare type FileOrFolder = string;
 /**

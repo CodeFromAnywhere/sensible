@@ -1,4 +1,5 @@
-import { objectMap, Path } from "sensible-core";
+import { objectMap } from "sensible-core";
+import { Path } from "sensible-files";
 import path from "path";
 import * as TJS from "typescript-json-schema";
 import fs from "fs";

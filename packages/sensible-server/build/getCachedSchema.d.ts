@@ -1,4 +1,4 @@
-import { Path } from "sensible-core";
+import { Path } from "sensible-files";
 import * as TJS from "typescript-json-schema";
 import { ModelSchemaObject, InterpretableTypes } from "sensible-core";
 /**

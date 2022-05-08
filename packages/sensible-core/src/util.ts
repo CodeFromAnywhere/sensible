@@ -1,4 +1,4 @@
-import { API } from ".";
+import { API } from "./types";
 
 export function onlyUnique<T extends unknown>(
   value: T,

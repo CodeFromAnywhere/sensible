@@ -18,3 +18,4 @@ export interface Markdown {
 }
 
 export type Path = string;
+export type FolderPath = { relativeFolder: string | undefined; path: Path };

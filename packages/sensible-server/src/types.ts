@@ -1,6 +1,7 @@
 import { Context } from "./server.types";
-import { Endpoint, InterpretableTypes, Path } from "sensible-core";
+import { Endpoint, InterpretableTypes } from "sensible-core";
 import { Middleware } from "server/typings/common";
+import { Path } from "sensible-files";
 
 export type Keys<TObject> = Extract<keyof TObject, string>;
 

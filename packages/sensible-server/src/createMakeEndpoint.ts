@@ -1,5 +1,6 @@
 import Ajv from "ajv";
-import { Endpoint, InterpretableTypes, Path } from "sensible-core";
+import { Endpoint, InterpretableTypes } from "sensible-core";
+import { Path } from "sensible-files";
 import server from "server";
 import { Middleware } from "server/typings/common";
 import * as TJS from "typescript-json-schema";

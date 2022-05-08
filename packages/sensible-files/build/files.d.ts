@@ -1,4 +1,7 @@
-import { FolderPath, Path } from "sensible-core";
+import { Path, FolderPath } from "./types";
+export declare const mergeObjectsArray: (objectsArray: object[]) => {
+    [key: string]: any;
+};
 export declare const withoutExtension: (fileName: string) => string;
 export declare const getExtension: (fileName: string) => string;
 export declare const findFilesRecursively: ({ match, basePath, relativePath, onlyInSubFolders, onlyInCurrentFolder, }: {

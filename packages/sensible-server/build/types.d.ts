@@ -1,6 +1,7 @@
 import { Context } from "./server.types";
-import { Endpoint, InterpretableTypes, Path } from "sensible-core";
+import { Endpoint, InterpretableTypes } from "sensible-core";
 import { Middleware } from "server/typings/common";
+import { Path } from "sensible-files";
 export declare type Keys<TObject> = Extract<keyof TObject, string>;
 export declare type WithDataValues<TModel> = TModel & {
     dataValues: TModel;

@@ -1,6 +1,13 @@
-import { FolderPath, mergeObjectsArray, Path } from "sensible-core";
 import path from "path";
 import fs from "fs";
+import { Path, FolderPath } from "./types";
+
+export const mergeObjectsArray = (
+  objectsArray: object[]
+): { [key: string]: any } =>
+  objectsArray.reduce((previous, current) => {
+    return { ...previous, ...current };
+  }, {});
 
 export const withoutExtension = (fileName: string) => {
   const pieces = fileName.split(".");

@@ -5,13 +5,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.makeSensibleEndpoints = void 0;
 const path_1 = __importDefault(require("path"));
+const sensible_files_1 = require("sensible-files");
 const server_1 = __importDefault(require("server"));
 const reply_1 = require("server/reply");
 const createMakeEndpoint_1 = require("../createMakeEndpoint");
 const getCachedApps_1 = require("../getCachedApps");
 const getCachedFrontend_1 = require("../getCachedFrontend");
 const getCachedSchema_1 = require("../getCachedSchema");
-const sensible_files_1 = require("sensible-files");
 const { get } = server_1.default.router;
 const makeSensibleEndpoints = (basePath, appPaths, interpretableTypes, constants) => {
     const schemasFolderPath = path_1.default.join(basePath, "..", "schemas");
