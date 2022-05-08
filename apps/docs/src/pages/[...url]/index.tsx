@@ -4,7 +4,6 @@ import { useEffect } from "react";
 import useStore from "../../store";
 import "react-toastify/dist/ReactToastify.css";
 import Model from "../../components/Model";
-import { useScrollTo } from "../../util/useScrollTo";
 import { useCoreQuery, useOtherQuery } from "../../util/useQueryHooks";
 import { useRouter } from "react-with-native-router";
 import { getQueryStrings } from "../../util/util";

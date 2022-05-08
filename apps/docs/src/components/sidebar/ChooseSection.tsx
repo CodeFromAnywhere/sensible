@@ -1,6 +1,4 @@
-import type { NextPage } from "next";
 import { useRouter } from "next/router";
-import useStore from "../../store";
 import { getQueryStrings } from "../../util/util";
 import Select from "./Select";
 const ChooseSection = () => {

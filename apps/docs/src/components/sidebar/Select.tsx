@@ -1,4 +1,3 @@
-import { DetailedHTMLProps, SelectHTMLAttributes } from "react";
 import { ChangeEventHandler } from "react";
 
 export type Option = {
