@@ -26,7 +26,10 @@ brew install node
 ```
 
 2. call the init command of the cli.
-   `npx sensible init`
+
+```
+npx sensible init
+```
 
 <p align="center">
   <img src="./assets/sensible-meme2.png" width="300" />
