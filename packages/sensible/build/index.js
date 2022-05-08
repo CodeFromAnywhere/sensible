@@ -278,7 +278,7 @@ var getCommand = function (command) {
     if (!command.command) {
         return false;
     }
-    console.log("executing command: " + command.command);
+    //console.log("[sensible]: ","executing command: " + command.command);
     if (isCommandPerOs(command.command)) {
         var cmd = command.command[os] || command.command.default;
         return cmd;
@@ -286,7 +286,7 @@ var getCommand = function (command) {
     return command.command;
 };
 var executeCommand = function (command, dir, debug) {
-    console.log("[sensible]: ", "executing command");
+    //console.log("[sensible]: ", "executing command");
     // if command is disabled, immediately resolve so it is skippped.
     if (command.isDisabled) {
         return new Promise(function (resolve) {
@@ -389,13 +389,10 @@ var commandExistsOrInstall = function (_a) {
         var isAvailable, isAvailableResult, installCommandString, ok;
         return __generator(this, function (_b) {
             switch (_b.label) {
-                case 0:
-                    console.log("[sensible]: ", "inside making sure you have ".concat(command));
-                    return [4 /*yield*/, commandExistsAsync(command)];
+                case 0: return [4 /*yield*/, commandExistsAsync(command)];
                 case 1:
                     isAvailableResult = _b.sent();
                     isAvailable = !!isAvailableResult;
-                    console.log("[sensible]: ", "command ".concat(command, " exists: ") + isAvailable);
                     installCommandString = installCommand && getCommand(installCommand);
                     if (isAvailable)
                         return [2 /*return*/, true];
@@ -484,7 +481,10 @@ var installRequiredStuff = function () { return __awaiter(void 0, void 0, void 0
         switch (_a.label) {
             case 0:
                 currentPlatformId = getPlatformId(process.platform);
-                console.log("[sensible]: ", "making sure you have ".concat(installHelper[currentPlatformId]));
+                // console.log(
+                //   "[sensible]: ",
+                //   `making sure you have ${installHelper[currentPlatformId]}`
+                // );
                 return [4 /*yield*/, commandExistsOrInstall({
                         command: installHelper[currentPlatformId],
                         installInstructions: "Please install ".concat(installHelper[currentPlatformId], ". Go to \"https://brew.sh\" for instructions"),
@@ -495,8 +495,12 @@ var installRequiredStuff = function () { return __awaiter(void 0, void 0, void 0
                         exitIfNotInstalled: true,
                     })];
             case 1:
+                // console.log(
+                //   "[sensible]: ",
+                //   `making sure you have ${installHelper[currentPlatformId]}`
+                // );
                 _a.sent();
-                console.log("[sensible]: ", "making sure you have node");
+                //console.log("[sensible]: ", "making sure you have node");
                 return [4 /*yield*/, commandExistsOrInstall({
                         command: "node",
                         installInstructions: "Please run \"".concat(installHelper[currentPlatformId], " install node\" or go to https://formulae.brew.sh/formula/node for instructions"),
@@ -507,6 +511,7 @@ var installRequiredStuff = function () { return __awaiter(void 0, void 0, void 0
                         exitIfNotInstalled: true,
                     })];
             case 2:
+                //console.log("[sensible]: ", "making sure you have node");
                 _a.sent();
                 return [4 /*yield*/, commandExistsOrInstall({
                         command: "npm",

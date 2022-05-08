@@ -280,7 +280,7 @@ const getCommand = (command: Command): string | false => {
   if (!command.command) {
     return false;
   }
-  console.log("executing command: " + command.command);
+  //console.log("[sensible]: ","executing command: " + command.command);
 
   if (isCommandPerOs(command.command)) {
     const cmd = command.command[os] || command.command.default!;
@@ -290,7 +290,7 @@ const getCommand = (command: Command): string | false => {
 };
 
 const executeCommand = (command: Command, dir: string, debug: boolean) => {
-  console.log("[sensible]: ", "executing command");
+  //console.log("[sensible]: ", "executing command");
   // if command is disabled, immediately resolve so it is skippped.
   if (command.isDisabled) {
     return new Promise<void>((resolve) => {
@@ -392,11 +392,11 @@ const commandExistsOrInstall = async ({
   installInstructions: string;
   exitIfNotInstalled?: boolean;
 }) => {
-  console.log("[sensible]: ", `inside making sure you have ${command}`);
+  //console.log("[sensible]: ", `inside making sure you have ${command}`);
   let isAvailable;
   const isAvailableResult = await commandExistsAsync(command);
   isAvailable = !!isAvailableResult;
-  console.log("[sensible]: ", `command ${command} exists: ` + isAvailable);
+  //console.log("[sensible]: ", `command ${command} exists: ` + isAvailable);
   const installCommandString = installCommand && getCommand(installCommand);
   if (isAvailable) return true;
 
@@ -488,10 +488,10 @@ const getPlatformId = (platformVariable: string) => {
 const installRequiredStuff = async () => {
   //making sure you have brew, node, npm, yarn, code, git, jq, watchman
   let currentPlatformId = getPlatformId(process.platform);
-  console.log(
-    "[sensible]: ",
-    `making sure you have ${installHelper[currentPlatformId]}`
-  );
+  // console.log(
+  //   "[sensible]: ",
+  //   `making sure you have ${installHelper[currentPlatformId]}`
+  // );
   await commandExistsOrInstall({
     command: installHelper[currentPlatformId],
     installInstructions: `Please install ${installHelper[currentPlatformId]}. Go to "https://brew.sh" for instructions`,
@@ -502,7 +502,7 @@ const installRequiredStuff = async () => {
     },
     exitIfNotInstalled: true,
   });
-  console.log("[sensible]: ", "making sure you have node");
+  //console.log("[sensible]: ", "making sure you have node");
   await commandExistsOrInstall({
     command: "node",
     installInstructions: `Please run "${installHelper[currentPlatformId]} install node" or go to https://formulae.brew.sh/formula/node for instructions`,
