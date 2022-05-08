@@ -56,6 +56,9 @@ var child_process_1 = require("child_process");
 var fs_1 = __importDefault(require("fs"));
 var os_1 = require("os");
 var util_templates_1 = require("./util.templates");
+var command_exists_1 = __importDefault(require("command-exists"));
+var os = process.platform;
+//CONSTANTS
 var DEBUG_COMMANDS = false;
 var defaultAppName = "makes-sense";
 //test environment should be optional and easy to set up, live should be the default, since we want people to immedeately ship
@@ -97,9 +100,11 @@ var cacheUpdatedAtLocation = path_1.default.join((0, os_1.homedir)(), ".sensible
 var updatedAt = fs_1.default.existsSync(cacheUpdatedAtLocation)
     ? fs_1.default.readFileSync(cacheUpdatedAtLocation, "utf8")
     : "0";
+var firstTimeCli = updatedAt === "0";
 var difference = Date.now() - Number(updatedAt);
 var shouldGetCache = (difference < 86400 * 1000 * cacheDaysNumber || isOffline) && !isNoCache;
 var mainBranchName = typeof mainBranch === "string" && mainBranch.length > 0 ? mainBranch : "live";
+//UTILITY FUNCTIONS
 function slugify(string) {
     var a = "àáâäæãåāăąçćčđďèéêëēėęěğǵḧîïíīįìıİłḿñńǹňôöòóœøōõőṕŕřßśšşșťțûüùúūǘůűųẃẍÿýžźż·/_,:;";
     var b = "aaaaaaaaaacccddeeeeeeeegghiiiiiiiilmnnnnoooooooooprrsssssttuuuuuuuuuwxyyzzz------";
@@ -146,6 +151,17 @@ var getArgumentOrAsk = function (argumentPosition, question) { return __awaiter(
         return [2 /*return*/, ask(question)];
     });
 }); };
+var askOk = function (question) { return __awaiter(void 0, void 0, void 0, function () {
+    var answer;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: return [4 /*yield*/, ask(question)];
+            case 1:
+                answer = _a.sent();
+                return [2 /*return*/, ["yes", "y", ""].includes(answer)];
+        }
+    });
+}); };
 var getName = function () { return __awaiter(void 0, void 0, void 0, function () {
     var name, appName, n, fullAppName;
     return __generator(this, function (_a) {
@@ -182,132 +198,250 @@ var getRemote = function (name) { return __awaiter(void 0, void 0, void 0, funct
         }
     });
 }); };
+var isCommandPerOs = function (command) {
+    if (typeof command === "object") {
+        return true;
+    }
+    return false;
+};
+var getCommand = function (command) {
+    if (!command.command) {
+        return false;
+    }
+    if (isCommandPerOs(command.command)) {
+        var cmd = command.command[os] || command.command.default;
+        return cmd;
+    }
+    return command.command;
+};
+var executeCommand = function (command, dir, debug) {
+    // if command is disabled, immediately resolve so it is skippped.
+    if (command.isDisabled) {
+        return new Promise(function (resolve) {
+            resolve();
+        });
+    }
+    //tell the user what is happening, with a dot every second
+    process.stdout.write(command.description);
+    var interval = setInterval(function () { return process.stdout.write("."); }, 1000);
+    return new Promise(function (resolve) {
+        var messages = [];
+        var onFinish = function (_a) {
+            var success = _a.success;
+            //once done, clear the console
+            console.clear();
+            clearInterval(interval);
+            if (success) {
+                resolve();
+            }
+        };
+        if (DEBUG_COMMANDS) {
+            console.log("".concat(Date.toString(), ": extecuted ").concat(command, " in ").concat(dir));
+            resolve();
+        }
+        else if (command.command) {
+            var commandString = getCommand(command);
+            if (!commandString) {
+                onFinish({ success: true });
+                return;
+            }
+            (0, child_process_1.spawn)(commandString, {
+                stdio: debug ? "inherit" : "ignore",
+                shell: true,
+                cwd: dir,
+            })
+                .on("exit", function (code) {
+                var CODE_SUCCESSFUL = 0;
+                if (code === CODE_SUCCESSFUL) {
+                    onFinish({ success: true });
+                }
+                else {
+                    onFinish({ success: false });
+                    console.log(messages.join("\n"));
+                    console.log("The following command failed: \"".concat(command.command, "\""));
+                    process.exit(1);
+                }
+            })
+                //save all output so it can be printed on an error
+                .on("message", function (message) {
+                messages.push(message.toString());
+            })
+                .on("error", function (err) {
+                onFinish({ success: false });
+                console.log(messages.join("\n"));
+                console.log("The following command failed: \"".concat(command.command, "\": \"").concat(err, "\""));
+                process.exit(1);
+            });
+        }
+        else if (command.nodeFunction) {
+            command.nodeFunction(function () {
+                onFinish({ success: true });
+            });
+        }
+        else {
+            onFinish({ success: true });
+        }
+    });
+};
 var getSpawnCommandsReducer = function (dir, debug) {
     return function (previous, command) { return __awaiter(void 0, void 0, void 0, function () {
-        var interval;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, previous];
                 case 1:
                     _a.sent();
-                    // if command is disabled, immediately resolve so it is skippped.
-                    if (command.isDisabled) {
-                        return [2 /*return*/, new Promise(function (resolve) {
-                                resolve();
-                            })];
-                    }
-                    //tell the user what is happening, with a dot every second
-                    process.stdout.write(command.description);
-                    interval = setInterval(function () { return process.stdout.write("."); }, 1000);
-                    return [2 /*return*/, new Promise(function (resolve) {
-                            var messages = [];
-                            var onFinish = function (_a) {
-                                var success = _a.success;
-                                //once done, clear the console
-                                console.clear();
-                                clearInterval(interval);
-                                if (success) {
-                                    resolve();
-                                }
-                            };
-                            if (DEBUG_COMMANDS) {
-                                console.log("".concat(Date.toString(), ": extecuted ").concat(command, " in ").concat(dir));
-                                resolve();
-                            }
-                            else if (command.command) {
-                                (0, child_process_1.spawn)(command.command, {
-                                    stdio: debug ? "inherit" : "ignore",
-                                    shell: true,
-                                    cwd: dir,
-                                })
-                                    .on("exit", function (code) {
-                                    var CODE_SUCCESSFUL = 0;
-                                    if (code === CODE_SUCCESSFUL) {
-                                        onFinish({ success: true });
-                                    }
-                                    else {
-                                        onFinish({ success: false });
-                                        console.log(messages.join("\n"));
-                                        console.log("The following command failed: \"".concat(command.command, "\""));
-                                        process.exit(1);
-                                    }
-                                })
-                                    //save all output so it can be printed on an error
-                                    .on("message", function (message) {
-                                    messages.push(message.toString());
-                                })
-                                    .on("error", function (err) {
-                                    onFinish({ success: false });
-                                    console.log(messages.join("\n"));
-                                    console.log("The following command failed: \"".concat(command.command, "\": \"").concat(err, "\""));
-                                    process.exit(1);
-                                });
-                            }
-                            else if (command.nodeFunction) {
-                                command.nodeFunction(function () {
-                                    onFinish({ success: true });
-                                });
-                            }
-                            else {
-                                onFinish({ success: true });
-                            }
-                        })];
+                    return [2 /*return*/, executeCommand(command, dir, debug)];
             }
         });
     }); };
 };
-var askEnvironmentSetup = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var envIsSetup;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0: return [4 /*yield*/, ask("Do you have the following environment setup and tools installed? Continuing with a different setup could cause bugs. \n\n- macos\n- node 18, npm, yarn\n- vscode with code cli\n- jq\n- git\n- watchman\n\nSee https://github.com/Code-From-Anywhere/sensible/blob/main/docs/cli.md for more info.\n\nYes (y, yes, enter) or no?\n\n")];
-            case 1:
-                envIsSetup = _a.sent();
-                if (["y", "", "yes"].includes(envIsSetup)) {
+var commandExistsOrInstall = function (_a) {
+    var command = _a.command, installCommand = _a.installCommand, installInstructions = _a.installInstructions, exitIfNotInstalled = _a.exitIfNotInstalled;
+    return __awaiter(void 0, void 0, void 0, function () {
+        var isAvailable, installCommandString, ok;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
+                case 0: return [4 /*yield*/, (0, command_exists_1.default)(command)];
+                case 1:
+                    isAvailable = !!(_b.sent());
+                    installCommandString = installCommand && getCommand(installCommand);
+                    if (isAvailable)
+                        return [2 /*return*/, true];
+                    if (!installCommand) return [3 /*break*/, 4];
+                    return [4 /*yield*/, askOk("You don't have ".concat(command, ", but we need it to set up your project. Shall we install it for you, using \"").concat(installCommand, "\"? \n\n yes/no \n\n"))];
+                case 2:
+                    ok = _b.sent();
+                    if (!ok) return [3 /*break*/, 4];
+                    return [4 /*yield*/, executeCommand(installCommand, __dirname, !!isDebug)];
+                case 3:
+                    _b.sent();
                     return [2 /*return*/, true];
-                }
-                else {
+                case 4:
+                    console.log(installInstructions);
+                    if (exitIfNotInstalled) {
+                        process.exit(1);
+                    }
                     return [2 /*return*/, false];
-                }
-                return [2 /*return*/];
-        }
+            }
+        });
     });
-}); };
+};
 /**
  * replace all variables in a command string with the actual value
  */
 var commandReplaceVariables = function (variables) {
     return function (command) {
-        return {
-            description: command.description,
-            command: Object.keys(variables).reduce(function (command, key) {
+        if (getCommand(command)) {
+            command.command = Object.keys(variables).reduce(function (command, key) {
                 return command === null || command === void 0 ? void 0 : command.replaceAll("{".concat(key, "}"), variables[key]);
-            }, command.command),
-        };
+            }, getCommand(command));
+        }
+        return command;
     };
 };
-var main = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, appName, remote, sensibleDir, targetDir, pushToGit, openVSCode, setNewDefaults, selectedApps, commandsWithoutCache, cacheCommands, commandsFromFolders;
-    return __generator(this, function (_b) {
-        switch (_b.label) {
-            case 0:
-                _a = updatedAt === "0";
-                if (!_a) return [3 /*break*/, 2];
-                return [4 /*yield*/, askEnvironmentSetup()];
+var installRequiredStuff = function () { return __awaiter(void 0, void 0, void 0, function () {
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: 
+            //making sure you have brew, node, npm, yarn, code, git, jq, watchman
+            return [4 /*yield*/, commandExistsOrInstall({
+                    command: "brew",
+                    installInstructions: "Please install brew. Go to https://brew.sh for instructions",
+                    installCommand: {
+                        command: '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"',
+                        description: "Installing brew",
+                    },
+                    exitIfNotInstalled: true,
+                })];
             case 1:
-                _a = !(_b.sent());
-                _b.label = 2;
+                //making sure you have brew, node, npm, yarn, code, git, jq, watchman
+                _a.sent();
+                return [4 /*yield*/, commandExistsOrInstall({
+                        command: "node",
+                        installInstructions: 'Please run "brew install node" or go to https://formulae.brew.sh/formula/node for instructions',
+                        installCommand: {
+                            command: "brew install node",
+                            description: "Installing node using brew",
+                        },
+                        exitIfNotInstalled: true,
+                    })];
             case 2:
-                if (_a) {
-                    console.log("Please set up your environment first.");
-                    process.exit(1);
-                }
-                return [4 /*yield*/, getName()];
+                _a.sent();
+                return [4 /*yield*/, commandExistsOrInstall({
+                        command: "npm",
+                        installInstructions: "Please install node and npm, see https://docs.npmjs.com/downloading-and-installing-node-js-and-npm",
+                        installCommand: {
+                            command: "brew install node",
+                            description: "Installing node using brew",
+                        },
+                        exitIfNotInstalled: true,
+                    })];
             case 3:
-                appName = _b.sent();
-                return [4 /*yield*/, getRemote(appName)];
+                _a.sent();
+                return [4 /*yield*/, commandExistsOrInstall({
+                        command: "yarn",
+                        installInstructions: "Please install yarn, see https://classic.yarnpkg.com/lang/en/docs/install",
+                        installCommand: {
+                            command: "npm install --global yarn",
+                            description: "Installing yarn",
+                        },
+                        exitIfNotInstalled: true,
+                    })];
             case 4:
-                remote = _b.sent();
+                _a.sent();
+                return [4 /*yield*/, commandExistsOrInstall({
+                        command: "code",
+                        exitIfNotInstalled: true,
+                        installInstructions: 'Please install VSCode and the code cli command. see https://code.visualstudio.com/docs/editor/command-line \n\n TL;DR: Linux and Windows, the code command comes with a VSCode installation, but on MacOS you need to activate it from within VSCode using "Cmd + Shift + P" and selecting "Install \'code\' command in PATH".',
+                    })];
+            case 5:
+                _a.sent();
+                return [4 /*yield*/, commandExistsOrInstall({
+                        command: "git",
+                        exitIfNotInstalled: true,
+                        installInstructions: "Please install git, see https://git-scm.com/book/en/v2/Getting-Started-Installing-Git for instructions.",
+                    })];
+            case 6:
+                _a.sent();
+                return [4 /*yield*/, commandExistsOrInstall({
+                        command: "jq",
+                        exitIfNotInstalled: true,
+                        installCommand: {
+                            command: "brew install jq",
+                            description: "Installing jq using brew",
+                        },
+                        installInstructions: "Please install jq, see https://stedolan.github.io/jq/download/ for instructions.",
+                    })];
+            case 7:
+                _a.sent();
+                return [4 /*yield*/, commandExistsOrInstall({
+                        command: "watchman",
+                        exitIfNotInstalled: true,
+                        installCommand: {
+                            command: "brew install watchman",
+                            description: "Installing watchman using brew",
+                        },
+                        installInstructions: "Please install watchman, see https://facebook.github.io/watchman/docs/install.html for instructions.",
+                    })];
+            case 8:
+                _a.sent();
+                return [2 /*return*/];
+        }
+    });
+}); };
+var main = function () { return __awaiter(void 0, void 0, void 0, function () {
+    var appName, remote, sensibleDir, targetDir, pushToGit, openVSCode, setNewDefaults, selectedApps, commandsWithoutCache, cacheCommands, commandsFromFolders;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: return [4 /*yield*/, installRequiredStuff()];
+            case 1:
+                _a.sent();
+                return [4 /*yield*/, getName()];
+            case 2:
+                appName = _a.sent();
+                return [4 /*yield*/, getRemote(appName)];
+            case 3:
+                remote = _a.sent();
                 sensibleDir = path_1.default.resolve(__dirname, "..");
                 targetDir = process.cwd();
                 pushToGit = {
@@ -462,8 +596,8 @@ var main = function () { return __awaiter(void 0, void 0, void 0, function () {
                             }
                         });
                     }); }, Promise.resolve())];
-            case 5:
-                _b.sent();
+            case 4:
+                _a.sent();
                 return [2 /*return*/];
         }
     });

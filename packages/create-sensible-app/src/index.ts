@@ -7,6 +7,31 @@ import { spawn } from "child_process";
 import fs from "fs";
 import { homedir } from "os";
 import { findAndRenameTemplateFiles } from "./util.templates";
+import commandExists from "command-exists";
+
+//TYPE INTERFACES
+
+type OSOrDefault = NodeJS.Platform | "default";
+
+type CommandPerOs = {
+  [key in OSOrDefault]?: string;
+};
+
+type CommandPerOSOrCommandString = CommandPerOs | string;
+
+type Command = {
+  command?: CommandPerOSOrCommandString;
+  nodeFunction?: (resolve: () => void) => void;
+  description: string;
+  isDisabled?: boolean;
+};
+
+type CommandsObject = {
+  dir: string;
+  commands: Command[];
+};
+
+const os = process.platform;
 
 type TaskObject = {};
 
@@ -14,6 +39,8 @@ type InstallObject = {
   commands: Command[];
   tasks: TaskObject[];
 };
+
+//CONSTANTS
 
 const DEBUG_COMMANDS = false;
 const defaultAppName = "makes-sense";
@@ -31,6 +58,7 @@ const settingsString = fs.existsSync(settingsLocation)
   ? fs.readFileSync(settingsLocation, "utf8")
   : "";
 const settingsArray = settingsString.split(" ");
+
 const findArgument = (flag: string) => (arg: string) =>
   arg.startsWith(`--${flag}`);
 
@@ -63,6 +91,8 @@ const cacheUpdatedAtLocation = path.join(homedir(), ".sensible/updatedAt.txt");
 const updatedAt = fs.existsSync(cacheUpdatedAtLocation)
   ? fs.readFileSync(cacheUpdatedAtLocation, "utf8")
   : "0";
+const firstTimeCli = updatedAt === "0";
+
 const difference = Date.now() - Number(updatedAt);
 const shouldGetCache =
   (difference < 86400 * 1000 * cacheDaysNumber || isOffline) && !isNoCache;
@@ -70,16 +100,8 @@ const shouldGetCache =
 const mainBranchName =
   typeof mainBranch === "string" && mainBranch.length > 0 ? mainBranch : "live";
 
-type Command = {
-  command?: string;
-  nodeFunction?: (resolve: () => void) => void;
-  description: string;
-  isDisabled?: boolean;
-};
-type CommandsObject = {
-  dir: string;
-  commands: Command[];
-};
+//UTILITY FUNCTIONS
+
 function slugify(string: string) {
   var a =
     "àáâäæãåāăąçćčđďèéêëēėęěğǵḧîïíīįìıİłḿñńǹňôöòóœøōõőṕŕřßśšşșťțûüùúūǘůűųẃẍÿýžźż·/_,:;";
@@ -134,6 +156,11 @@ const getArgumentOrAsk = async (
   return ask(question);
 };
 
+const askOk = async (question: string): Promise<boolean> => {
+  const answer = await ask(question);
+  return ["yes", "y", ""].includes(answer);
+};
+
 const getName = async (): Promise<string> => {
   const name = await getArgumentOrAsk(
     1,
@@ -168,95 +195,139 @@ const getRemote = async (name: string): Promise<string | null> => {
     : null;
 };
 
+const isCommandPerOs = (
+  command: CommandPerOSOrCommandString
+): command is CommandPerOs => {
+  if (typeof command === "object") {
+    return true;
+  }
+  return false;
+};
+
+const getCommand = (command: Command): string | false => {
+  if (!command.command) {
+    return false;
+  }
+
+  if (isCommandPerOs(command.command)) {
+    const cmd = command.command[os] || command.command.default!;
+    return cmd;
+  }
+  return command.command;
+};
+
+const executeCommand = (command: Command, dir: string, debug: boolean) => {
+  // if command is disabled, immediately resolve so it is skippped.
+  if (command.isDisabled) {
+    return new Promise<void>((resolve) => {
+      resolve();
+    });
+  }
+  //tell the user what is happening, with a dot every second
+  process.stdout.write(command.description);
+  const interval = setInterval(() => process.stdout.write("."), 1000);
+
+  return new Promise<void>((resolve) => {
+    const messages: string[] = [];
+
+    const onFinish = ({ success }: { success: boolean }) => {
+      //once done, clear the console
+      console.clear();
+      clearInterval(interval);
+      if (success) {
+        resolve();
+      }
+    };
+
+    if (DEBUG_COMMANDS) {
+      console.log(`${Date.toString()}: extecuted ${command} in ${dir}`);
+      resolve();
+    } else if (command.command) {
+      const commandString = getCommand(command);
+
+      if (!commandString) {
+        onFinish({ success: true });
+        return;
+      }
+
+      spawn(commandString, {
+        stdio: debug ? "inherit" : "ignore",
+        shell: true,
+        cwd: dir,
+      })
+        .on("exit", (code) => {
+          const CODE_SUCCESSFUL = 0;
+          if (code === CODE_SUCCESSFUL) {
+            onFinish({ success: true });
+          } else {
+            onFinish({ success: false });
+            console.log(messages.join("\n"));
+            console.log(`The following command failed: "${command.command}"`);
+            process.exit(1);
+          }
+        })
+        //save all output so it can be printed on an error
+        .on("message", (message) => {
+          messages.push(message.toString());
+        })
+        .on("error", (err) => {
+          onFinish({ success: false });
+          console.log(messages.join("\n"));
+          console.log(
+            `The following command failed: "${command.command}": "${err}"`
+          );
+          process.exit(1);
+        });
+    } else if (command.nodeFunction) {
+      command.nodeFunction(() => {
+        onFinish({ success: true });
+      });
+    } else {
+      onFinish({ success: true });
+    }
+  });
+};
+
 const getSpawnCommandsReducer =
   (dir: string, debug: boolean) =>
   async (previous: Promise<void>, command: Command) => {
     await previous;
-
-    // if command is disabled, immediately resolve so it is skippped.
-    if (command.isDisabled) {
-      return new Promise<void>((resolve) => {
-        resolve();
-      });
-    }
-    //tell the user what is happening, with a dot every second
-    process.stdout.write(command.description);
-    const interval = setInterval(() => process.stdout.write("."), 1000);
-
-    return new Promise<void>((resolve) => {
-      const messages: string[] = [];
-
-      const onFinish = ({ success }: { success: boolean }) => {
-        //once done, clear the console
-        console.clear();
-        clearInterval(interval);
-        if (success) {
-          resolve();
-        }
-      };
-
-      if (DEBUG_COMMANDS) {
-        console.log(`${Date.toString()}: extecuted ${command} in ${dir}`);
-        resolve();
-      } else if (command.command) {
-        spawn(command.command, {
-          stdio: debug ? "inherit" : "ignore",
-          shell: true,
-          cwd: dir,
-        })
-          .on("exit", (code) => {
-            const CODE_SUCCESSFUL = 0;
-            if (code === CODE_SUCCESSFUL) {
-              onFinish({ success: true });
-            } else {
-              onFinish({ success: false });
-              console.log(messages.join("\n"));
-              console.log(`The following command failed: "${command.command}"`);
-              process.exit(1);
-            }
-          })
-          //save all output so it can be printed on an error
-          .on("message", (message) => {
-            messages.push(message.toString());
-          })
-          .on("error", (err) => {
-            onFinish({ success: false });
-            console.log(messages.join("\n"));
-            console.log(
-              `The following command failed: "${command.command}": "${err}"`
-            );
-            process.exit(1);
-          });
-      } else if (command.nodeFunction) {
-        command.nodeFunction(() => {
-          onFinish({ success: true });
-        });
-      } else {
-        onFinish({ success: true });
-      }
-    });
+    return executeCommand(command, dir, debug);
   };
 
-const askEnvironmentSetup = async () => {
-  const envIsSetup =
-    await ask(`Do you have the following environment setup and tools installed? Continuing with a different setup could cause bugs. 
+const commandExistsOrInstall = async ({
+  command,
+  installCommand,
+  installInstructions,
+  exitIfNotInstalled,
+}: {
+  command: string;
+  installCommand?: Command;
+  installInstructions: string;
+  exitIfNotInstalled?: boolean;
+}) => {
+  const isAvailable = !!(await commandExists(command));
 
-- macos
-- node 18, npm, yarn
-- vscode with code cli
-- jq
-- git
-- watchman
+  const installCommandString = installCommand && getCommand(installCommand);
+  if (isAvailable) return true;
 
-See https://github.com/Code-From-Anywhere/sensible/blob/main/docs/cli.md for more info.
+  if (installCommand) {
+    const ok = await askOk(
+      `You don't have ${command}, but we need it to set up your project. Shall we install it for you, using "${installCommand}"? \n\n yes/no \n\n`
+    );
 
-Yes (y, yes, enter) or no?\n\n`);
-
-  if (["y", "", "yes"].includes(envIsSetup)) {
-    return true;
-  } else {
-    return false;
+    if (ok) {
+      await executeCommand(installCommand, __dirname, !!isDebug);
+      return true;
+    }
   }
+
+  console.log(installInstructions);
+
+  if (exitIfNotInstalled) {
+    process.exit(1);
+  }
+  return false;
 };
 
 /**
@@ -265,19 +336,101 @@ Yes (y, yes, enter) or no?\n\n`);
 const commandReplaceVariables =
   (variables: { [key: string]: string }) =>
   (command: Command): Command => {
-    return {
-      description: command.description,
-      command: Object.keys(variables).reduce((command, key) => {
+    if (getCommand(command)) {
+      command.command = Object.keys(variables).reduce((command, key) => {
         return command?.replaceAll(`{${key}}`, variables[key]);
-      }, command.command),
-    };
+      }, getCommand(command) as string);
+    }
+    return command;
   };
 
+const installRequiredStuff = async () => {
+  //making sure you have brew, node, npm, yarn, code, git, jq, watchman
+
+  await commandExistsOrInstall({
+    command: "brew",
+    installInstructions:
+      "Please install brew. Go to https://brew.sh for instructions",
+    installCommand: {
+      command:
+        '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"',
+      description: "Installing brew",
+    },
+    exitIfNotInstalled: true,
+  });
+
+  await commandExistsOrInstall({
+    command: "node",
+    installInstructions:
+      'Please run "brew install node" or go to https://formulae.brew.sh/formula/node for instructions',
+    installCommand: {
+      command: "brew install node",
+      description: "Installing node using brew",
+    },
+    exitIfNotInstalled: true,
+  });
+
+  await commandExistsOrInstall({
+    command: "npm",
+    installInstructions:
+      "Please install node and npm, see https://docs.npmjs.com/downloading-and-installing-node-js-and-npm",
+    installCommand: {
+      command: "brew install node",
+      description: "Installing node using brew",
+    },
+    exitIfNotInstalled: true,
+  });
+
+  await commandExistsOrInstall({
+    command: "yarn",
+    installInstructions:
+      "Please install yarn, see https://classic.yarnpkg.com/lang/en/docs/install",
+    installCommand: {
+      command: "npm install --global yarn",
+      description: "Installing yarn",
+    },
+    exitIfNotInstalled: true,
+  });
+
+  await commandExistsOrInstall({
+    command: "code",
+    exitIfNotInstalled: true,
+    installInstructions:
+      'Please install VSCode and the code cli command. see https://code.visualstudio.com/docs/editor/command-line \n\n TL;DR: Linux and Windows, the code command comes with a VSCode installation, but on MacOS you need to activate it from within VSCode using "Cmd + Shift + P" and selecting "Install \'code\' command in PATH".',
+  });
+
+  await commandExistsOrInstall({
+    command: "git",
+    exitIfNotInstalled: true,
+    installInstructions:
+      "Please install git, see https://git-scm.com/book/en/v2/Getting-Started-Installing-Git for instructions.",
+  });
+
+  await commandExistsOrInstall({
+    command: "jq",
+    exitIfNotInstalled: true,
+    installCommand: {
+      command: "brew install jq",
+      description: "Installing jq using brew",
+    },
+    installInstructions:
+      "Please install jq, see https://stedolan.github.io/jq/download/ for instructions.",
+  });
+
+  await commandExistsOrInstall({
+    command: "watchman",
+    exitIfNotInstalled: true,
+    installCommand: {
+      command: "brew install watchman",
+      description: "Installing watchman using brew",
+    },
+    installInstructions:
+      "Please install watchman, see https://facebook.github.io/watchman/docs/install.html for instructions.",
+  });
+};
 const main = async () => {
-  if (updatedAt === "0" && !(await askEnvironmentSetup())) {
-    console.log(`Please set up your environment first.`);
-    process.exit(1);
-  }
+  await installRequiredStuff();
+
   const appName = await getName();
   const remote = await getRemote(appName);
   const sensibleDir = path.resolve(__dirname, "..");

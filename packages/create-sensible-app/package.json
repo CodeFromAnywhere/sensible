@@ -1,6 +1,6 @@
 {
   "name": "create-sensible-app",
-  "version": "1.0.19",
+  "version": "1.0.20",
   "description": "A cli to create a new sensible app for you",
   "bin": {
     "create-sensible-app": "./build/index.js",
@@ -36,6 +36,9 @@
   },
   "homepage": "https://github.com/Code-From-Anywhere/sensible#readme",
   "dependencies": {
+    "@types/command-exists": "^1.2.0",
+    "command-exists": "^1.2.9",
+    "sensible-files": "^1.0.1",
     "sensible-server": "*"
   }
 }
