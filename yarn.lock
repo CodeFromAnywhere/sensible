@@ -2690,17 +2690,7 @@
   dependencies:
     "@types/yargs-parser" "*"
 
-"@typescript-eslint/parser@^5.0.0":
-  "integrity" "sha512-piwC4krUpRDqPaPbFaycN70KCP87+PC5WZmrWs+DlVOxxmF+zI6b6hETv7Quy4s9wbkV16ikMeZgXsvzwI3icQ=="
-  "resolved" "https://registry.npmjs.org/@typescript-eslint/parser/-/parser-5.22.0.tgz"
-  "version" "5.22.0"
-  dependencies:
-    "@typescript-eslint/scope-manager" "5.22.0"
-    "@typescript-eslint/types" "5.22.0"
-    "@typescript-eslint/typescript-estree" "5.22.0"
-    "debug" "^4.3.2"
-
-"@typescript-eslint/parser@^5.21.0":
+"@typescript-eslint/parser@^5.0.0", "@typescript-eslint/parser@^5.21.0":
   "integrity" "sha512-piwC4krUpRDqPaPbFaycN70KCP87+PC5WZmrWs+DlVOxxmF+zI6b6hETv7Quy4s9wbkV16ikMeZgXsvzwI3icQ=="
   "resolved" "https://registry.npmjs.org/@typescript-eslint/parser/-/parser-5.22.0.tgz"
   "version" "5.22.0"
@@ -4752,7 +4742,7 @@
 
 "create-sensible-app@file:/Users/wijnandkarsens/Developer/Code-From-Anywhere/sensible/packages/create-sensible-app":
   "resolved" "file:packages/create-sensible-app"
-  "version" "1.0.20"
+  "version" "1.0.21"
   dependencies:
     "@types/command-exists" "^1.2.0"
     "command-exists" "^1.2.9"
@@ -5766,18 +5756,7 @@
     "debug" "^3.2.7"
     "resolve" "^1.20.0"
 
-"eslint-import-resolver-typescript@^2.4.0":
-  "integrity" "sha512-00UbgGwV8bSgUv34igBDbTOtKhqoRMy9bFjNehT40bXg6585PNIct8HhXZ0SybqB9rWtXj9crcku8ndDn/gIqQ=="
-  "resolved" "https://registry.npmjs.org/eslint-import-resolver-typescript/-/eslint-import-resolver-typescript-2.7.1.tgz"
-  "version" "2.7.1"
-  dependencies:
-    "debug" "^4.3.4"
-    "glob" "^7.2.0"
-    "is-glob" "^4.0.3"
-    "resolve" "^1.22.0"
-    "tsconfig-paths" "^3.14.1"
-
-"eslint-import-resolver-typescript@^2.7.1":
+"eslint-import-resolver-typescript@^2.4.0", "eslint-import-resolver-typescript@^2.7.1":
   "integrity" "sha512-00UbgGwV8bSgUv34igBDbTOtKhqoRMy9bFjNehT40bXg6585PNIct8HhXZ0SybqB9rWtXj9crcku8ndDn/gIqQ=="
   "resolved" "https://registry.npmjs.org/eslint-import-resolver-typescript/-/eslint-import-resolver-typescript-2.7.1.tgz"
   "version" "2.7.1"
@@ -5833,37 +5812,12 @@
     "language-tags" "^1.0.5"
     "minimatch" "^3.0.4"
 
-"eslint-plugin-react-hooks@^4.3.0":
+"eslint-plugin-react-hooks@^4.3.0", "eslint-plugin-react-hooks@^4.5.0":
   "integrity" "sha512-8k1gRt7D7h03kd+SAAlzXkQwWK22BnK6GKZG+FJA6BAGy22CFvl8kCIXKpVux0cCxMWDQUPqSok0LKaZ0aOcCw=="
   "resolved" "https://registry.npmjs.org/eslint-plugin-react-hooks/-/eslint-plugin-react-hooks-4.5.0.tgz"
   "version" "4.5.0"
 
-"eslint-plugin-react-hooks@^4.5.0":
-  "integrity" "sha512-8k1gRt7D7h03kd+SAAlzXkQwWK22BnK6GKZG+FJA6BAGy22CFvl8kCIXKpVux0cCxMWDQUPqSok0LKaZ0aOcCw=="
-  "resolved" "https://registry.npmjs.org/eslint-plugin-react-hooks/-/eslint-plugin-react-hooks-4.5.0.tgz"
-  "version" "4.5.0"
-
-"eslint-plugin-react@^7.27.0":
-  "integrity" "sha512-CVCXajliVh509PcZYRFyu/BoUEz452+jtQJq2b3Bae4v3xBUWPLCmtmBM+ZinG4MzwmxJgJ2M5rMqhqLVn7MtQ=="
-  "resolved" "https://registry.npmjs.org/eslint-plugin-react/-/eslint-plugin-react-7.29.4.tgz"
-  "version" "7.29.4"
-  dependencies:
-    "array-includes" "^3.1.4"
-    "array.prototype.flatmap" "^1.2.5"
-    "doctrine" "^2.1.0"
-    "estraverse" "^5.3.0"
-    "jsx-ast-utils" "^2.4.1 || ^3.0.0"
-    "minimatch" "^3.1.2"
-    "object.entries" "^1.1.5"
-    "object.fromentries" "^2.0.5"
-    "object.hasown" "^1.1.0"
-    "object.values" "^1.1.5"
-    "prop-types" "^15.8.1"
-    "resolve" "^2.0.0-next.3"
-    "semver" "^6.3.0"
-    "string.prototype.matchall" "^4.0.6"
-
-"eslint-plugin-react@^7.29.4":
+"eslint-plugin-react@^7.27.0", "eslint-plugin-react@^7.29.4":
   "integrity" "sha512-CVCXajliVh509PcZYRFyu/BoUEz452+jtQJq2b3Bae4v3xBUWPLCmtmBM+ZinG4MzwmxJgJ2M5rMqhqLVn7MtQ=="
   "resolved" "https://registry.npmjs.org/eslint-plugin-react/-/eslint-plugin-react-7.29.4.tgz"
   "version" "7.29.4"
@@ -11998,7 +11952,7 @@
 
 "sensible-core@*", "sensible-core@^1.0.40", "sensible-core@file:/Users/wijnandkarsens/Developer/Code-From-Anywhere/sensible/packages/sensible-core":
   "resolved" "file:packages/sensible-core"
-  "version" "1.0.54"
+  "version" "1.0.55"
   dependencies:
     "sensible-files" "*"
     "typescript-json-schema" "^0.53.0"
@@ -12010,7 +11964,7 @@
 
 "sensible-files@*", "sensible-files@^1.0.0", "sensible-files@^1.0.1", "sensible-files@file:/Users/wijnandkarsens/Developer/Code-From-Anywhere/sensible/packages/sensible-files":
   "resolved" "file:packages/sensible-files"
-  "version" "1.0.4"
+  "version" "1.0.5"
   dependencies:
     "gray-matter" "^4.0.3"
 
@@ -12020,7 +11974,7 @@
 
 "sensible-server@*", "sensible-server@file:/Users/wijnandkarsens/Developer/Code-From-Anywhere/sensible/packages/sensible-server":
   "resolved" "file:packages/sensible-server"
-  "version" "1.0.78"
+  "version" "1.0.79"
   dependencies:
     "ajv" "^8.10.0"
     "gray-matter" "^4.0.3"
@@ -13275,16 +13229,10 @@
     "typescript" "~4.5.0"
     "yargs" "^17.1.1"
 
-"typescript@*", "typescript@^4.6.4", "typescript@>= 2.7", "typescript@>=2.7", "typescript@>=3.3.1", "typescript@4.6.4":
+"typescript@*", "typescript@^4.5.2", "typescript@^4.6.4", "typescript@>= 2.7", "typescript@>=2.7", "typescript@>=2.8.0 || >= 3.2.0-dev || >= 3.3.0-dev || >= 3.4.0-dev || >= 3.5.0-dev || >= 3.6.0-dev || >= 3.6.0-beta || >= 3.7.0-dev || >= 3.7.0-beta", "typescript@>=3.3.1", "typescript@4.6.4":
   "integrity" "sha512-9ia/jWHIEbo49HfjrLGfKbZSuWo9iTMwXO+Ca3pRsSpbsMbc7/IU8NKdCZVRRBafVPGnoJeFL76ZOAA84I9fEg=="
   "resolved" "https://registry.npmjs.org/typescript/-/typescript-4.6.4.tgz"
   "version" "4.6.4"
-
-"typescript@^4.5.2":
-  "version" "4.5.5"
-
-"typescript@>=2.8.0 || >= 3.2.0-dev || >= 3.3.0-dev || >= 3.4.0-dev || >= 3.5.0-dev || >= 3.6.0-dev || >= 3.6.0-beta || >= 3.7.0-dev || >= 3.7.0-beta":
-  "version" "4.5.5"
 
 "typescript@~4.5.0":
   "integrity" "sha512-TCTIul70LyWe6IJWT8QSYeA54WQe8EjQFU4wY52Fasj5UKx88LNYKCgBEHcOMOrFF1rKGbD8v/xcNWVUq9SymA=="
