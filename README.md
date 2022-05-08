@@ -6,19 +6,17 @@ website
 <a href="https://github.com/Code-From-Anywhere/sensible/tree/main/docs">docs</a> | <a href="https://github.com/Code-From-Anywhere/sensible/tree/main/packages">packages</a>
 </p>
 
-# The Shared Full Stack Typescript Framework
+# Welcome
 
-With strict conventions and the newest typescript and code sharing possibilities, we were able to create the most advanced typescript framework ever and boost the productivity of hundreds of development teams, maybe even by a factor of 10 or more if you compare it to the industry standard.
-
-Sensible's mission is to boost the productivity of 100.000+ Software Developers, making it as easy as possible to build a high-quality full-stack mobile/desktop app/website.
+Sensible is a full stack typescript framework that lets you build apps super quickly and smoothly. Sensible lets you easily share your code between `React` and `React Native`, and between `front-end` and `back-end`. It has never been this easy! Sensible's mission is to boost the productivity of 100.000+ Software Developers, making it as easy as possible to build a high-quality full-stack mobile/web app.
 
 Curious? Just run `npx sensible` and see the magic, or [check out the demo on the website](https://www.sensible.to)
 
-This will setup the sensible framework with all node modules installed, a small example, and it will also open up VSCode in the correct folder.
+Want to know more? See the [docs](https://doc.sensible.to)
 
 ## Installation instructions
 
-1. Make sure you have `node`, `npm` and `npx`. If you don't, this is how to install it with brew:
+1. Make sure you have `node`, `npm`, `npx`, and `brew`. If you don't, this is how to install them:
 
 ```
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
