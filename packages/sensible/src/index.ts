@@ -7,6 +7,7 @@ import { spawn } from "child_process";
 import fs from "fs";
 import { homedir } from "os";
 import { findAndRenameTemplateFiles } from "./util.templates";
+import { log } from "./util.log";
 import commandExists from "command-exists";
 
 //TYPE INTERFACES
@@ -212,9 +213,7 @@ const getName = async (): Promise<string> => {
     fullAppName = `${appName}${n}`;
   }
   if (fullAppName !== appName) {
-    console.log(
-      `Using name ${fullAppName} because ${appName} folder already exists.`
-    );
+    log(`Using name ${fullAppName} because ${appName} folder already exists.`);
   }
   return fullAppName;
 };
@@ -293,7 +292,7 @@ const executeCommand = (command: Command, dir: string, debug: boolean) => {
     };
 
     if (DEBUG_COMMANDS) {
-      console.log(`${Date.toString()}: extecuted ${command} in ${dir}`);
+      log(`${Date.toString()}: extecuted ${command} in ${dir}`);
       resolve();
     } else if (command.command) {
       const commandString = getCommand(command);
@@ -314,8 +313,8 @@ const executeCommand = (command: Command, dir: string, debug: boolean) => {
             onFinish({ success: true });
           } else {
             onFinish({ success: false });
-            console.log(messages.join("\n"));
-            console.log(`The following command failed: "${command.command}"`);
+            log(messages.join("\n"));
+            log(`The following command failed: "${command.command}"`);
             process.exit(1);
           }
         })
@@ -325,10 +324,8 @@ const executeCommand = (command: Command, dir: string, debug: boolean) => {
         })
         .on("error", (err) => {
           onFinish({ success: false });
-          console.log(messages.join("\n"));
-          console.log(
-            `The following command failed: "${command.command}": "${err}"`
-          );
+          log(messages.join("\n"));
+          log(`The following command failed: "${command.command}": "${err}"`);
           process.exit(1);
         });
     } else if (command.nodeFunction) {
@@ -375,7 +372,7 @@ const commandExistsOrInstall = async ({
     }
   }
 
-  console.log(installInstructions);
+  log(installInstructions);
 
   if (exitIfNotInstalled) {
     process.exit(1);
@@ -639,7 +636,7 @@ const getCommandsWithoutCache = ({
       },
 
       {
-        command: `echo $(node -e 'console.log(Date.now())') > .sensible/updatedAt.txt`,
+        command: `echo $(node -e 'log(Date.now())') > .sensible/updatedAt.txt`,
         description: "Add current timestamp to cached files",
       },
 
@@ -699,7 +696,7 @@ const main = async () => {
       Promise.resolve()
     );
   } else {
-    console.log('please run "sensible init" to use this cli.');
+    log('please run "sensible init" to use this cli.', "FgCyan");
   }
 };
 main();

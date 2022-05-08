@@ -1,0 +1,2 @@
+export declare const log: (message: string, option?: "Reset" | "Bright" | "Dim" | "Underscore" | "Blink" | "Reverse" | "Hidden" | "FgBlack" | "FgRed" | "FgGreen" | "FgYellow" | "FgBlue" | "FgMagenta" | "FgCyan" | "FgWhite" | "BgBlack" | "BgRed" | "BgGreen" | "BgYellow" | "BgBlue" | "BgMagenta" | "BgCyan" | "BgWhite" | undefined) => void;
+//# sourceMappingURL=util.log.d.ts.map

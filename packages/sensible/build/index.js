@@ -56,6 +56,7 @@ var child_process_1 = require("child_process");
 var fs_1 = __importDefault(require("fs"));
 var os_1 = require("os");
 var util_templates_1 = require("./util.templates");
+var util_log_1 = require("./util.log");
 var command_exists_1 = __importDefault(require("command-exists"));
 var os = process.platform;
 //CONSTANTS
@@ -211,7 +212,7 @@ var getName = function () { return __awaiter(void 0, void 0, void 0, function ()
                     fullAppName = "".concat(appName).concat(n);
                 }
                 if (fullAppName !== appName) {
-                    console.log("Using name ".concat(fullAppName, " because ").concat(appName, " folder already exists."));
+                    (0, util_log_1.log)("Using name ".concat(fullAppName, " because ").concat(appName, " folder already exists."));
                 }
                 return [2 /*return*/, fullAppName];
         }
@@ -287,7 +288,7 @@ var executeCommand = function (command, dir, debug) {
             }
         };
         if (DEBUG_COMMANDS) {
-            console.log("".concat(Date.toString(), ": extecuted ").concat(command, " in ").concat(dir));
+            (0, util_log_1.log)("".concat(Date.toString(), ": extecuted ").concat(command, " in ").concat(dir));
             resolve();
         }
         else if (command.command) {
@@ -308,8 +309,8 @@ var executeCommand = function (command, dir, debug) {
                 }
                 else {
                     onFinish({ success: false });
-                    console.log(messages.join("\n"));
-                    console.log("The following command failed: \"".concat(command.command, "\""));
+                    (0, util_log_1.log)(messages.join("\n"));
+                    (0, util_log_1.log)("The following command failed: \"".concat(command.command, "\""));
                     process.exit(1);
                 }
             })
@@ -319,8 +320,8 @@ var executeCommand = function (command, dir, debug) {
             })
                 .on("error", function (err) {
                 onFinish({ success: false });
-                console.log(messages.join("\n"));
-                console.log("The following command failed: \"".concat(command.command, "\": \"").concat(err, "\""));
+                (0, util_log_1.log)(messages.join("\n"));
+                (0, util_log_1.log)("The following command failed: \"".concat(command.command, "\": \"").concat(err, "\""));
                 process.exit(1);
             });
         }
@@ -368,7 +369,7 @@ var commandExistsOrInstall = function (_a) {
                     _b.sent();
                     return [2 /*return*/, true];
                 case 4:
-                    console.log(installInstructions);
+                    (0, util_log_1.log)(installInstructions);
                     if (exitIfNotInstalled) {
                         process.exit(1);
                     }
@@ -601,7 +602,7 @@ var getCommandsWithoutCache = function (_a) {
                     description: "Creating cache",
                 },
                 {
-                    command: "echo $(node -e 'console.log(Date.now())') > .sensible/updatedAt.txt",
+                    command: "echo $(node -e 'log(Date.now())') > .sensible/updatedAt.txt",
                     description: "Add current timestamp to cached files",
                 },
                 setNewDefaults,
@@ -668,7 +669,7 @@ var main = function () { return __awaiter(void 0, void 0, void 0, function () {
                 _a.sent();
                 return [3 /*break*/, 8];
             case 7:
-                console.log('please run "sensible init" to use this cli.');
+                (0, util_log_1.log)('please run "sensible init" to use this cli.', "FgCyan");
                 _a.label = 8;
             case 8: return [2 /*return*/];
         }
