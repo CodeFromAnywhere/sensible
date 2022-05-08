@@ -10,6 +10,26 @@ import { findAndRenameTemplateFiles } from "./util.templates";
 import { log } from "./util.log";
 import commandExists from "command-exists";
 
+//Platforms
+const platformIds = {
+  macOS: 0,
+  windows: 1,
+  linux: 2,
+};
+
+const platformNames = {
+  [platformIds.macOS]: "MacOS",
+  [platformIds.windows]: "Windows",
+  [platformIds.linux]: "Linux",
+};
+
+//InstallHelper
+const installHelper = {
+  [platformIds.macOS]: "brew",
+  [platformIds.windows]: "choco",
+  [platformIds.linux]: "brew",
+};
+
 //TYPE INTERFACES
 
 type OSOrDefault = NodeJS.Platform | "default";
@@ -382,7 +402,7 @@ const commandExistsOrInstall = async ({
 
   if (installCommand) {
     const ok = await askOk(
-      `You don't have ${command}, but we need it to set up your project. Shall we install it for you, using "${installCommand}"? \n\n yes/no \n\n`
+      `You don't have ${command}, but we need it to set up your project. Shall we install it for you, using "${installCommandString}"? \n\n yes/no \n\n`
     );
 
     if (ok) {
@@ -451,29 +471,44 @@ const getPushToGitCommands = (appName: string, remote: string | null) => {
     ],
   };
 };
-
+const getPlatformId = (platformVariable: string) => {
+  switch (platformVariable) {
+    case "darwin":
+      //its macos
+      return platformIds.macOS;
+    case "linux":
+      return platformIds.linux;
+    case "win32":
+      return platformIds.windows;
+    default:
+      //default is mac
+      return platformIds.macOS;
+  }
+};
 const installRequiredStuff = async () => {
   //making sure you have brew, node, npm, yarn, code, git, jq, watchman
-  console.log("[sensible]: ", "making sure you have brew");
+  let currentPlatformId = getPlatformId(process.platform);
+  console.log(
+    "[sensible]: ",
+    `making sure you have ${installHelper[currentPlatformId]}`
+  );
   await commandExistsOrInstall({
-    command: "brew",
-    installInstructions:
-      "Please install brew. Go to https://brew.sh for instructions",
+    command: installHelper[currentPlatformId],
+    installInstructions: `Please install ${installHelper[currentPlatformId]}. Go to "https://brew.sh" for instructions`,
     installCommand: {
       command:
         '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"',
-      description: "Installing brew",
+      description: `Installing ${installHelper[currentPlatformId]}`,
     },
     exitIfNotInstalled: true,
   });
   console.log("[sensible]: ", "making sure you have node");
   await commandExistsOrInstall({
     command: "node",
-    installInstructions:
-      'Please run "brew install node" or go to https://formulae.brew.sh/formula/node for instructions',
+    installInstructions: `Please run "${installHelper[currentPlatformId]} install node" or go to https://formulae.brew.sh/formula/node for instructions`,
     installCommand: {
-      command: "brew install node",
-      description: "Installing node using brew",
+      command: `${installHelper[currentPlatformId]} install node`,
+      description: `Installing node using ${installHelper[currentPlatformId]}`,
     },
     exitIfNotInstalled: true,
   });
@@ -483,8 +518,8 @@ const installRequiredStuff = async () => {
     installInstructions:
       "Please install node and npm, see https://docs.npmjs.com/downloading-and-installing-node-js-and-npm",
     installCommand: {
-      command: "brew install node",
-      description: "Installing node using brew",
+      command: `${installHelper[currentPlatformId]} install node`,
+      description: `Installing node using ${installHelper[currentPlatformId]}`,
     },
     exitIfNotInstalled: true,
   });
@@ -518,8 +553,8 @@ const installRequiredStuff = async () => {
     command: "jq",
     exitIfNotInstalled: true,
     installCommand: {
-      command: "brew install jq",
-      description: "Installing jq using brew",
+      command: `${installHelper[currentPlatformId]} install jq`,
+      description: `Installing jq using ${installHelper[currentPlatformId]}`,
     },
     installInstructions:
       "Please install jq, see https://stedolan.github.io/jq/download/ for instructions.",
@@ -529,8 +564,8 @@ const installRequiredStuff = async () => {
     command: "watchman",
     exitIfNotInstalled: true,
     installCommand: {
-      command: "brew install watchman",
-      description: "Installing watchman using brew",
+      command: `${installHelper[currentPlatformId]} install watchman`,
+      description: `Installing watchman using ${installHelper[currentPlatformId]}`,
     },
     installInstructions:
       "Please install watchman, see https://facebook.github.io/watchman/docs/install.html for instructions.",

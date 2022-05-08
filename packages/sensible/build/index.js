@@ -49,6 +49,7 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
+var _a, _b;
 Object.defineProperty(exports, "__esModule", { value: true });
 var readline_1 = __importDefault(require("readline"));
 var path_1 = __importDefault(require("path"));
@@ -58,6 +59,23 @@ var os_1 = require("os");
 var util_templates_1 = require("./util.templates");
 var util_log_1 = require("./util.log");
 var command_exists_1 = __importDefault(require("command-exists"));
+//Platforms
+var platformIds = {
+    macOS: 0,
+    windows: 1,
+    linux: 2,
+};
+var platformNames = (_a = {},
+    _a[platformIds.macOS] = "MacOS",
+    _a[platformIds.windows] = "Windows",
+    _a[platformIds.linux] = "Linux",
+    _a);
+//InstallHelper
+var installHelper = (_b = {},
+    _b[platformIds.macOS] = "brew",
+    _b[platformIds.windows] = "choco",
+    _b[platformIds.linux] = "brew",
+    _b);
 var os = process.platform;
 //CONSTANTS
 var DEBUG_COMMANDS = false;
@@ -382,7 +400,7 @@ var commandExistsOrInstall = function (_a) {
                     if (isAvailable)
                         return [2 /*return*/, true];
                     if (!installCommand) return [3 /*break*/, 4];
-                    return [4 /*yield*/, askOk("You don't have ".concat(command, ", but we need it to set up your project. Shall we install it for you, using \"").concat(installCommand, "\"? \n\n yes/no \n\n"))];
+                    return [4 /*yield*/, askOk("You don't have ".concat(command, ", but we need it to set up your project. Shall we install it for you, using \"").concat(installCommandString, "\"? \n\n yes/no \n\n"))];
                 case 2:
                     ok = _b.sent();
                     if (!ok) return [3 /*break*/, 4];
@@ -446,18 +464,33 @@ var getPushToGitCommands = function (appName, remote) {
         ],
     };
 };
+var getPlatformId = function (platformVariable) {
+    switch (platformVariable) {
+        case "darwin":
+            //its macos
+            return platformIds.macOS;
+        case "linux":
+            return platformIds.linux;
+        case "win32":
+            return platformIds.windows;
+        default:
+            //default is mac
+            return platformIds.macOS;
+    }
+};
 var installRequiredStuff = function () { return __awaiter(void 0, void 0, void 0, function () {
+    var currentPlatformId;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                //making sure you have brew, node, npm, yarn, code, git, jq, watchman
-                console.log("[sensible]: ", "making sure you have brew");
+                currentPlatformId = getPlatformId(process.platform);
+                console.log("[sensible]: ", "making sure you have ".concat(installHelper[currentPlatformId]));
                 return [4 /*yield*/, commandExistsOrInstall({
-                        command: "brew",
-                        installInstructions: "Please install brew. Go to https://brew.sh for instructions",
+                        command: installHelper[currentPlatformId],
+                        installInstructions: "Please install ".concat(installHelper[currentPlatformId], ". Go to \"https://brew.sh\" for instructions"),
                         installCommand: {
                             command: '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"',
-                            description: "Installing brew",
+                            description: "Installing ".concat(installHelper[currentPlatformId]),
                         },
                         exitIfNotInstalled: true,
                     })];
@@ -466,10 +499,10 @@ var installRequiredStuff = function () { return __awaiter(void 0, void 0, void 0
                 console.log("[sensible]: ", "making sure you have node");
                 return [4 /*yield*/, commandExistsOrInstall({
                         command: "node",
-                        installInstructions: 'Please run "brew install node" or go to https://formulae.brew.sh/formula/node for instructions',
+                        installInstructions: "Please run \"".concat(installHelper[currentPlatformId], " install node\" or go to https://formulae.brew.sh/formula/node for instructions"),
                         installCommand: {
-                            command: "brew install node",
-                            description: "Installing node using brew",
+                            command: "".concat(installHelper[currentPlatformId], " install node"),
+                            description: "Installing node using ".concat(installHelper[currentPlatformId]),
                         },
                         exitIfNotInstalled: true,
                     })];
@@ -479,8 +512,8 @@ var installRequiredStuff = function () { return __awaiter(void 0, void 0, void 0
                         command: "npm",
                         installInstructions: "Please install node and npm, see https://docs.npmjs.com/downloading-and-installing-node-js-and-npm",
                         installCommand: {
-                            command: "brew install node",
-                            description: "Installing node using brew",
+                            command: "".concat(installHelper[currentPlatformId], " install node"),
+                            description: "Installing node using ".concat(installHelper[currentPlatformId]),
                         },
                         exitIfNotInstalled: true,
                     })];
@@ -515,8 +548,8 @@ var installRequiredStuff = function () { return __awaiter(void 0, void 0, void 0
                         command: "jq",
                         exitIfNotInstalled: true,
                         installCommand: {
-                            command: "brew install jq",
-                            description: "Installing jq using brew",
+                            command: "".concat(installHelper[currentPlatformId], " install jq"),
+                            description: "Installing jq using ".concat(installHelper[currentPlatformId]),
                         },
                         installInstructions: "Please install jq, see https://stedolan.github.io/jq/download/ for instructions.",
                     })];
@@ -526,8 +559,8 @@ var installRequiredStuff = function () { return __awaiter(void 0, void 0, void 0
                         command: "watchman",
                         exitIfNotInstalled: true,
                         installCommand: {
-                            command: "brew install watchman",
-                            description: "Installing watchman using brew",
+                            command: "".concat(installHelper[currentPlatformId], " install watchman"),
+                            description: "Installing watchman using ".concat(installHelper[currentPlatformId]),
                         },
                         installInstructions: "Please install watchman, see https://facebook.github.io/watchman/docs/install.html for instructions.",
                     })];
