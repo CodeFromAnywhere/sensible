@@ -39,7 +39,8 @@
     "sensible-core": "^1.0.40",
     "sensible-files": "^1.0.0",
     "typescript-json-schema": "^0.53.0",
-    "ui": "*"
+    "ui": "*",
+    "core": "*"
   },
   "devDependencies": {
     "@svgr/webpack": "^6.2.1",
