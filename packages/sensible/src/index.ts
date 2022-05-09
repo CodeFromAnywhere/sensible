@@ -338,11 +338,23 @@ const executeCommand = (command: Command, dir: string, debug: boolean) => {
       })
         .on("exit", (code) => {
           const CODE_SUCCESSFUL = 0;
-          if (code === CODE_SUCCESSFUL) {
+          const ALLOWED_ERRORS = [];
+          if (
+            typeof command.command === "string" &&
+            command.command.includes("robocopy")
+          ) {
+            //with robocopy, errors 1, 2 and 4 are not really errors;
+            ALLOWED_ERRORS.push(1, 2, 4);
+          }
+          if (
+            code === CODE_SUCCESSFUL ||
+            (code && ALLOWED_ERRORS.includes(code))
+          ) {
             onFinish({ success: true });
           } else {
             onFinish({ success: false });
             log(messages.join("\n"));
+            console.log("[sensible]: ", "command exited with code " + code);
             log(`The following command failed: "${command.command}"`);
             process.exit(1);
           }

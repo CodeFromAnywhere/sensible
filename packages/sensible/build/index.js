@@ -331,12 +331,20 @@ var executeCommand = function (command, dir, debug) {
             })
                 .on("exit", function (code) {
                 var CODE_SUCCESSFUL = 0;
-                if (code === CODE_SUCCESSFUL) {
+                var ALLOWED_ERRORS = [];
+                if (typeof command.command === "string" &&
+                    command.command.includes("robocopy")) {
+                    //with robocopy, errors 1, 2 and 4 are not really errors;
+                    ALLOWED_ERRORS.push(1, 2, 4);
+                }
+                if (code === CODE_SUCCESSFUL ||
+                    (code && ALLOWED_ERRORS.includes(code))) {
                     onFinish({ success: true });
                 }
                 else {
                     onFinish({ success: false });
                     (0, util_log_1.log)(messages.join("\n"));
+                    console.log("[sensible]: ", "command exited with code " + code);
                     (0, util_log_1.log)("The following command failed: \"".concat(command.command, "\""));
                     process.exit(1);
                 }
