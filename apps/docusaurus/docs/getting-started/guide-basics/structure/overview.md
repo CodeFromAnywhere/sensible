@@ -1,5 +1,5 @@
 ---
-sidebar_position: 2
+sidebar_position: 1
 ---
 
 # Folder structure
@@ -16,15 +16,4 @@ Every Sensible project must adhere the following structure:
 - `README.md` information about the project, instructions, etc.
 - `turbo.json` a [turbo-file](https://turborepo.org) to setup code-sharing functionalities and easy installation and building capabilities.
 
-# Reserved Keyword Files
-
-In core and server, the src folder contains all model folders (to keep file structure as flat as possible).
-
-There are some reserved keywords in the filename. In core those reserved keywords are `endpoint` and `type`, while in server those reserved keywords are `api` and `model`. You should only create the files `{word}.ts`, `{word}s.ts`, `filename.{word}.ts` and `filename.{word}s.ts` if those files are actually implementing the convention for that keyword.
-
-The following should be known about those reserved filenames:
-
-- type files should only contain types
-- endpoint files should only contain endpoint definitions (that implement the types)
-- model files should only contain models (that implement the types)
-- api files should only contain apis (that implement the endpoint defenitions)
+![monorepo](./monorepo.png)

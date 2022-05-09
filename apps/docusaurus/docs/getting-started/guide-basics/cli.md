@@ -1,3 +1,7 @@
+---
+sidebar_position: 1
+---
+
 # Create sensible app
 
 `npx sensible init` or `yarn create sensible-app` bootstraps a new sensible project for you, with sensible defaults.

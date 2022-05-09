@@ -3,7 +3,7 @@ import Layout from "@theme/Layout";
 import React, { useEffect } from "react";
 
 const Home = () => {
-  const intro = useBaseUrl("/docs/introduction/intro");
+  const intro = useBaseUrl("/docs/getting-started/intro");
   useEffect(() => {
     if (typeof window !== "undefined") {
       window.location.href = intro;
