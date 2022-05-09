@@ -13,7 +13,6 @@ You need to have the following environment setup and tools installed. Continuing
 - macos
 - node 18, npm, yarn
 - vscode with code cli
-- jq
 - git
 - watchman
 

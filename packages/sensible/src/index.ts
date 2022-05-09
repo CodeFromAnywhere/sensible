@@ -1,16 +1,16 @@
 #!/usr/bin/env node
 //this should run the whole script as a cli
 
-import readline from "readline";
 import path from "path";
-import { spawn, spawnSync } from "child_process";
 import fs from "fs";
 import { homedir } from "os";
 import { findAndRenameTemplateFiles } from "./util.templates";
 import { log } from "./util.log";
-import { getPlatformId, platformIds, platformNames } from "./util.platform";
-
+import { getPlatformId, platformIds } from "./util.platform";
 import commandExists from "command-exists";
+import { Command, executeCommand, getCommand } from "./util.commands";
+import { ask, askOk, getArgumentOrAsk } from "./util.userinput";
+import { handleVersionUpdates } from "./util.versions";
 
 //InstallHelper
 const installHelper = {
@@ -74,20 +74,10 @@ const removeDirAndRecreateEmptyHelper = {
 };
 
 //TYPE INTERFACES
-
-type OSOrDefault = NodeJS.Platform | "default";
-
-type CommandPerOs = {
-  [key in OSOrDefault]?: string;
-};
-
-type CommandPerOSOrCommandString = CommandPerOs | string;
-
-type Command = {
-  command?: CommandPerOSOrCommandString;
-  nodeFunction?: (resolve: () => void) => void;
+type AppType = {
+  slug: string;
   description: string;
-  isDisabled?: boolean;
+  default?: boolean;
 };
 
 type CommandsObject = {
@@ -107,7 +97,6 @@ type InstallObject = {
 
 //CONSTANTS
 
-const DEBUG_COMMANDS = false;
 const defaultAppName = "makes-sense";
 //test environment should be optional and easy to set up, live should be the default, since we want people to immedeately ship
 const initialCommitMessage = "🧠 This Makes Sense";
@@ -156,7 +145,6 @@ const cacheUpdatedAtLocation = path.join(homedir(), ".sensible/updatedAt.txt");
 const updatedAt = fs.existsSync(cacheUpdatedAtLocation)
   ? fs.readFileSync(cacheUpdatedAtLocation, "utf8")
   : "0";
-const firstTimeCli = updatedAt === "0";
 
 const difference = Date.now() - Number(updatedAt);
 const shouldGetCache =
@@ -189,52 +177,14 @@ function slugify(string: string) {
     .replace(/-+$/, ""); // Trim - from end of text
 }
 
-const ask = (question: string): Promise<string> => {
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-    terminal: false,
-  });
-
-  return new Promise((resolve) => {
-    rl.question(question, (input) => {
-      resolve(input);
-      rl.close();
-    });
-  });
-};
-
 const flagArgumentsString = process.argv
   .filter((a) => a.startsWith("--"))
   .join(",");
 //.join(" ");
 const argumentsWithoutFlags = process.argv.filter((a) => !a.startsWith("--"));
 
-const getArgumentOrAsk = async (
-  argumentPosition: number,
-  question: string
-): Promise<string> => {
-  let argument = argumentsWithoutFlags[argumentPosition + 1];
-  if (argument && argument.length > 0) return argument;
-
-  if (isNonInteractive) {
-    return "";
-  }
-
-  return ask(question);
-};
-
-const askOk = async (question: string): Promise<boolean> => {
-  const answer = await ask(question);
-  return ["yes", "y", ""].includes(answer);
-};
-
 const getApps = async (): Promise<string[]> => {
-  const possibleApps: {
-    slug: string;
-    description: string;
-    default?: boolean;
-  }[] = [
+  const possibleApps: AppType[] = [
     {
       slug: "app",
       description: "Expo app (for android, iOS, web)",
@@ -277,7 +227,8 @@ ${possibleApps
 const getName = async (): Promise<string> => {
   const name = await getArgumentOrAsk(
     2,
-    `What should your sensible app be called? (default: ${defaultAppName})\n`
+    `What should your sensible app be called? (default: ${defaultAppName})\n`,
+    !!isNonInteractive
   );
   const appName = name.length > 0 ? slugify(name) : defaultAppName;
 
@@ -297,7 +248,8 @@ const getName = async (): Promise<string> => {
 const getRemote = async (name: string): Promise<string | null> => {
   const remote = await getArgumentOrAsk(
     3,
-    `Where should ${name} be hosted? Provide an URL or a GitHub slug (either "org/repo" or "username/repo")\n`
+    `Where should ${name} be hosted? Provide an URL or a GitHub slug (either "org/repo" or "username/repo")\n`,
+    !!isNonInteractive
   );
   return remote.length > 0
     ? remote.includes("https://")
@@ -321,118 +273,6 @@ const askOpenDocs = async (): Promise<void> => {
       false
     );
   }
-};
-
-const isCommandPerOs = (
-  command: CommandPerOSOrCommandString
-): command is CommandPerOs => {
-  if (typeof command === "object") {
-    return true;
-  }
-  return false;
-};
-
-const getCommand = (command: Command): string | false => {
-  if (!command.command) {
-    return false;
-  }
-
-  if (isCommandPerOs(command.command)) {
-    const cmd = command.command[os] || command.command.default!;
-    return cmd;
-  }
-  return command.command;
-};
-
-const executeCommand = (command: Command, dir: string, debug: boolean) => {
-  // if command is disabled, immediately resolve so it is skippped.
-  if (command.isDisabled) {
-    return new Promise<void>((resolve) => {
-      resolve();
-    });
-  }
-  //tell the user what is happening, with a dot every second
-  process.stdout.write(command.description);
-  const interval = setInterval(() => process.stdout.write("."), 1000);
-
-  return new Promise<void>((resolve) => {
-    const messages: string[] = [];
-
-    const onFinish = ({ success }: { success: boolean }) => {
-      //once done, clear the console
-      console.clear();
-      clearInterval(interval);
-      if (success) {
-        resolve();
-      }
-    };
-
-    if (DEBUG_COMMANDS) {
-      log(`${Date.toString()}: extecuted ${command} in ${dir}`);
-      resolve();
-    } else if (command.command) {
-      const commandString = getCommand(command);
-
-      if (!commandString) {
-        onFinish({ success: true });
-        return;
-      }
-
-      spawn(commandString, {
-        stdio: debug ? "inherit" : "ignore",
-        shell: true,
-        cwd: dir,
-      })
-        .on("exit", (code) => {
-          const CODE_SUCCESSFUL = 0;
-          const ALLOWED_ERRORS = [];
-          if (
-            typeof command.command === "string" &&
-            command.command.includes("robocopy")
-          ) {
-            //with robocopy, errors 1, 2 and 4 are not really errors;
-            ALLOWED_ERRORS.push(1, 2, 4);
-          }
-          if (
-            typeof command.command === "string" &&
-            command.command.includes("rmdir")
-          ) {
-            //rmdir outputs 2 when it doesn't find the folder to delete
-            ALLOWED_ERRORS.push(2);
-          }
-          if (
-            code === CODE_SUCCESSFUL ||
-            (code && ALLOWED_ERRORS.includes(code))
-          ) {
-            onFinish({ success: true });
-          } else {
-            onFinish({ success: false });
-            log(messages.join("\n"));
-
-            log(
-              `The following command failed: "${command.command} (code ${code})"`
-            );
-            process.exit(1);
-          }
-        })
-        //save all output so it can be printed on an error
-        .on("message", (message) => {
-          messages.push(message.toString());
-        })
-        .on("error", (err) => {
-          onFinish({ success: false });
-          log(messages.join("\n"));
-          log(`The following command failed: "${command.command}": "${err}"`);
-          process.exit(1);
-        });
-    } else if (command.nodeFunction) {
-      command.nodeFunction(() => {
-        onFinish({ success: true });
-      });
-    } else {
-      onFinish({ success: true });
-    }
-  });
 };
 
 const getSpawnCommandsReducer =
@@ -541,7 +381,7 @@ const getPushToGitCommands = (appName: string, remote: string | null) => {
   };
 };
 const installRequiredStuff = async () => {
-  //making sure you have brew, node, npm, yarn, code, git, jq, watchman
+  //making sure you have brew, node, npm, yarn, code, git, watchman
   await commandExistsOrInstall({
     command: installHelper[currentPlatformId],
     installInstructions: `Please install ${installHelper[currentPlatformId]}. Go to "https://brew.sh" for instructions`,
@@ -596,17 +436,6 @@ const installRequiredStuff = async () => {
     exitIfNotInstalled: true,
     installInstructions:
       "Please install git, see https://git-scm.com/book/en/v2/Getting-Started-Installing-Git for instructions.",
-  });
-
-  await commandExistsOrInstall({
-    command: "jq",
-    exitIfNotInstalled: true,
-    installCommand: {
-      command: `${installHelper[currentPlatformId]} install jq`,
-      description: `Installing jq using ${installHelper[currentPlatformId]}`,
-    },
-    installInstructions:
-      "Please install jq, see https://stedolan.github.io/jq/download/ for instructions.",
   });
 
   await commandExistsOrInstall({
@@ -809,93 +638,9 @@ const getCacheCommands = ({
   ];
 };
 
-const getVersionParts = (versionString: string) => {
-  const [major, minor, patch] = versionString.split(".").map(Number);
-  return { major, minor, patch };
-};
-
-const getPackageVersions = async (
-  name: string
-): Promise<{ latest: string; current: string }> => {
-  const latest = spawn(`npm show ${name} version`);
-
-  const current: string = JSON.parse(
-    fs.readFileSync(path.resolve(sensibleDir, "package.json"), "utf8")
-  ).version;
-
-  return new Promise((resolve, reject) => {
-    // You can also use a variable to save the output
-    // for when the script closes later
-    let latestVersion = "";
-    latest.stdout.setEncoding("utf8");
-    latest.stdout.on("data", function (data) {
-      latestVersion += data;
-    });
-    latest.on("close", function (code) {
-      //Here you can get the exit code of the script
-      console.log("closing code: " + code);
-      console.log("Full output of script: ", latestVersion);
-
-      resolve({ latest: latestVersion, current });
-    });
-  });
-};
-
-const getUpdateSeverity = async ({
-  latest,
-  current,
-}: {
-  latest: string;
-  current: string;
-}) => {
-  const latestParts = getVersionParts(latest);
-  const currentParts = getVersionParts(current);
-
-  if (latestParts.major > currentParts.major) return "major";
-  if (latestParts.minor > currentParts.minor) return "minor";
-  if (latestParts.patch > currentParts.patch) return "patch";
-  return false;
-};
-
-const handleVersionUpdates = async () => {
-  const { latest, current } = await getPackageVersions("sensible");
-  const updateSeverity = await getUpdateSeverity({ latest, current });
-
-  if (!updateSeverity) return;
-
-  if (updateSeverity === "patch") {
-    return log(
-      `There's a new version of sensible with version ${latest}. You are now on version ${current}.`,
-      "FgYellow"
-    );
-  }
-
-  const shouldUpdate = await askOk(
-    `Theres a new ${updateSeverity} version available for Sensible (${latest}). You're now on version ${current}. Shall we update? yes/no`
-  );
-
-  if (shouldUpdate) {
-    await executeCommand(
-      {
-        description: "Updating sensible",
-        command: "npm install --global sensible@latest",
-      },
-      targetDir,
-      !!isDebug
-    );
-
-    return process.exit(0);
-  }
-
-  return log(
-    `Continuing on an older ${updateSeverity} version. Probably mostly harmless.`,
-    "FgGreen"
-  );
-};
-
 const main = async () => {
   //problem with imports package.json ect. do some research to solve this.
-  await handleVersionUpdates();
+  await handleVersionUpdates("sensible", targetDir);
   await installRequiredStuff();
   const command = argumentsWithoutFlags[2];
 
@@ -919,6 +664,17 @@ const main = async () => {
         );
       },
       Promise.resolve()
+    );
+  } else if (command === "setup") {
+    executeCommand(
+      {
+        description: "Setting up your computer for developing sensible apps",
+        ///bin/bash -c \"
+        command:
+          "$(curl -fsSL https://raw.githubusercontent.com/Code-From-Anywhere/sensible/main/packages/sensible/setup-mac/install.sh)",
+      },
+      process.cwd(),
+      true
     );
   } else {
     log('please run "sensible init" to use this cli.', "FgCyan");

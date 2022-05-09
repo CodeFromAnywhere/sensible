@@ -51,16 +51,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 var _a, _b, _c, _d, _e, _f;
 Object.defineProperty(exports, "__esModule", { value: true });
-var readline_1 = __importDefault(require("readline"));
 var path_1 = __importDefault(require("path"));
-var child_process_1 = require("child_process");
 var fs_1 = __importDefault(require("fs"));
 var os_1 = require("os");
 var util_templates_1 = require("./util.templates");
 var util_log_1 = require("./util.log");
 var util_platform_1 = require("./util.platform");
-//import latestVersion from "latest-version";
 var command_exists_1 = __importDefault(require("command-exists"));
+var util_commands_1 = require("./util.commands");
+var util_userinput_1 = require("./util.userinput");
+var util_versions_1 = require("./util.versions");
 //InstallHelper
 var installHelper = (_a = {},
     _a[util_platform_1.platformIds.macOS] = "brew",
@@ -119,7 +119,6 @@ var removeDirAndRecreateEmptyHelper = (_f = {},
 var os = process.platform;
 var currentPlatformId = (0, util_platform_1.getPlatformId)(os);
 //CONSTANTS
-var DEBUG_COMMANDS = false;
 var defaultAppName = "makes-sense";
 //test environment should be optional and easy to set up, live should be the default, since we want people to immedeately ship
 var initialCommitMessage = "🧠 This Makes Sense";
@@ -160,7 +159,6 @@ var cacheUpdatedAtLocation = path_1.default.join((0, os_1.homedir)(), ".sensible
 var updatedAt = fs_1.default.existsSync(cacheUpdatedAtLocation)
     ? fs_1.default.readFileSync(cacheUpdatedAtLocation, "utf8")
     : "0";
-var firstTimeCli = updatedAt === "0";
 var difference = Date.now() - Number(updatedAt);
 var shouldGetCache = (difference < 86400 * 1000 * cacheDaysNumber || isOffline) && !isNoCache;
 var mainBranchName = typeof mainBranch === "string" && mainBranch.length > 0 ? mainBranch : "live";
@@ -184,47 +182,11 @@ function slugify(string) {
         .replace(/^-+/, "") // Trim - from start of text
         .replace(/-+$/, ""); // Trim - from end of text
 }
-var ask = function (question) {
-    var rl = readline_1.default.createInterface({
-        input: process.stdin,
-        output: process.stdout,
-        terminal: false,
-    });
-    return new Promise(function (resolve) {
-        rl.question(question, function (input) {
-            resolve(input);
-            rl.close();
-        });
-    });
-};
 var flagArgumentsString = process.argv
     .filter(function (a) { return a.startsWith("--"); })
     .join(",");
 //.join(" ");
 var argumentsWithoutFlags = process.argv.filter(function (a) { return !a.startsWith("--"); });
-var getArgumentOrAsk = function (argumentPosition, question) { return __awaiter(void 0, void 0, void 0, function () {
-    var argument;
-    return __generator(this, function (_a) {
-        argument = argumentsWithoutFlags[argumentPosition + 1];
-        if (argument && argument.length > 0)
-            return [2 /*return*/, argument];
-        if (isNonInteractive) {
-            return [2 /*return*/, ""];
-        }
-        return [2 /*return*/, ask(question)];
-    });
-}); };
-var askOk = function (question) { return __awaiter(void 0, void 0, void 0, function () {
-    var answer;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0: return [4 /*yield*/, ask(question)];
-            case 1:
-                answer = _a.sent();
-                return [2 /*return*/, ["yes", "y", ""].includes(answer)];
-        }
-    });
-}); };
 var getApps = function () { return __awaiter(void 0, void 0, void 0, function () {
     var possibleApps, appsString, apps;
     return __generator(this, function (_a) {
@@ -245,7 +207,7 @@ var getApps = function () { return __awaiter(void 0, void 0, void 0, function ()
                         description: "Electron app (for Windows, Linux and MacOS) (Experimental)",
                     },
                 ];
-                return [4 /*yield*/, ask("Which apps do you want to create boilerplates for? Just press enter for all non-experimental ones \n    \n".concat(possibleApps
+                return [4 /*yield*/, (0, util_userinput_1.ask)("Which apps do you want to create boilerplates for? Just press enter for all non-experimental ones \n    \n".concat(possibleApps
                         .map(function (possible) { return "- ".concat(possible.slug, ": ").concat(possible.description, "\n"); })
                         .join(""), "\n"))];
             case 1:
@@ -268,7 +230,7 @@ var getName = function () { return __awaiter(void 0, void 0, void 0, function ()
     var name, appName, n, fullAppName;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, getArgumentOrAsk(2, "What should your sensible app be called? (default: ".concat(defaultAppName, ")\n"))];
+            case 0: return [4 /*yield*/, (0, util_userinput_1.getArgumentOrAsk)(2, "What should your sensible app be called? (default: ".concat(defaultAppName, ")\n"), !!isNonInteractive)];
             case 1:
                 name = _a.sent();
                 appName = name.length > 0 ? slugify(name) : defaultAppName;
@@ -289,7 +251,7 @@ var getRemote = function (name) { return __awaiter(void 0, void 0, void 0, funct
     var remote;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, getArgumentOrAsk(3, "Where should ".concat(name, " be hosted? Provide an URL or a GitHub slug (either \"org/repo\" or \"username/repo\")\n"))];
+            case 0: return [4 /*yield*/, (0, util_userinput_1.getArgumentOrAsk)(3, "Where should ".concat(name, " be hosted? Provide an URL or a GitHub slug (either \"org/repo\" or \"username/repo\")\n"), !!isNonInteractive)];
             case 1:
                 remote = _a.sent();
                 return [2 /*return*/, remote.length > 0
@@ -304,11 +266,11 @@ var askOpenDocs = function () { return __awaiter(void 0, void 0, void 0, functio
     var openDocs;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, askOk("That's all we need to know! Do you want to open the docs while waiting?\n")];
+            case 0: return [4 /*yield*/, (0, util_userinput_1.askOk)("That's all we need to know! Do you want to open the docs while waiting?\n")];
             case 1:
                 openDocs = _a.sent();
                 if (openDocs) {
-                    executeCommand({
+                    (0, util_commands_1.executeCommand)({
                         description: "Opening docs",
                         command: "".concat(openUrlHelper[currentPlatformId], " https://doc.sensible.to"),
                     }, __dirname, false);
@@ -317,103 +279,6 @@ var askOpenDocs = function () { return __awaiter(void 0, void 0, void 0, functio
         }
     });
 }); };
-var isCommandPerOs = function (command) {
-    if (typeof command === "object") {
-        return true;
-    }
-    return false;
-};
-var getCommand = function (command) {
-    if (!command.command) {
-        return false;
-    }
-    if (isCommandPerOs(command.command)) {
-        var cmd = command.command[os] || command.command.default;
-        return cmd;
-    }
-    return command.command;
-};
-var executeCommand = function (command, dir, debug) {
-    // if command is disabled, immediately resolve so it is skippped.
-    if (command.isDisabled) {
-        return new Promise(function (resolve) {
-            resolve();
-        });
-    }
-    //tell the user what is happening, with a dot every second
-    process.stdout.write(command.description);
-    var interval = setInterval(function () { return process.stdout.write("."); }, 1000);
-    return new Promise(function (resolve) {
-        var messages = [];
-        var onFinish = function (_a) {
-            var success = _a.success;
-            //once done, clear the console
-            console.clear();
-            clearInterval(interval);
-            if (success) {
-                resolve();
-            }
-        };
-        if (DEBUG_COMMANDS) {
-            (0, util_log_1.log)("".concat(Date.toString(), ": extecuted ").concat(command, " in ").concat(dir));
-            resolve();
-        }
-        else if (command.command) {
-            var commandString = getCommand(command);
-            if (!commandString) {
-                onFinish({ success: true });
-                return;
-            }
-            (0, child_process_1.spawn)(commandString, {
-                stdio: debug ? "inherit" : "ignore",
-                shell: true,
-                cwd: dir,
-            })
-                .on("exit", function (code) {
-                var CODE_SUCCESSFUL = 0;
-                var ALLOWED_ERRORS = [];
-                if (typeof command.command === "string" &&
-                    command.command.includes("robocopy")) {
-                    //with robocopy, errors 1, 2 and 4 are not really errors;
-                    ALLOWED_ERRORS.push(1, 2, 4);
-                }
-                if (typeof command.command === "string" &&
-                    command.command.includes("rmdir")) {
-                    //rmdir outputs 2 when it doesn't find the folder to delete
-                    ALLOWED_ERRORS.push(2);
-                }
-                if (code === CODE_SUCCESSFUL ||
-                    (code && ALLOWED_ERRORS.includes(code))) {
-                    onFinish({ success: true });
-                }
-                else {
-                    onFinish({ success: false });
-                    (0, util_log_1.log)(messages.join("\n"));
-                    (0, util_log_1.log)("The following command failed: \"".concat(command.command, " (code ").concat(code, ")\""));
-                    process.exit(1);
-                }
-            })
-                //save all output so it can be printed on an error
-                .on("message", function (message) {
-                messages.push(message.toString());
-            })
-                .on("error", function (err) {
-                onFinish({ success: false });
-                (0, util_log_1.log)(messages.join("\n"));
-                (0, util_log_1.log)("The following command failed: \"".concat(command.command, "\": \"").concat(err, "\""));
-                process.exit(1);
-            });
-        }
-        else if (command.nodeFunction) {
-            command.nodeFunction(function () {
-                onFinish({ success: true });
-            });
-        }
-        else {
-            onFinish({ success: true });
-        }
-    });
-};
 var getSpawnCommandsReducer = function (dir, debug) {
     return function (previous, command) { return __awaiter(void 0, void 0, void 0, function () {
         return __generator(this, function (_a) {
@@ -421,7 +286,7 @@ var getSpawnCommandsReducer = function (dir, debug) {
                 case 0: return [4 /*yield*/, previous];
                 case 1:
                     _a.sent();
-                    return [2 /*return*/, executeCommand(command, dir, debug)];
+                    return [2 /*return*/, (0, util_commands_1.executeCommand)(command, dir, debug)];
             }
         });
     }); };
@@ -446,15 +311,15 @@ var commandExistsOrInstall = function (_a) {
                     (0, util_log_1.log)("Command not found");
                     return [3 /*break*/, 4];
                 case 4:
-                    installCommandString = installCommand && getCommand(installCommand);
+                    installCommandString = installCommand && (0, util_commands_1.getCommand)(installCommand);
                     if (isAvailable)
                         return [2 /*return*/, true];
                     if (!installCommand) return [3 /*break*/, 7];
-                    return [4 /*yield*/, askOk("You don't have ".concat(command, ", but we need it to set up your project. Shall we install it for you, using \"").concat(installCommandString, "\"? \n\n yes/no \n\n"))];
+                    return [4 /*yield*/, (0, util_userinput_1.askOk)("You don't have ".concat(command, ", but we need it to set up your project. Shall we install it for you, using \"").concat(installCommandString, "\"? \n\n yes/no \n\n"))];
                 case 5:
                     ok = _b.sent();
                     if (!ok) return [3 /*break*/, 7];
-                    return [4 /*yield*/, executeCommand(installCommand, __dirname, !!isDebug)];
+                    return [4 /*yield*/, (0, util_commands_1.executeCommand)(installCommand, __dirname, !!isDebug)];
                 case 6:
                     _b.sent();
                     return [2 /*return*/, true];
@@ -478,7 +343,7 @@ var commandReplaceVariables = function (variables) {
                 return command
                     ? command === null || command === void 0 ? void 0 : command.replaceAll("{".concat(variableKey, "}"), variables[variableKey])
                     : "";
-            }, getCommand(command)) || "";
+            }, (0, util_commands_1.getCommand)(command)) || "";
             command.command = newCommand;
         }
         return command;
@@ -522,7 +387,7 @@ var installRequiredStuff = function () { return __awaiter(void 0, void 0, void 0
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0: 
-            //making sure you have brew, node, npm, yarn, code, git, jq, watchman
+            //making sure you have brew, node, npm, yarn, code, git, watchman
             return [4 /*yield*/, commandExistsOrInstall({
                     command: installHelper[currentPlatformId],
                     installInstructions: "Please install ".concat(installHelper[currentPlatformId], ". Go to \"https://brew.sh\" for instructions"),
@@ -533,7 +398,7 @@ var installRequiredStuff = function () { return __awaiter(void 0, void 0, void 0
                     exitIfNotInstalled: true,
                 })];
             case 1:
-                //making sure you have brew, node, npm, yarn, code, git, jq, watchman
+                //making sure you have brew, node, npm, yarn, code, git, watchman
                 _a.sent();
                 return [4 /*yield*/, commandExistsOrInstall({
                         command: "node",
@@ -583,17 +448,6 @@ var installRequiredStuff = function () { return __awaiter(void 0, void 0, void 0
             case 6:
                 _a.sent();
                 return [4 /*yield*/, commandExistsOrInstall({
-                        command: "jq",
-                        exitIfNotInstalled: true,
-                        installCommand: {
-                            command: "".concat(installHelper[currentPlatformId], " install jq"),
-                            description: "Installing jq using ".concat(installHelper[currentPlatformId]),
-                        },
-                        installInstructions: "Please install jq, see https://stedolan.github.io/jq/download/ for instructions.",
-                    })];
-            case 7:
-                _a.sent();
-                return [4 /*yield*/, commandExistsOrInstall({
                         command: "watchman",
                         exitIfNotInstalled: true,
                         installCommand: {
@@ -602,7 +456,7 @@ var installRequiredStuff = function () { return __awaiter(void 0, void 0, void 0
                         },
                         installInstructions: "Please install watchman, see https://facebook.github.io/watchman/docs/install.html for instructions.",
                     })];
-            case 8:
+            case 7:
                 _a.sent();
                 return [2 /*return*/];
         }
@@ -685,7 +539,7 @@ var getCommandsWithoutCache = function (_a) {
             },
         ];
         return {
-            dir: "".concat(targetDir, "/").concat(appName, "/apps"),
+            dir: path_1.default.join(targetDir, appName, "apps"),
             commands: filledInAppCommands.concat(defaultAppsCommands),
         };
     }), true), [
@@ -740,90 +594,32 @@ var getCacheCommands = function (_a) {
         getPushToGitCommands(appName, remote),
     ];
 };
-var getVersionParts = function (versionString) {
-    var _a = versionString.split(".").map(Number), major = _a[0], minor = _a[1], patch = _a[2];
-    return { major: major, minor: minor, patch: patch };
-};
-var getPackageVersions = function (name) { return __awaiter(void 0, void 0, void 0, function () {
-    var latest, current;
-    return __generator(this, function (_a) {
-        latest = "";
-        current = JSON.parse(fs_1.default.readFileSync(path_1.default.resolve(sensibleDir, "package.json"), "utf8")).version;
-        return [2 /*return*/, { latest: latest, current: current }];
-    });
-}); };
-var getUpdateSeverity = function (_a) {
-    var latest = _a.latest, current = _a.current;
-    return __awaiter(void 0, void 0, void 0, function () {
-        var latestParts, currentParts;
-        return __generator(this, function (_b) {
-            latestParts = getVersionParts(latest);
-            currentParts = getVersionParts(current);
-            if (latestParts.major > currentParts.major)
-                return [2 /*return*/, "major"];
-            if (latestParts.minor > currentParts.minor)
-                return [2 /*return*/, "minor"];
-            if (latestParts.patch > currentParts.patch)
-                return [2 /*return*/, "patch"];
-            return [2 /*return*/, false];
-        });
-    });
-};
-var handleVersionUpdates = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, latest, current, updateSeverity, shouldUpdate;
-    return __generator(this, function (_b) {
-        switch (_b.label) {
-            case 0: return [4 /*yield*/, getPackageVersions("sensible")];
-            case 1:
-                _a = _b.sent(), latest = _a.latest, current = _a.current;
-                return [4 /*yield*/, getUpdateSeverity({ latest: latest, current: current })];
-            case 2:
-                updateSeverity = _b.sent();
-                if (!updateSeverity)
-                    return [2 /*return*/];
-                if (updateSeverity === "patch") {
-                    return [2 /*return*/, (0, util_log_1.log)("There's a new version of sensible with version ".concat(latest, ". You are now on version ").concat(current, "."), "FgYellow")];
-                }
-                return [4 /*yield*/, askOk("Theres a new ".concat(updateSeverity, " version available for Sensible (").concat(latest, "). You're now on version ").concat(current, ". Shall we update? yes/no"))];
-            case 3:
-                shouldUpdate = _b.sent();
-                if (!shouldUpdate) return [3 /*break*/, 5];
-                return [4 /*yield*/, executeCommand({
-                        description: "Updating sensible",
-                        command: "npm install --glopbal sensible@latest",
-                    }, targetDir, !!isDebug)];
-            case 4:
-                _b.sent();
-                return [2 /*return*/, process.exit(0)];
-            case 5: return [2 /*return*/, (0, util_log_1.log)("Continuing on an older ".concat(updateSeverity, " version. Probably mostly harmless."), "FgGreen")];
-        }
-    });
-}); };
 var main = function () { return __awaiter(void 0, void 0, void 0, function () {
     var command, appName, remote, selectedApps, commandsFromFolders;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0: 
             //problem with imports package.json ect. do some research to solve this.
-            //await handleVersionUpdates();
-            return [4 /*yield*/, installRequiredStuff()];
+            return [4 /*yield*/, (0, util_versions_1.handleVersionUpdates)("sensible", targetDir)];
             case 1:
                 //problem with imports package.json ect. do some research to solve this.
-                //await handleVersionUpdates();
+                _a.sent();
+                return [4 /*yield*/, installRequiredStuff()];
+            case 2:
                 _a.sent();
                 command = argumentsWithoutFlags[2];
-                if (!(command === "init")) return [3 /*break*/, 7];
+                if (!(command === "init")) return [3 /*break*/, 8];
                 return [4 /*yield*/, getName()];
-            case 2:
+            case 3:
                 appName = _a.sent();
                 return [4 /*yield*/, getRemote(appName)];
-            case 3:
+            case 4:
                 remote = _a.sent();
                 return [4 /*yield*/, getApps()];
-            case 4:
+            case 5:
                 selectedApps = _a.sent();
                 return [4 /*yield*/, askOpenDocs()];
-            case 5:
+            case 6:
                 _a.sent();
                 commandsFromFolders = shouldGetCache
                     ? getCacheCommands({ appName: appName, remote: remote })
@@ -838,13 +634,22 @@ var main = function () { return __awaiter(void 0, void 0, void 0, function () {
                             }
                         });
                     }); }, Promise.resolve())];
-            case 6:
-                _a.sent();
-                return [3 /*break*/, 8];
             case 7:
-                (0, util_log_1.log)('please run "sensible init" to use this cli.', "FgCyan");
-                _a.label = 8;
-            case 8: return [2 /*return*/];
+                _a.sent();
+                return [3 /*break*/, 9];
+            case 8:
+                if (command === "setup") {
+                    (0, util_commands_1.executeCommand)({
+                        description: "Setting up your computer for developing sensible apps",
+                        ///bin/bash -c \"
+                        command: "$(curl -fsSL https://raw.githubusercontent.com/Code-From-Anywhere/sensible/main/packages/sensible/setup-mac/install.sh)",
+                    }, process.cwd(), true);
+                }
+                else {
+                    (0, util_log_1.log)('please run "sensible init" to use this cli.', "FgCyan");
+                }
+                _a.label = 9;
+            case 9: return [2 /*return*/];
         }
     });
 }); };

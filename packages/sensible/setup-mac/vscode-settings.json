@@ -1,0 +1,65 @@
+//this file should be saved as global vscode settings
+
+{
+  //CFA SETUP
+
+  //CFA json schemas
+  "json.schemas": [
+    {
+      "name": "vscode-expo-manifest",
+      "url": "file:///Users/wijnandkarsens/Library/Application%20Support/Code/User/globalStorage/bycedric.vscode-expo/manifest-44.0.0.json",
+      "fileMatch": ["app.json", "app.config.json"]
+    }
+  ],
+
+  //suggestions
+  "editor.inlineSuggest.enabled": true,
+
+  //linting
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": true,
+    "source.fixAll": true
+  },
+
+  "css.validate": true,
+
+  "eslint.enable": true,
+  "prettier.enable": true,
+  "typescript.format.enable": true,
+
+  "tailwindCSS.classAttributes": ["class", "className", "ngClass"],
+  "tailwindCSS.codeActions": true,
+  "tailwindCSS.emmetCompletions": true,
+  "tailwindCSS.hovers": true,
+  "tailwindCSS.suggestions": true,
+  "tailwindCSS.colorDecorators": true,
+  "tailwindCSS.validate": true,
+
+  //formatting
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": true,
+  "typescript.tsserver.experimental.enableProjectDiagnostics": true,
+  "workbench.startupEditor": "readme",
+  "task.problemMatchers.neverPrompt": {
+    "shell": true
+  },
+  "taskExplorer.enableComposer": false,
+  "workbench.sideBar.location": "right",
+
+  // this is super handy for automatically changing the apperarance color of everything using "nightfall"
+  "window.autoDetectColorScheme": true,
+  "workbench.preferredLightColorTheme": "Default Light+",
+  "workbench.preferredDarkColorTheme": "Default Dark+",
+
+  //personal things
+  "window.zoomLevel": 1,
+  "editor.quickSuggestions": {
+    "strings": true,
+    "comments": "inline",
+    "other": "on"
+  },
+
+  //generated
+  "workbench.colorTheme": "Default Light+"
+}
