@@ -29,6 +29,8 @@ brew install node
 npx sensible init
 ```
 
+NB, if you are on an aold version, run `npx sensible@latest init` to update it first.
+
 <p align="center">
   <img src="./assets/sensible-meme2.png" width="300" />
 </p>
