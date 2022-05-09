@@ -711,7 +711,7 @@ const getCommandsWithoutCache = ({
         commandReplaceVariables({})
       );
 
-      const defaultAppsCommands = [
+      const defaultAppsCommands: Command[] = [
         {
           //`cp -R ${sensibleDir}/templates/apps/${app}/. ${targetDir}/${appName}/apps/${app}`
           command: copyCommandHelper[currentPlatformId](
@@ -719,6 +719,7 @@ const getCommandsWithoutCache = ({
             `${targetDir}/${appName}/apps/${app}`
           ),
           description: `Copying ${app} template`,
+          isDisabled: appsCommands.commands.length === 0,
         },
       ];
 

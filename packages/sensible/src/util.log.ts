@@ -32,5 +32,5 @@ const options = {
 const resetString = "\x1b[0m";
 
 export const log = (message: string, option?: keyof typeof options) => {
-  console.log(`${options[option || "FgBlack"]}%s${resetString}`, message);
+  console.log(`${options[option || "BgBlue"]}%s${resetString}`, message);
 };

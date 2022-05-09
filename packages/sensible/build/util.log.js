@@ -31,7 +31,7 @@ var options = {
 };
 var resetString = "\x1b[0m";
 var log = function (message, option) {
-    console.log("".concat(options[option || "FgBlack"], "%s").concat(resetString), message);
+    console.log("".concat(options[option || "BgBlue"], "%s").concat(resetString), message);
 };
 exports.log = log;
 //# sourceMappingURL=util.log.js.map

@@ -678,6 +678,7 @@ var getCommandsWithoutCache = function (_a) {
                 //`cp -R ${sensibleDir}/templates/apps/${app}/. ${targetDir}/${appName}/apps/${app}`
                 command: copyCommandHelper[currentPlatformId]("".concat(sensibleDir, "/templates/apps/").concat(app, "/."), "".concat(targetDir, "/").concat(appName, "/apps/").concat(app)),
                 description: "Copying ".concat(app, " template"),
+                isDisabled: appsCommands.commands.length === 0,
             },
         ];
         return {
