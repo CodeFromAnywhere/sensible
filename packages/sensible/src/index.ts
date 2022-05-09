@@ -36,6 +36,29 @@ const copyCommandHelper = {
   },
 };
 
+const removeDirCommandHelper = {
+  [platformIds.macOS]: (filePath: string) => {
+    return `rm -rf ${filePath}`;
+  },
+  [platformIds.windows]: (filePath: string) => {
+    return `rmdir ${filePath} /s /q`;
+  },
+  [platformIds.linux]: (filePath: string) => {
+    return `rm -rf ${filePath}`;
+  },
+};
+
+const makeDirCommandHelper = {
+  [platformIds.macOS]: (filePath: string) => {
+    return `mkdir -p ${filePath}`;
+  },
+  [platformIds.windows]: (filePath: string) => {
+    return `mkdir "${filePath}"`;
+  },
+  [platformIds.linux]: (filePath: string) => {
+    return `mkdir -p ${filePath}`;
+  },
+};
 //TYPE INTERFACES
 
 type OSOrDefault = NodeJS.Platform | "default";
@@ -347,6 +370,13 @@ const executeCommand = (command: Command, dir: string, debug: boolean) => {
             ALLOWED_ERRORS.push(1, 2, 4);
           }
           if (
+            typeof command.command === "string" &&
+            command.command.includes("rmdir")
+          ) {
+            //rmdir outputs 2 when it doesn't find the folder to delete
+            ALLOWED_ERRORS.push(2);
+          }
+          if (
             code === CODE_SUCCESSFUL ||
             (code && ALLOWED_ERRORS.includes(code))
           ) {
@@ -457,7 +487,8 @@ const getPushToGitCommands = (appName: string, remote: string | null) => {
     dir: `${targetDir}/${appName}`,
     commands: [
       {
-        command: "rm -rf .git",
+        //command: "rm -rf .git",
+        command: removeDirCommandHelper[currentPlatformId](".git"),
         description: "Remove previous git",
       },
 
@@ -602,7 +633,8 @@ const getCommandsWithoutCache = ({
       dir: targetDir,
       commands: [
         {
-          command: `mkdir ${appName}`,
+          //command: `mkdir ${appName}`,
+          command: makeDirCommandHelper[currentPlatformId](appName),
           description: "Making folder for your app",
         },
         {
@@ -694,7 +726,10 @@ const getCommandsWithoutCache = ({
       commands: [
         {
           // NB: -p stands for parents and makes directories recursively
-          command: "rm -rf .sensible/cache && mkdir -p .sensible/cache",
+          //command: "rm -rf .sensible/cache && mkdir -p .sensible/cache",
+          command: `${removeDirCommandHelper[currentPlatformId](
+            ".sensible/cache"
+          )} && ${makeDirCommandHelper[currentPlatformId](".sensible/cache")}`,
           description: "Creating sensible cache folder",
         },
 

@@ -49,7 +49,7 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-var _a, _b, _c;
+var _a, _b, _c, _d, _e;
 Object.defineProperty(exports, "__esModule", { value: true });
 var readline_1 = __importDefault(require("readline"));
 var path_1 = __importDefault(require("path"));
@@ -82,6 +82,28 @@ var copyCommandHelper = (_c = {},
         return "cp -R ".concat(source, " ").concat(dest);
     },
     _c);
+var removeDirCommandHelper = (_d = {},
+    _d[util_platform_1.platformIds.macOS] = function (filePath) {
+        return "rm -rf ".concat(filePath);
+    },
+    _d[util_platform_1.platformIds.windows] = function (filePath) {
+        return "rmdir ".concat(filePath, " /s /q");
+    },
+    _d[util_platform_1.platformIds.linux] = function (filePath) {
+        return "rm -rf ".concat(filePath);
+    },
+    _d);
+var makeDirCommandHelper = (_e = {},
+    _e[util_platform_1.platformIds.macOS] = function (filePath) {
+        return "mkdir -p ".concat(filePath);
+    },
+    _e[util_platform_1.platformIds.windows] = function (filePath) {
+        return "mkdir \"".concat(filePath, "\"");
+    },
+    _e[util_platform_1.platformIds.linux] = function (filePath) {
+        return "mkdir -p ".concat(filePath);
+    },
+    _e);
 var os = process.platform;
 var currentPlatformId = (0, util_platform_1.getPlatformId)(os);
 //CONSTANTS
@@ -337,6 +359,11 @@ var executeCommand = function (command, dir, debug) {
                     //with robocopy, errors 1, 2 and 4 are not really errors;
                     ALLOWED_ERRORS.push(1, 2, 4);
                 }
+                if (typeof command.command === "string" &&
+                    command.command.includes("rmdir")) {
+                    //rmdir outputs 2 when it doesn't find the folder to delete
+                    ALLOWED_ERRORS.push(2);
+                }
                 if (code === CODE_SUCCESSFUL ||
                     (code && ALLOWED_ERRORS.includes(code))) {
                     onFinish({ success: true });
@@ -448,7 +475,8 @@ var getPushToGitCommands = function (appName, remote) {
         dir: "".concat(targetDir, "/").concat(appName),
         commands: [
             {
-                command: "rm -rf .git",
+                //command: "rm -rf .git",
+                command: removeDirCommandHelper[currentPlatformId](".git"),
                 description: "Remove previous git",
             },
             {
@@ -593,7 +621,8 @@ var getCommandsWithoutCache = function (_a) {
             dir: targetDir,
             commands: [
                 {
-                    command: "mkdir ".concat(appName),
+                    //command: `mkdir ${appName}`,
+                    command: makeDirCommandHelper[currentPlatformId](appName),
                     description: "Making folder for your app",
                 },
                 {
@@ -659,7 +688,8 @@ var getCommandsWithoutCache = function (_a) {
             commands: [
                 {
                     // NB: -p stands for parents and makes directories recursively
-                    command: "rm -rf .sensible/cache && mkdir -p .sensible/cache",
+                    //command: "rm -rf .sensible/cache && mkdir -p .sensible/cache",
+                    command: "".concat(removeDirCommandHelper[currentPlatformId](".sensible/cache"), " && ").concat(makeDirCommandHelper[currentPlatformId](".sensible/cache")),
                     description: "Creating sensible cache folder",
                 },
                 {
