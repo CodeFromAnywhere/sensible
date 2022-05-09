@@ -59,6 +59,18 @@ const makeDirCommandHelper = {
     return `mkdir -p ${filePath}`;
   },
 };
+
+const removeDirAndRecreateEmptyHelper = {
+  [platformIds.macOS]: (filePath: string) => {
+    return `rm -rf ${filePath} && mkdir -p ${filePath}`;
+  },
+  [platformIds.windows]: (filePath: string) => {
+    return `if exist "${filePath}" (rmdir "${filePath}" /s /q && mkdir "${filePath}") else (mkdir "${filePath}")`;
+  },
+  [platformIds.linux]: (filePath: string) => {
+    return `rm -rf ${filePath} && mkdir -p ${filePath}`;
+  },
+};
 //TYPE INTERFACES
 
 type OSOrDefault = NodeJS.Platform | "default";
@@ -727,9 +739,10 @@ const getCommandsWithoutCache = ({
         {
           // NB: -p stands for parents and makes directories recursively
           //command: "rm -rf .sensible/cache && mkdir -p .sensible/cache",
-          command: `${removeDirCommandHelper[currentPlatformId](
-            ".sensible/cache"
-          )} && ${makeDirCommandHelper[currentPlatformId](".sensible/cache")}`,
+          command:
+            removeDirAndRecreateEmptyHelper[currentPlatformId](
+              ".sensible/cache"
+            ),
           description: "Creating sensible cache folder",
         },
 

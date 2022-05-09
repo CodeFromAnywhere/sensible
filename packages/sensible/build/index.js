@@ -49,7 +49,7 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-var _a, _b, _c, _d, _e;
+var _a, _b, _c, _d, _e, _f;
 Object.defineProperty(exports, "__esModule", { value: true });
 var readline_1 = __importDefault(require("readline"));
 var path_1 = __importDefault(require("path"));
@@ -104,6 +104,17 @@ var makeDirCommandHelper = (_e = {},
         return "mkdir -p ".concat(filePath);
     },
     _e);
+var removeDirAndRecreateEmptyHelper = (_f = {},
+    _f[util_platform_1.platformIds.macOS] = function (filePath) {
+        return "rm -rf ".concat(filePath, " && mkdir -p ").concat(filePath);
+    },
+    _f[util_platform_1.platformIds.windows] = function (filePath) {
+        return "if exist \"".concat(filePath, "\" (rmdir \"").concat(filePath, "\" /s /q && mkdir \"").concat(filePath, "\") else (mkdir \"").concat(filePath, "\")");
+    },
+    _f[util_platform_1.platformIds.linux] = function (filePath) {
+        return "rm -rf ".concat(filePath, " && mkdir -p ").concat(filePath);
+    },
+    _f);
 var os = process.platform;
 var currentPlatformId = (0, util_platform_1.getPlatformId)(os);
 //CONSTANTS
@@ -689,7 +700,7 @@ var getCommandsWithoutCache = function (_a) {
                 {
                     // NB: -p stands for parents and makes directories recursively
                     //command: "rm -rf .sensible/cache && mkdir -p .sensible/cache",
-                    command: "".concat(removeDirCommandHelper[currentPlatformId](".sensible/cache"), " && ").concat(makeDirCommandHelper[currentPlatformId](".sensible/cache")),
+                    command: removeDirAndRecreateEmptyHelper[currentPlatformId](".sensible/cache"),
                     description: "Creating sensible cache folder",
                 },
                 {
