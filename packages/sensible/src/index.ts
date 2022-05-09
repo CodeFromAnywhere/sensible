@@ -671,7 +671,7 @@ const main = async () => {
         description: "Setting up your computer for developing sensible apps",
         ///bin/bash -c \"
         command:
-          "$(curl -fsSL https://raw.githubusercontent.com/Code-From-Anywhere/sensible/main/packages/sensible/setup-mac/install.sh)",
+          '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Code-From-Anywhere/sensible/main/packages/sensible/setup-mac/install.sh)"',
       },
       process.cwd(),
       true

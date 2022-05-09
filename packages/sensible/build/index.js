@@ -642,7 +642,7 @@ var main = function () { return __awaiter(void 0, void 0, void 0, function () {
                     (0, util_commands_1.executeCommand)({
                         description: "Setting up your computer for developing sensible apps",
                         ///bin/bash -c \"
-                        command: "$(curl -fsSL https://raw.githubusercontent.com/Code-From-Anywhere/sensible/main/packages/sensible/setup-mac/install.sh)",
+                        command: '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Code-From-Anywhere/sensible/main/packages/sensible/setup-mac/install.sh)"',
                     }, process.cwd(), true);
                 }
                 else {
