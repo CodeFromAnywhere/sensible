@@ -19,13 +19,6 @@ const Home: NextPage = () => {
   const core = useCoreQuery();
   const other = useOtherQuery();
   const constants = other.data?.constants;
-  // this results in unwanted scrollling
-  // useEffect(() => {
-  //   if (core.data?.success && location) {
-  //     scrollTo(location);
-  //   }
-  // }, [core.dataUpdatedAt, location]);
-
   // adding the site from your link to the recent sites, if not already there
   useEffect(() => {
     if (
@@ -75,7 +68,30 @@ const Home: NextPage = () => {
 
   return (
     <div>
-      {hasError(core) ? <p>{core.data?.response}</p> : null}
+      {other.isError ? (
+        <div>
+          <p className="text-red-600">
+            The server cannot be found. Did you start everything?
+          </p>
+          <br />
+          <br />
+          <p>
+            To start everything, make sure you run{" "}
+            <b className="font-bold">yarn dev</b> inside of packages/core and
+            every app you want to run. And of course, don&apos;t forget the
+            server app.
+          </p>
+          <br />
+          <br />
+          <a
+            className="cursor-pointer italic bg-blue-200 hover:bg-blue-300 p-3 rounded-md"
+            onClick={() => window.location.reload()}
+          >
+            Reload page
+          </a>
+        </div>
+      ) : null}
+      {/* {hasError(core) ? <p>{core.data?.response}</p> : null} */}
       {core.isLoading ? (
         <div>
           <p>Fetching the newest docs</p>

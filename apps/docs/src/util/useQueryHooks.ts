@@ -34,7 +34,12 @@ export const useOtherQuery = () => {
 
     async () => {
       if (url) {
-        return api(url)?.("sensible/other", "GET");
+        const result = await api(url)?.("sensible/other", "GET");
+
+        if (result?.error) {
+          throw new Error(result.response);
+        }
+        return result;
       } else {
         throw new Error("Couldn't find api string");
       }

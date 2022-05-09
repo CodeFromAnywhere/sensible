@@ -1,6 +1,6 @@
-import { App } from "sensible-core";
+import { App, AppsObject, InterpretableTypes, ProjectType } from "sensible-core";
 import { Path } from "sensible-files";
-export declare const getAppType: (projectType: ProjectType, folder: string) => "frontend" | "server" | "core" | null;
+export declare const getAppType: (projectType: ProjectType, folder: string) => "server" | "frontend" | "core" | null;
 /**
  *
  * @param folderPath path to app folder
@@ -8,5 +8,5 @@ export declare const getAppType: (projectType: ProjectType, folder: string) => "
  * @returns App | null
  */
 export declare const getAppInfo: (folderPath: Path) => App | null;
-export declare const getCachedApps: (appPaths: Path[], interpretableTypes: InterpretableTypes, schemasFolderPath: Path) => any;
+export declare const getCachedApps: (appPaths: Path[], interpretableTypes: InterpretableTypes, schemasFolderPath: Path) => AppsObject;
 //# sourceMappingURL=getCachedApps.d.ts.map

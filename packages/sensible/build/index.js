@@ -240,7 +240,7 @@ var getApps = function () { return __awaiter(void 0, void 0, void 0, function ()
                         description: "Electron app (for Windows, Linux and MacOS) (Experimental)",
                     },
                 ];
-                return [4 /*yield*/, getArgumentOrAsk(2, "Which apps do you want to create boilerplates for? Just press enter for all of them \n    \n".concat(possibleApps
+                return [4 /*yield*/, ask("Which apps do you want to create boilerplates for? Just press enter for all of them \n    \n".concat(possibleApps
                         .map(function (possible) { return "- ".concat(possible.slug, ": ").concat(possible.description, "\n"); })
                         .join(""), "\n"))];
             case 1:
@@ -306,7 +306,7 @@ var askOpenDocs = function () { return __awaiter(void 0, void 0, void 0, functio
                 if (openDocs) {
                     executeCommand({
                         description: "Opening docs",
-                        command: "".concat(openUrlHelper[currentPlatformId], " https://docs.sensible.to"),
+                        command: "open https://doc.sensible.to",
                     }, __dirname, false);
                 }
                 return [2 /*return*/];
@@ -441,26 +441,36 @@ var commandExistsAsync = function (command) { return __awaiter(void 0, void 0, v
 var commandExistsOrInstall = function (_a) {
     var command = _a.command, installCommand = _a.installCommand, installInstructions = _a.installInstructions, exitIfNotInstalled = _a.exitIfNotInstalled;
     return __awaiter(void 0, void 0, void 0, function () {
-        var isAvailable, isAvailableResult, installCommandString, ok;
+        var isAvailable, err_1, installCommandString, ok;
         return __generator(this, function (_b) {
             switch (_b.label) {
-                case 0: return [4 /*yield*/, commandExistsAsync(command)];
+                case 0:
+                    isAvailable = false;
+                    _b.label = 1;
                 case 1:
-                    isAvailableResult = _b.sent();
-                    isAvailable = !!isAvailableResult;
+                    _b.trys.push([1, 3, , 4]);
+                    return [4 /*yield*/, (0, command_exists_1.default)(command)];
+                case 2:
+                    isAvailable = !!(_b.sent());
+                    return [3 /*break*/, 4];
+                case 3:
+                    err_1 = _b.sent();
+                    (0, util_log_1.log)("Command not found");
+                    return [3 /*break*/, 4];
+                case 4:
                     installCommandString = installCommand && getCommand(installCommand);
                     if (isAvailable)
                         return [2 /*return*/, true];
-                    if (!installCommand) return [3 /*break*/, 4];
-                    return [4 /*yield*/, askOk("You don't have ".concat(command, ", but we need it to set up your project. Shall we install it for you, using \"").concat(installCommandString, "\"? \n\n yes/no \n\n"))];
-                case 2:
+                    if (!installCommand) return [3 /*break*/, 7];
+                    return [4 /*yield*/, askOk("You don't have ".concat(command, ", but we need it to set up your project. Shall we install it for you, using \"").concat(installCommand.command, "\"? \n\n yes/no \n\n"))];
+                case 5:
                     ok = _b.sent();
-                    if (!ok) return [3 /*break*/, 4];
+                    if (!ok) return [3 /*break*/, 7];
                     return [4 /*yield*/, executeCommand(installCommand, __dirname, !!isDebug)];
-                case 3:
+                case 6:
                     _b.sent();
                     return [2 /*return*/, true];
-                case 4:
+                case 7:
                     (0, util_log_1.log)(installInstructions);
                     if (exitIfNotInstalled) {
                         process.exit(1);
@@ -611,6 +621,10 @@ var getOpenVSCodeCommand = function (appName) { return ({
     command: "code ".concat(targetDir, "/").concat(appName, " --goto README.md:1:1"),
     description: "Opening your project in VSCode",
 }); };
+var openDocsCommand = {
+    command: "open https://docs.sensibleframework.co/localhost:4000",
+    description: "Opening the docs for your project",
+};
 var setNewDefaults = {
     command: "echo ".concat(flagArgumentsString, " > ").concat(settingsLocation),
     description: "Save new setttings",
@@ -663,7 +677,10 @@ var getCommandsWithoutCache = function (_a) {
                 }); }),
         }
     ], selectedApps.map(function (app) {
-        var fileString = fs_1.default.readFileSync(path_1.default.join(sensibleDir, "templates/apps/".concat(app, ".install.json")), { encoding: "utf8" });
+        var installPath = path_1.default.join(sensibleDir, "templates/apps/".concat(app, ".install.json"));
+        var fileString = fs_1.default.existsSync(installPath)
+            ? fs_1.default.readFileSync(installPath, { encoding: "utf8" })
+            : "";
         var appsCommands = fileString && fileString.length > 0
             ? JSON.parse(fileString)
             : { commands: [], tasks: [] };
@@ -682,7 +699,7 @@ var getCommandsWithoutCache = function (_a) {
     }), true), [
         {
             dir: "".concat(targetDir, "/").concat(appName),
-            commands: [getOpenVSCodeCommand(appName)],
+            commands: [getOpenVSCodeCommand(appName), openDocsCommand],
         },
         getPushToGitCommands(appName, remote),
         {
@@ -724,18 +741,83 @@ var getCacheCommands = function (_a) {
                     description: "Copying sensible from cache",
                 },
                 getOpenVSCodeCommand(appName),
+                openDocsCommand,
                 setNewDefaults,
             ],
         },
         getPushToGitCommands(appName, remote),
     ];
 };
+var getVersionParts = function (versionString) {
+    var _a = versionString.split(".").map(Number), major = _a[0], minor = _a[1], patch = _a[2];
+    return { major: major, minor: minor, patch: patch };
+};
+var getPackageVersions = function (name) { return __awaiter(void 0, void 0, void 0, function () {
+    var latest, current;
+    return __generator(this, function (_a) {
+        latest = "";
+        current = JSON.parse(fs_1.default.readFileSync(path_1.default.resolve(sensibleDir, "package.json"), "utf8")).version;
+        return [2 /*return*/, { latest: latest, current: current }];
+    });
+}); };
+var getUpdateSeverity = function (_a) {
+    var latest = _a.latest, current = _a.current;
+    return __awaiter(void 0, void 0, void 0, function () {
+        var latestParts, currentParts;
+        return __generator(this, function (_b) {
+            latestParts = getVersionParts(latest);
+            currentParts = getVersionParts(current);
+            if (latestParts.major > currentParts.major)
+                return [2 /*return*/, "major"];
+            if (latestParts.minor > currentParts.minor)
+                return [2 /*return*/, "minor"];
+            if (latestParts.patch > currentParts.patch)
+                return [2 /*return*/, "patch"];
+            return [2 /*return*/, false];
+        });
+    });
+};
+var handleVersionUpdates = function () { return __awaiter(void 0, void 0, void 0, function () {
+    var _a, latest, current, updateSeverity, shouldUpdate;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
+            case 0: return [4 /*yield*/, getPackageVersions("sensible")];
+            case 1:
+                _a = _b.sent(), latest = _a.latest, current = _a.current;
+                return [4 /*yield*/, getUpdateSeverity({ latest: latest, current: current })];
+            case 2:
+                updateSeverity = _b.sent();
+                if (!updateSeverity)
+                    return [2 /*return*/];
+                if (updateSeverity === "patch") {
+                    return [2 /*return*/, (0, util_log_1.log)("There's a new version of sensible with version ".concat(latest, ". You are now on version ").concat(current, "."), "FgYellow")];
+                }
+                return [4 /*yield*/, askOk("Theres a new ".concat(updateSeverity, " version available for Sensible (").concat(latest, "). You're now on version ").concat(current, ". Shall we update? yes/no"))];
+            case 3:
+                shouldUpdate = _b.sent();
+                if (!shouldUpdate) return [3 /*break*/, 5];
+                return [4 /*yield*/, executeCommand({
+                        description: "Updating sensible",
+                        command: "npm install --glopbal sensible@latest",
+                    }, targetDir, !!isDebug)];
+            case 4:
+                _b.sent();
+                return [2 /*return*/, process.exit(0)];
+            case 5: return [2 /*return*/, (0, util_log_1.log)("Continuing on an older ".concat(updateSeverity, " version. Probably mostly harmless."), "FgGreen")];
+        }
+    });
+}); };
 var main = function () { return __awaiter(void 0, void 0, void 0, function () {
     var command, appName, remote, selectedApps, commandsFromFolders;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, installRequiredStuff()];
+            case 0: 
+            //problem with imports package.json ect. do some research to solve this.
+            //await handleVersionUpdates();
+            return [4 /*yield*/, installRequiredStuff()];
             case 1:
+                //problem with imports package.json ect. do some research to solve this.
+                //await handleVersionUpdates();
                 _a.sent();
                 command = argumentsWithoutFlags[2];
                 if (!(command === "init")) return [3 /*break*/, 7];
@@ -748,8 +830,10 @@ var main = function () { return __awaiter(void 0, void 0, void 0, function () {
                 return [4 /*yield*/, getApps()];
             case 4:
                 selectedApps = _a.sent();
+                // console.log({ selectedApps });
                 return [4 /*yield*/, askOpenDocs()];
             case 5:
+                // console.log({ selectedApps });
                 _a.sent();
                 commandsFromFolders = shouldGetCache
                     ? getCacheCommands({ appName: appName, remote: remote })

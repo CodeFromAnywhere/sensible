@@ -219,6 +219,7 @@ export const makeApi = <TAllEndpoints extends unknown>(config: Config) => {
         console.warn(error);
         return {
           success: false,
+          error: true,
           response: "The API didn't resolve: " + error, //error + error.status +
         };
       });

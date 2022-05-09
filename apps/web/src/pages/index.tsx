@@ -6,61 +6,178 @@ import { TwitterTweetEmbed } from "react-twitter-embed";
 import { isEmail } from "sensible-core";
 import { api, useStore } from "ui";
 
-type Brand = {
+const CTA = () => {
+  return (
+    <a
+      href="https://doc.sensible.to"
+      target="_blank"
+      rel="noreferrer"
+      className="my-10"
+    >
+      <button
+        className={`disabled:hidden transition-all duration-600 w-40 lg:w-96 bg-blue-500 hover:bg-blue-400 border-black border rounded-xl p-4`}
+      >
+        {"Docs"}
+      </button>
+    </a>
+  );
+};
+
+const EmailForm = () => {
+  const [email, setEmail] = useStore("email");
+  const [isLoading, setIsLoading] = useState(false);
+
+  return (
+    <div className="flex flex-col items-center">
+      {isLoading ? (
+        <button type="button" className="bg-indigo-500" disabled>
+          <svg className="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24"></svg>
+          Processing...
+        </button>
+      ) : (
+        <div className="flex flex-col m-4 px-2 lg:px-6 pt-6 justify-center">
+          <p className="pb-4">Request a demo:</p>
+          <input
+            type="text"
+            className="w-52 lg:w-96 border-gray-500 p-4 opacity-50 border-4 border cursor-pointer rounded-lg text-black hover:text-blue-600 lg:text-3xl transition-all duration-1200"
+            value={email}
+            placeholder="Your email"
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </div>
+      )}
+
+      <button
+        onClick={() => {
+          if (isLoading) return;
+          setIsLoading(true);
+          api("requestAccess", "POST", { email }).then((res) => {
+            setIsLoading(false);
+            alert(res.response);
+          });
+        }}
+        disabled={!isEmail(email) || isLoading}
+        className={`disabled:hidden transition-all duration-600 w-40 lg:w-96 bg-blue-500 hover:bg-blue-400 border-black border rounded-xl p-4`}
+      >
+        {isLoading ? "Please wait..." : "Get it!"}
+      </button>
+    </div>
+  );
+};
+type Link = {
   path: string;
   url: string;
   alt: string;
+  isSmall?: boolean;
   noFollow?: boolean;
+  target?: string;
+  subtitle?: string;
 };
 
-const tweets = ["1522222259326406657"];
-const brands: Brand[] = [
+const communityLink =
+  "https://join.slack.com/t/codefromanywhere/shared_invite/zt-18r6mfudt-Zhb7FaZ70WlWVI1a_ZxgPw";
+const communityImage = "/slack.png";
+
+const tweets: string[] = []; //"1522222259326406657"
+
+const renderLink = (link: Link, index: number) => {
+  return (
+    <a
+      key={`icon${index}`}
+      href={link.url}
+      rel={link.noFollow ? "nofollow" : undefined}
+      className={`m-2 flex flex-col items-center`}
+      target={link.target}
+    >
+      <div
+        className={`relative ${
+          !link.isSmall ? "w-10 h-10 lg:w-20 lg:h-20" : "w-4 h-4 lg:w-6 lg:h-6"
+        }`}
+      >
+        <Image
+          src={link.path}
+          layout="fill"
+          alt={link.alt}
+          className="aspect-square rounded-full hover:animate-pulse"
+        />
+      </div>
+      {link.subtitle && (
+        <p className={link.isSmall ? "italic text-[0.5rem]" : "font-bold"}>
+          {link.subtitle}
+        </p>
+      )}
+    </a>
+  );
+};
+
+const links: Link[] = [
   {
-    path: "/icon.png",
+    path: "/github.png",
     url: "https://github.com/Code-From-Anywhere/sensible",
     alt: "Sensible",
+    subtitle: "GitHub",
+    isSmall: true,
+    target: "_blank",
+  },
+
+  {
+    path: communityImage,
+    url: communityLink,
+    alt: "Join our community!",
+    subtitle: "Community",
+    isSmall: true,
+    target: "_blank",
   },
 
   {
     path: "/pasfoto.png",
-    url: "https://karsens.com",
-    alt: "My site",
+    url: "https://twitter.com/wkarsens",
+    alt: "Follow me",
+    subtitle: "Twitter",
+    isSmall: true,
+    target: "_blank",
   },
 
   {
     path: "/cfa.png",
     url: "https://codefromanywhere.com",
-    alt: "Go to GitHub",
+    alt: "About us",
+    subtitle: "About us",
+    isSmall: true,
+    target: "_blank",
   },
-
+];
+const brands: Link[] = [
   {
     path: "/emesa.jpeg",
     url: "https://emesa.nl",
     noFollow: true,
     alt: "Emesa",
+    target: "_blank",
   },
   {
     path: "/stoic.jpeg",
     url: "https://stoicstrats.com",
     noFollow: true,
     alt: "Stoic Strategies",
+    target: "_blank",
   },
   {
     path: "/king.webp",
     url: "https://getking.co",
     alt: "King",
+    target: "_blank",
   },
   {
     path: "/coworksurf.png",
     url: "https://coworksurf.com",
     alt: "Coworksurf",
+    target: "_blank",
   },
 ];
 
 const Home: NextPage = () => {
   const contentRef = useRef<HTMLDivElement>(null);
-  const [email, setEmail] = useStore("email");
-  const [isLoading, setIsLoading] = useState(false);
 
   return (
     <div
@@ -111,7 +228,13 @@ const Home: NextPage = () => {
               <div className="absolute top-0 -right-4 w-32 lg:w-96 h-32 lg:h-96 bg-yellow-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
               <div className="absolute -bottom-8 left-20 w-32 lg:w-96 h-32 lg:h-96 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
 
-              <div className="lg:m-8 relative">
+              <div className="lg:m-8 relative flex flex-col">
+                <div
+                  className="flex mx-4 lg:mx-12 w-full relative flex-wrap justify-end"
+                  ref={contentRef}
+                >
+                  {links.map(renderLink)}
+                </div>
                 <div className="flex-col lg:p-5 rounded-lg flex items-center justify-between lg:space-x-8">
                   <div className="flex-1 mb-6">
                     <h1
@@ -149,60 +272,12 @@ const Home: NextPage = () => {
               className="flex mx-4 lg:mx-12 w-full relative flex-wrap justify-center"
               ref={contentRef}
             >
-              {brands.map((brand, index) => {
-                return (
-                  <a
-                    key={`brand${index}`}
-                    href={brand.url}
-                    rel={brand.noFollow ? "nofollow" : undefined}
-                    className={`m-2 relative w-10 h-10 lg:w-20 lg:h-20`}
-                  >
-                    <Image
-                      src={brand.path}
-                      layout="fill"
-                      alt={brand.alt}
-                      className="aspect-square rounded-full hover:animate-pulse"
-                    />
-                  </a>
-                );
-              })}
+              {brands.map(renderLink)}
             </div>
 
-            {isLoading ? (
-              <button type="button" className="bg-indigo-500" disabled>
-                <svg
-                  className="animate-spin h-5 w-5 mr-3"
-                  viewBox="0 0 24 24"
-                ></svg>
-                Processing...
-              </button>
-            ) : (
-              <div className="flex flex-col m-4 px-2 lg:px-6 pt-6 justify-center">
-                <p className="pb-4">Request access:</p>
-                <input
-                  type="text"
-                  className="w-52 lg:w-96 border-gray-500 p-4 opacity-50 border-4 border-double cursor-pointer rounded-full text-black hover:text-blue-600 lg:text-3xl transition-all duration-1200"
-                  value={email}
-                  placeholder="Your email"
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
-            )}
+            {/* <EmailForm /> */}
 
-            <button
-              onClick={() => {
-                if (isLoading) return;
-                setIsLoading(true);
-                api("requestAccess", "POST", { email }).then((res) => {
-                  setIsLoading(false);
-                  alert(res.response);
-                });
-              }}
-              disabled={!isEmail(email) || isLoading}
-              className={`disabled:hidden transition-all duration-600 w-40 lg:w-96 bg-blue-500 hover:bg-blue-400 border-black border rounded-xl p-4`}
-            >
-              {isLoading ? "Please wait..." : "Get it!"}
-            </button>
+            <CTA />
           </div>
         </div>
 

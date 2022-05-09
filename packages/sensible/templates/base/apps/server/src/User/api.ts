@@ -2,16 +2,16 @@ import { makeEndpoint } from "../makeEndpoint";
 import User from "./model";
 
 module.exports = [
-  makeEndpoint("me", "GET", async (ctx) => {
-    const { loginToken } = ctx.body;
+  makeEndpoint("signup", "POST", async (ctx) => {
+    const { email } = ctx.body;
 
-    const user = await User.findOne({ where: { loginToken } });
+    const user = await User.create({ email });
 
-    if (!user) {
-      return { response: "Couldn't find user", success: false };
-    }
+    const success = !!user;
 
-    const success = false;
-    return { response: success ? "Inserted" : "Insertion failed", success };
+    return {
+      response: success ? "Signed up" : "Something went wrong",
+      success,
+    };
   }),
 ];

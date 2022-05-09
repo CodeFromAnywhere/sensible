@@ -1,0 +1,32 @@
+{
+  "config": {
+    "tasks": [
+      {
+        "label": "VS extension packager",
+        "isBackground": true,
+        "options": { "cwd": "${workspaceFolder}/apps/vscode" },
+        "presentation": { "group": "run" },
+        "command": "yarn dev",
+        "runOptions": { "runOn": "folderOpen" }
+      }
+    ]
+  },
+  "instructions": "",
+  "commands": [
+    {
+      "command": "mkdir vscode",
+      "description": "Creating vscode folder"
+    },
+    {
+      "command": "cd vscode && yarn init -y",
+      "description": "Creating package.jsons..."
+    },
+    {
+      "command": "cd vscode && yarn",
+      "description": "Installing Dependencies..."
+    },
+    {
+      "command": ""
+    }
+  ]
+}

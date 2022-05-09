@@ -9,6 +9,8 @@ import { homedir } from "os";
 import { findAndRenameTemplateFiles } from "./util.templates";
 import { log } from "./util.log";
 import { getPlatformId, platformIds, platformNames } from "./util.platform";
+//import latestVersion from "latest-version";
+
 import commandExists from "command-exists";
 
 //InstallHelper
@@ -71,6 +73,7 @@ const removeDirAndRecreateEmptyHelper = {
     return `rm -rf ${filePath} && mkdir -p ${filePath}`;
   },
 };
+
 //TYPE INTERFACES
 
 type OSOrDefault = NodeJS.Platform | "default";
@@ -240,8 +243,8 @@ const getApps = async (): Promise<string[]> => {
     },
   ];
 
-  const appsString = await getArgumentOrAsk(
-    2,
+
+  const appsString = await ask(
     `Which apps do you want to create boilerplates for? Just press enter for all of them 
     
 ${possibleApps
@@ -433,20 +436,7 @@ const getSpawnCommandsReducer =
     return executeCommand(command, dir, debug);
   };
 
-const commandExistsAsync = async (command: string) => {
-  return new Promise((resolve, reject) => {
-    commandExists(command, function (err, commandExists) {
-      if (err) {
-        reject("Some error checking if command exists. Details: " + err);
-      }
-      if (commandExists) {
-        // proceed confidently knowing this command is available
-        resolve(true);
-      }
-      resolve(false);
-    });
-  });
-};
+
 const commandExistsOrInstall = async ({
   command,
   installCommand,
@@ -458,9 +448,14 @@ const commandExistsOrInstall = async ({
   installInstructions: string;
   exitIfNotInstalled?: boolean;
 }) => {
-  let isAvailable;
-  const isAvailableResult = await commandExistsAsync(command);
-  isAvailable = !!isAvailableResult;
+
+  let isAvailable = false;
+  try {
+    isAvailable = !!(await commandExists(command));
+  } catch (err) {
+    log("Command not found");
+  }
+
   const installCommandString = installCommand && getCommand(installCommand);
   if (isAvailable) return true;
 
@@ -489,10 +484,12 @@ const commandExistsOrInstall = async ({
 const commandReplaceVariables =
   (variables: { [key: string]: string }) =>
   (command: Command): Command => {
-    if (getCommand(command)) {
+    if (
+      (command)) {
       command.command = Object.keys(variables).reduce((command, key) => {
         return command?.replaceAll(`{${key}}`, variables[key]);
-      }, getCommand(command) as string);
+      }, 
+                                                      (command) as string);
     }
     return command;
   };
@@ -622,6 +619,11 @@ const getOpenVSCodeCommand = (appName: string) => ({
   description: "Opening your project in VSCode",
 });
 
+const openDocsCommand = {
+  command: `open https://docs.sensibleframework.co/localhost:4000`,
+  description: "Opening the docs for your project",
+};
+
 const setNewDefaults: Command = {
   command: `echo ${flagArgumentsString} > ${settingsLocation}`,
   description: "Save new setttings",
@@ -678,6 +680,7 @@ const getCommandsWithoutCache = ({
         },
       ],
     },
+
 
     {
       // download all third-party dependencies that are tightly integrated and probably still require some bugfixing in v1
@@ -787,15 +790,84 @@ const getCacheCommands = ({
           description: "Copying sensible from cache",
         },
         getOpenVSCodeCommand(appName),
+        openDocsCommand,
         setNewDefaults,
       ],
     },
+
 
     getPushToGitCommands(appName, remote),
   ];
 };
 
+const getVersionParts = (versionString: string) => {
+  const [major, minor, patch] = versionString.split(".").map(Number);
+  return { major, minor, patch };
+};
+
+const getPackageVersions = async (name: string) => {
+  const latest = ""; //await latestVersion(name);
+  const current: string = JSON.parse(
+    fs.readFileSync(path.resolve(sensibleDir, "package.json"), "utf8")
+  ).version;
+  return { latest, current };
+};
+
+const getUpdateSeverity = async ({
+  latest,
+  current,
+}: {
+  latest: string;
+  current: string;
+}) => {
+  const latestParts = getVersionParts(latest);
+  const currentParts = getVersionParts(current);
+
+  if (latestParts.major > currentParts.major) return "major";
+  if (latestParts.minor > currentParts.minor) return "minor";
+  if (latestParts.patch > currentParts.patch) return "patch";
+  return false;
+};
+
+const handleVersionUpdates = async () => {
+  const { latest, current } = await getPackageVersions("sensible");
+  const updateSeverity = await getUpdateSeverity({ latest, current });
+
+  if (!updateSeverity) return;
+
+  if (updateSeverity === "patch") {
+    return log(
+      `There's a new version of sensible with version ${latest}. You are now on version ${current}.`,
+      "FgYellow"
+    );
+  }
+
+  const shouldUpdate = await askOk(
+    `Theres a new ${updateSeverity} version available for Sensible (${latest}). You're now on version ${current}. Shall we update? yes/no`
+  );
+
+  if (shouldUpdate) {
+    await executeCommand(
+      {
+        description: "Updating sensible",
+        command: "npm install --glopbal sensible@latest",
+      },
+      targetDir,
+      !!isDebug
+    );
+
+    return process.exit(0);
+  }
+
+  return log(
+    `Continuing on an older ${updateSeverity} version. Probably mostly harmless.`,
+    "FgGreen"
+  );
+};
+
 const main = async () => {
+  //problem with imports package.json ect. do some research to solve this.
+  //await handleVersionUpdates();
   await installRequiredStuff();
   const command = argumentsWithoutFlags[2];
 
