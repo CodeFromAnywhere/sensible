@@ -1,8 +1,0 @@
-{
-  "label": "Walkthrough",
-  "position": 3,
-  "link": {
-    "type": "generated-index",
-    "description": "A minicourse that walks you through the process of creating a Sensible app"
-  }
-}

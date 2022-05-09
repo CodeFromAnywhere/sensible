@@ -5,16 +5,14 @@ export interface SignupEndpoint extends Endpoint {
   method: "POST";
   body: {
     email: string;
-    source: SignupSource;
     username?: string;
     password?: string;
     name?: string;
     image?: string;
-    base64?: string;
     subscribeToNewsletter?: boolean;
   };
   response: DefaultResponse;
 }
 ```
 
-As you can see, an endpoint always has a method, body and response.
+As you can see, an endpoint always has a method, body and response. You should define these (along with your types) in the core package, so it will be introspected by the sensible-server and you can see them in the auto-generated docs.

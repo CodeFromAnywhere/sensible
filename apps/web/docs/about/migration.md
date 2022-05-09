@@ -1,4 +1,4 @@
-# Converting to Sensible Monorepo
+# Migration
 
 Put the apps (app, web, server, etc.) in the "apps" folder.
 Also create a packages folder in which you create a core folder and ui folder.
