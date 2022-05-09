@@ -307,7 +307,7 @@ var askOpenDocs = function () { return __awaiter(void 0, void 0, void 0, functio
                 if (openDocs) {
                     executeCommand({
                         description: "Opening docs",
-                        command: "".concat(openUrlHelper[currentPlatformId], " https://docs.sensible.to"),
+                        command: "".concat(openUrlHelper[currentPlatformId], " https://doc.sensible.to"),
                     }, __dirname, false);
                 }
                 return [2 /*return*/];
@@ -665,7 +665,10 @@ var getCommandsWithoutCache = function (_a) {
                 }); }),
         }
     ], selectedApps.map(function (app) {
-        var fileString = fs_1.default.readFileSync(path_1.default.join(sensibleDir, "templates/apps/".concat(app, ".install.json")), { encoding: "utf8" });
+        var installFilePath = path_1.default.join(sensibleDir, "templates/apps/".concat(app, ".install.json"));
+        var fileString = fs_1.default.existsSync(installFilePath)
+            ? fs_1.default.readFileSync(installFilePath, { encoding: "utf8" })
+            : "";
         var appsCommands = fileString && fileString.length > 0
             ? JSON.parse(fileString)
             : { commands: [], tasks: [] };

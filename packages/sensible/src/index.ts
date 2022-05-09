@@ -308,7 +308,7 @@ const askOpenDocs = async (): Promise<void> => {
     executeCommand(
       {
         description: "Opening docs",
-        command: `${openUrlHelper[currentPlatformId]} https://docs.sensible.to`,
+        command: `${openUrlHelper[currentPlatformId]} https://doc.sensible.to`,
       },
       __dirname,
       false
@@ -694,10 +694,13 @@ const getCommandsWithoutCache = ({
 
     // only install selected apps
     ...selectedApps.map((app) => {
-      const fileString = fs.readFileSync(
-        path.join(sensibleDir, `templates/apps/${app}.install.json`),
-        { encoding: "utf8" }
+      const installFilePath = path.join(
+        sensibleDir,
+        `templates/apps/${app}.install.json`
       );
+      const fileString = fs.existsSync(installFilePath)
+        ? fs.readFileSync(installFilePath, { encoding: "utf8" })
+        : "";
 
       const appsCommands: InstallObject =
         fileString && fileString.length > 0
