@@ -16,6 +16,9 @@ const addScriptToPackage = async () => {
     },
   });
 
+  // could be replaced by this command
+  // npx setjsonkey package.json srcipts.build:tailwind "tailwindcss --input input.css --output tailwind.css --no-autoprefixer && tailwind-rn" && npx setjsonkey package.json scripts.dev:tailwindcss "tailwindcss --input input.css --output tailwind.css --no-autoprefixer --watch" && npx setjsonkey package.json scripts.dev:tailwindrn "tailwind-rn --watch" && npx setjsonkey package.json scripts.dev "npm-run-all dev:*"
+
   await packageJson.save();
 };
 

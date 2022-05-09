@@ -12226,7 +12226,7 @@
 
 "sensible@file:/Users/wijnandkarsens/Developer/Code-From-Anywhere/sensible/packages/sensible":
   "resolved" "file:packages/sensible"
-  "version" "1.1.6"
+  "version" "1.1.7"
   dependencies:
     "@types/command-exists" "^1.2.0"
     "command-exists" "^1.2.9"

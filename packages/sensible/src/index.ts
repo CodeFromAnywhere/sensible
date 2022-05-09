@@ -732,7 +732,7 @@ const getCommandsWithoutCache = ({
       ];
 
       return {
-        dir: `${targetDir}/${appName}/apps`,
+        dir: path.join(targetDir, appName, "apps"),
         commands: filledInAppCommands.concat(defaultAppsCommands),
       };
     }),
