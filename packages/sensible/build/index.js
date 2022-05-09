@@ -59,6 +59,7 @@ var os_1 = require("os");
 var util_templates_1 = require("./util.templates");
 var util_log_1 = require("./util.log");
 var util_platform_1 = require("./util.platform");
+//import latestVersion from "latest-version";
 var command_exists_1 = __importDefault(require("command-exists"));
 //InstallHelper
 var installHelper = (_a = {},
@@ -306,7 +307,7 @@ var askOpenDocs = function () { return __awaiter(void 0, void 0, void 0, functio
                 if (openDocs) {
                     executeCommand({
                         description: "Opening docs",
-                        command: "open https://doc.sensible.to",
+                        command: "".concat(openUrlHelper[currentPlatformId], " https://docs.sensible.to"),
                     }, __dirname, false);
                 }
                 return [2 /*return*/];
@@ -422,22 +423,6 @@ var getSpawnCommandsReducer = function (dir, debug) {
         });
     }); };
 };
-var commandExistsAsync = function (command) { return __awaiter(void 0, void 0, void 0, function () {
-    return __generator(this, function (_a) {
-        return [2 /*return*/, new Promise(function (resolve, reject) {
-                (0, command_exists_1.default)(command, function (err, commandExists) {
-                    if (err) {
-                        reject("Some error checking if command exists. Details: " + err);
-                    }
-                    if (commandExists) {
-                        // proceed confidently knowing this command is available
-                        resolve(true);
-                    }
-                    resolve(false);
-                });
-            })];
-    });
-}); };
 var commandExistsOrInstall = function (_a) {
     var command = _a.command, installCommand = _a.installCommand, installInstructions = _a.installInstructions, exitIfNotInstalled = _a.exitIfNotInstalled;
     return __awaiter(void 0, void 0, void 0, function () {
@@ -462,7 +447,7 @@ var commandExistsOrInstall = function (_a) {
                     if (isAvailable)
                         return [2 /*return*/, true];
                     if (!installCommand) return [3 /*break*/, 7];
-                    return [4 /*yield*/, askOk("You don't have ".concat(command, ", but we need it to set up your project. Shall we install it for you, using \"").concat(installCommand.command, "\"? \n\n yes/no \n\n"))];
+                    return [4 /*yield*/, askOk("You don't have ".concat(command, ", but we need it to set up your project. Shall we install it for you, using \"").concat(installCommandString, "\"? \n\n yes/no \n\n"))];
                 case 5:
                     ok = _b.sent();
                     if (!ok) return [3 /*break*/, 7];
@@ -485,10 +470,13 @@ var commandExistsOrInstall = function (_a) {
  */
 var commandReplaceVariables = function (variables) {
     return function (command) {
-        if (getCommand(command)) {
-            command.command = Object.keys(variables).reduce(function (command, key) {
-                return command === null || command === void 0 ? void 0 : command.replaceAll("{".concat(key, "}"), variables[key]);
-            }, getCommand(command));
+        if (command) {
+            var newCommand = Object.keys(variables).reduce(function (command, variableKey) {
+                return command
+                    ? command === null || command === void 0 ? void 0 : command.replaceAll("{".concat(variableKey, "}"), variables[variableKey])
+                    : "";
+            }, getCommand(command)) || "";
+            command.command = newCommand;
         }
         return command;
     };
@@ -677,10 +665,7 @@ var getCommandsWithoutCache = function (_a) {
                 }); }),
         }
     ], selectedApps.map(function (app) {
-        var installPath = path_1.default.join(sensibleDir, "templates/apps/".concat(app, ".install.json"));
-        var fileString = fs_1.default.existsSync(installPath)
-            ? fs_1.default.readFileSync(installPath, { encoding: "utf8" })
-            : "";
+        var fileString = fs_1.default.readFileSync(path_1.default.join(sensibleDir, "templates/apps/".concat(app, ".install.json")), { encoding: "utf8" });
         var appsCommands = fileString && fileString.length > 0
             ? JSON.parse(fileString)
             : { commands: [], tasks: [] };
@@ -699,7 +684,7 @@ var getCommandsWithoutCache = function (_a) {
     }), true), [
         {
             dir: "".concat(targetDir, "/").concat(appName),
-            commands: [getOpenVSCodeCommand(appName), openDocsCommand],
+            commands: [getOpenVSCodeCommand(appName)],
         },
         getPushToGitCommands(appName, remote),
         {
@@ -830,10 +815,8 @@ var main = function () { return __awaiter(void 0, void 0, void 0, function () {
                 return [4 /*yield*/, getApps()];
             case 4:
                 selectedApps = _a.sent();
-                // console.log({ selectedApps });
                 return [4 /*yield*/, askOpenDocs()];
             case 5:
-                // console.log({ selectedApps });
                 _a.sent();
                 commandsFromFolders = shouldGetCache
                     ? getCacheCommands({ appName: appName, remote: remote })

@@ -243,7 +243,6 @@ const getApps = async (): Promise<string[]> => {
     },
   ];
 
-
   const appsString = await ask(
     `Which apps do you want to create boilerplates for? Just press enter for all of them 
     
@@ -436,7 +435,6 @@ const getSpawnCommandsReducer =
     return executeCommand(command, dir, debug);
   };
 
-
 const commandExistsOrInstall = async ({
   command,
   installCommand,
@@ -448,7 +446,6 @@ const commandExistsOrInstall = async ({
   installInstructions: string;
   exitIfNotInstalled?: boolean;
 }) => {
-
   let isAvailable = false;
   try {
     isAvailable = !!(await commandExists(command));
@@ -484,12 +481,15 @@ const commandExistsOrInstall = async ({
 const commandReplaceVariables =
   (variables: { [key: string]: string }) =>
   (command: Command): Command => {
-    if (
-      (command)) {
-      command.command = Object.keys(variables).reduce((command, key) => {
-        return command?.replaceAll(`{${key}}`, variables[key]);
-      }, 
-                                                      (command) as string);
+    if (command) {
+      const newCommand =
+        Object.keys(variables).reduce((command, variableKey) => {
+          return command
+            ? command?.replaceAll(`{${variableKey}}`, variables[variableKey])
+            : "";
+        }, getCommand(command)) || "";
+
+      command.command = newCommand;
     }
     return command;
   };
@@ -681,7 +681,6 @@ const getCommandsWithoutCache = ({
       ],
     },
 
-
     {
       // download all third-party dependencies that are tightly integrated and probably still require some bugfixing in v1
       dir: `${targetDir}/${appName}/third-party`,
@@ -794,7 +793,6 @@ const getCacheCommands = ({
         setNewDefaults,
       ],
     },
-
 
     getPushToGitCommands(appName, remote),
   ];
