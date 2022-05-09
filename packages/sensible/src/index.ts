@@ -8,8 +8,72 @@ import fs from "fs";
 import { homedir } from "os";
 import { findAndRenameTemplateFiles } from "./util.templates";
 import { log } from "./util.log";
+import { getPlatformId, platformIds, platformNames } from "./util.platform";
+//import latestVersion from "latest-version";
+
 import commandExists from "command-exists";
-// import latestVersion from "latest-version";
+
+//InstallHelper
+const installHelper = {
+  [platformIds.macOS]: "brew",
+  [platformIds.windows]: "choco",
+  [platformIds.linux]: "brew",
+};
+
+const openUrlHelper = {
+  [platformIds.macOS]: "open",
+  [platformIds.windows]: "start",
+  [platformIds.linux]: "open",
+};
+
+const copyCommandHelper = {
+  [platformIds.macOS]: (source: string, dest: string) => {
+    return `cp -R ${source} ${dest}`;
+  },
+  [platformIds.windows]: (source: string, dest: string) => {
+    return `robocopy "${source}" "${dest}" /MIR`;
+  },
+  [platformIds.linux]: (source: string, dest: string) => {
+    return `cp -R ${source} ${dest}`;
+  },
+};
+
+const removeDirCommandHelper = {
+  [platformIds.macOS]: (filePath: string) => {
+    return `rm -rf ${filePath}`;
+  },
+  [platformIds.windows]: (filePath: string) => {
+    return `rmdir ${filePath} /s /q`;
+  },
+  [platformIds.linux]: (filePath: string) => {
+    return `rm -rf ${filePath}`;
+  },
+};
+
+const makeDirCommandHelper = {
+  [platformIds.macOS]: (filePath: string) => {
+    return `mkdir -p ${filePath}`;
+  },
+  [platformIds.windows]: (filePath: string) => {
+    return `mkdir "${filePath}"`;
+  },
+  [platformIds.linux]: (filePath: string) => {
+    return `mkdir -p ${filePath}`;
+  },
+};
+
+const removeDirAndRecreateEmptyHelper = {
+  [platformIds.macOS]: (filePath: string) => {
+    return `rm -rf ${filePath} && mkdir -p ${filePath}`;
+  },
+  [platformIds.windows]: (filePath: string) => {
+    return `if exist "${filePath}" (rmdir "${filePath}" /s /q && mkdir "${filePath}") else (mkdir "${filePath}")`;
+  },
+  [platformIds.linux]: (filePath: string) => {
+    return `rm -rf ${filePath} && mkdir -p ${filePath}`;
+  },
+};
+
 //TYPE INTERFACES
 
 type OSOrDefault = NodeJS.Platform | "default";
@@ -33,6 +97,7 @@ type CommandsObject = {
 };
 
 const os = process.platform;
+const currentPlatformId = getPlatformId(os);
 
 type TaskObject = {};
 
@@ -142,7 +207,8 @@ const ask = (question: string): Promise<string> => {
 
 const flagArgumentsString = process.argv
   .filter((a) => a.startsWith("--"))
-  .join(" ");
+  .join(",");
+//.join(" ");
 const argumentsWithoutFlags = process.argv.filter((a) => !a.startsWith("--"));
 
 const getArgumentOrAsk = async (
@@ -177,6 +243,7 @@ const getApps = async (): Promise<string[]> => {
     },
   ];
 
+
   const appsString = await ask(
     `Which apps do you want to create boilerplates for? Just press enter for all of them 
     
@@ -192,8 +259,12 @@ ${possibleApps
           .replaceAll(" ", ",")
           .replaceAll(";", ",")
           .split(",")
-          .filter((x) => !possibleApps.map((x) => x.slug).includes(x));
-
+          .filter(
+            (canditateApp) =>
+              possibleApps.map((app) => app.slug).includes(canditateApp) ===
+              true
+          );
+  //.filter((x) => !possibleApps.map((x) => x.slug).includes(x));
   return apps;
 };
 
@@ -238,7 +309,7 @@ const askOpenDocs = async (): Promise<void> => {
     executeCommand(
       {
         description: "Opening docs",
-        command: "open https://doc.sensible.to",
+        command: `${openUrlHelper[currentPlatformId]} https://docs.sensible.to`,
       },
       __dirname,
       false
@@ -308,12 +379,33 @@ const executeCommand = (command: Command, dir: string, debug: boolean) => {
       })
         .on("exit", (code) => {
           const CODE_SUCCESSFUL = 0;
-          if (code === CODE_SUCCESSFUL) {
+          const ALLOWED_ERRORS = [];
+          if (
+            typeof command.command === "string" &&
+            command.command.includes("robocopy")
+          ) {
+            //with robocopy, errors 1, 2 and 4 are not really errors;
+            ALLOWED_ERRORS.push(1, 2, 4);
+          }
+          if (
+            typeof command.command === "string" &&
+            command.command.includes("rmdir")
+          ) {
+            //rmdir outputs 2 when it doesn't find the folder to delete
+            ALLOWED_ERRORS.push(2);
+          }
+          if (
+            code === CODE_SUCCESSFUL ||
+            (code && ALLOWED_ERRORS.includes(code))
+          ) {
             onFinish({ success: true });
           } else {
             onFinish({ success: false });
             log(messages.join("\n"));
-            log(`The following command failed: "${command.command}"`);
+
+            log(
+              `The following command failed: "${command.command} (code ${code})"`
+            );
             process.exit(1);
           }
         })
@@ -344,6 +436,7 @@ const getSpawnCommandsReducer =
     return executeCommand(command, dir, debug);
   };
 
+
 const commandExistsOrInstall = async ({
   command,
   installCommand,
@@ -355,7 +448,7 @@ const commandExistsOrInstall = async ({
   installInstructions: string;
   exitIfNotInstalled?: boolean;
 }) => {
-  // const isAvailable = !!(await commandExists(command));
+
   let isAvailable = false;
   try {
     isAvailable = !!(await commandExists(command));
@@ -368,7 +461,7 @@ const commandExistsOrInstall = async ({
 
   if (installCommand) {
     const ok = await askOk(
-      `You don't have ${command}, but we need it to set up your project. Shall we install it for you, using "${installCommand.command}"? \n\n yes/no \n\n`
+      `You don't have ${command}, but we need it to set up your project. Shall we install it for you, using "${installCommandString}"? \n\n yes/no \n\n`
     );
 
     if (ok) {
@@ -391,10 +484,12 @@ const commandExistsOrInstall = async ({
 const commandReplaceVariables =
   (variables: { [key: string]: string }) =>
   (command: Command): Command => {
-    if (getCommand(command)) {
+    if (
+      (command)) {
       command.command = Object.keys(variables).reduce((command, key) => {
         return command?.replaceAll(`{${key}}`, variables[key]);
-      }, getCommand(command) as string);
+      }, 
+                                                      (command) as string);
     }
     return command;
   };
@@ -404,7 +499,8 @@ const getPushToGitCommands = (appName: string, remote: string | null) => {
     dir: `${targetDir}/${appName}`,
     commands: [
       {
-        command: "rm -rf .git",
+        //command: "rm -rf .git",
+        command: removeDirCommandHelper[currentPlatformId](".git"),
         description: "Remove previous git",
       },
 
@@ -437,29 +533,24 @@ const getPushToGitCommands = (appName: string, remote: string | null) => {
     ],
   };
 };
-
 const installRequiredStuff = async () => {
   //making sure you have brew, node, npm, yarn, code, git, jq, watchman
-
   await commandExistsOrInstall({
-    command: "brew",
-    installInstructions:
-      "Please install brew. Go to https://brew.sh for instructions",
+    command: installHelper[currentPlatformId],
+    installInstructions: `Please install ${installHelper[currentPlatformId]}. Go to "https://brew.sh" for instructions`,
     installCommand: {
       command:
         '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"',
-      description: "Installing brew",
+      description: `Installing ${installHelper[currentPlatformId]}`,
     },
     exitIfNotInstalled: true,
   });
-
   await commandExistsOrInstall({
     command: "node",
-    installInstructions:
-      'Please run "brew install node" or go to https://formulae.brew.sh/formula/node for instructions',
+    installInstructions: `Please run "${installHelper[currentPlatformId]} install node" or go to https://formulae.brew.sh/formula/node for instructions`,
     installCommand: {
-      command: "brew install node",
-      description: "Installing node using brew",
+      command: `${installHelper[currentPlatformId]} install node`,
+      description: `Installing node using ${installHelper[currentPlatformId]}`,
     },
     exitIfNotInstalled: true,
   });
@@ -469,8 +560,8 @@ const installRequiredStuff = async () => {
     installInstructions:
       "Please install node and npm, see https://docs.npmjs.com/downloading-and-installing-node-js-and-npm",
     installCommand: {
-      command: "brew install node",
-      description: "Installing node using brew",
+      command: `${installHelper[currentPlatformId]} install node`,
+      description: `Installing node using ${installHelper[currentPlatformId]}`,
     },
     exitIfNotInstalled: true,
   });
@@ -504,8 +595,8 @@ const installRequiredStuff = async () => {
     command: "jq",
     exitIfNotInstalled: true,
     installCommand: {
-      command: "brew install jq",
-      description: "Installing jq using brew",
+      command: `${installHelper[currentPlatformId]} install jq`,
+      description: `Installing jq using ${installHelper[currentPlatformId]}`,
     },
     installInstructions:
       "Please install jq, see https://stedolan.github.io/jq/download/ for instructions.",
@@ -515,8 +606,8 @@ const installRequiredStuff = async () => {
     command: "watchman",
     exitIfNotInstalled: true,
     installCommand: {
-      command: "brew install watchman",
-      description: "Installing watchman using brew",
+      command: `${installHelper[currentPlatformId]} install watchman`,
+      description: `Installing watchman using ${installHelper[currentPlatformId]}`,
     },
     installInstructions:
       "Please install watchman, see https://facebook.github.io/watchman/docs/install.html for instructions.",
@@ -547,116 +638,133 @@ const getCommandsWithoutCache = ({
   appName: string;
   selectedApps: string[];
   remote: string | null;
-}) => [
-  {
-    dir: targetDir,
-    commands: [
-      {
-        command: `mkdir ${appName}`,
-        description: "Making folder for your app",
-      },
-      {
-        //NB: "*" doesn't match hidden files, so we use "." here
-        command: `cp -R ${sensibleDir}/templates/base/. ${targetDir}/${appName}`,
-        description: "Copying sensible base",
-      },
+}) => {
+  return [
+    {
+      dir: targetDir,
+      commands: [
+        {
+          //command: `mkdir ${appName}`,
+          command: makeDirCommandHelper[currentPlatformId](appName),
+          description: "Making folder for your app",
+        },
+        {
+          //NB: "*" doesn't match hidden files, so we use "." here
+          //`cp -R ${sensibleDir}/templates/base/. ${targetDir}/${appName}`,
+          command: copyCommandHelper[currentPlatformId](
+            `${sensibleDir}/templates/base/.`,
+            `${targetDir}/${appName}`
+          ),
+          description: "Copying sensible base",
+        },
 
-      {
-        nodeFunction: findAndRenameTemplateFiles(`${targetDir}/${appName}`),
-        description: "Rename template files to normal files",
-      },
-    ],
-  },
+        {
+          nodeFunction: findAndRenameTemplateFiles(`${targetDir}/${appName}`),
+          description: "Rename template files to normal files",
+        },
+      ],
+    },
 
-  {
-    dir: `${targetDir}/${appName}/apps/server`,
-    commands: [
-      {
-        command:
-          "yarn add cors dotenv md5 reflect-metadata sequelize sequelize-typescript server sqlite3 typescript",
-        description: "Installing server dependencies",
-      },
-      {
-        command:
-          "yarn add -D @types/node @types/server @types/validator babel-cli eslint ts-node ts-node-dev",
-        description: "Installing server devDependencies",
-      },
-    ],
-  },
+    {
+      dir: `${targetDir}/${appName}/apps/server`,
+      commands: [
+        {
+          command:
+            "yarn add cors dotenv md5 reflect-metadata sequelize sequelize-typescript server sqlite3 typescript",
+          description: "Installing server dependencies",
+        },
+        {
+          command:
+            "yarn add -D @types/node @types/server @types/validator babel-cli eslint ts-node ts-node-dev",
+          description: "Installing server devDependencies",
+        },
+      ],
+    },
 
-  {
-    // download all third-party dependencies that are tightly integrated and probably still require some bugfixing in v1
-    dir: `${targetDir}/${appName}/third-party`,
-    commands: isNoThirdParty
-      ? []
-      : includedRepoSlugs.map((slug) => ({
-          command: `git clone https://github.com/${slug}.git`,
-          description: `Adding third-party repo: ${slug}`,
-        })),
-  },
 
-  // only install selected apps
-  ...selectedApps.map((app) => {
-    const installPath = path.join(
-      sensibleDir,
-      `templates/apps/${app}.install.json`
-    );
-    const fileString = fs.existsSync(installPath)
-      ? fs.readFileSync(installPath, { encoding: "utf8" })
-      : "";
+    {
+      // download all third-party dependencies that are tightly integrated and probably still require some bugfixing in v1
+      dir: `${targetDir}/${appName}/third-party`,
+      commands: isNoThirdParty
+        ? []
+        : includedRepoSlugs.map((slug) => ({
+            command: `git clone https://github.com/${slug}.git`,
+            description: `Adding third-party repo: ${slug}`,
+          })),
+    },
 
-    const appsCommands: InstallObject =
-      fileString && fileString.length > 0
-        ? JSON.parse(fileString)
-        : { commands: [], tasks: [] };
+    // only install selected apps
+    ...selectedApps.map((app) => {
+      const fileString = fs.readFileSync(
+        path.join(sensibleDir, `templates/apps/${app}.install.json`),
+        { encoding: "utf8" }
+      );
 
-    const filledInAppCommands = appsCommands.commands.map(
-      commandReplaceVariables({})
-    );
+      const appsCommands: InstallObject =
+        fileString && fileString.length > 0
+          ? JSON.parse(fileString)
+          : { commands: [], tasks: [] };
 
-    const defaultAppsCommands = [
-      {
-        command: `cp -R ${sensibleDir}/templates/apps/${app}/. ${targetDir}/${appName}/apps/${app}`,
-        description: `Copying ${app} template`,
-      },
-    ];
+      const filledInAppCommands = appsCommands.commands.map(
+        commandReplaceVariables({})
+      );
 
-    return {
-      dir: `${targetDir}/${appName}/apps`,
-      commands: filledInAppCommands.concat(defaultAppsCommands),
-    };
-  }),
+      const defaultAppsCommands = [
+        {
+          //`cp -R ${sensibleDir}/templates/apps/${app}/. ${targetDir}/${appName}/apps/${app}`
+          command: copyCommandHelper[currentPlatformId](
+            `${sensibleDir}/templates/apps/${app}/.`,
+            `${targetDir}/${appName}/apps/${app}`
+          ),
+          description: `Copying ${app} template`,
+        },
+      ];
 
-  {
-    dir: `${targetDir}/${appName}`,
-    commands: [getOpenVSCodeCommand(appName), openDocsCommand],
-  },
+      return {
+        dir: `${targetDir}/${appName}/apps`,
+        commands: filledInAppCommands.concat(defaultAppsCommands),
+      };
+    }),
 
-  getPushToGitCommands(appName, remote),
+    {
+      dir: `${targetDir}/${appName}`,
+      commands: [getOpenVSCodeCommand(appName)],
+    },
 
-  {
-    dir: homedir(),
-    commands: [
-      {
-        // NB: -p stands for parents and makes directories recursively
-        command: "rm -rf .sensible/cache && mkdir -p .sensible/cache",
-        description: "Creating sensible cache folder",
-      },
+    getPushToGitCommands(appName, remote),
 
-      {
-        command: `cp -R ${targetDir}/${appName}/. .sensible/cache`,
-        description: "Creating cache",
-      },
+    {
+      dir: homedir(),
+      commands: [
+        {
+          // NB: -p stands for parents and makes directories recursively
+          //command: "rm -rf .sensible/cache && mkdir -p .sensible/cache",
+          command:
+            removeDirAndRecreateEmptyHelper[currentPlatformId](
+              ".sensible/cache"
+            ),
+          description: "Creating sensible cache folder",
+        },
 
-      {
-        command: `echo $(node -e 'log(Date.now())') > .sensible/updatedAt.txt`,
-        description: "Add current timestamp to cached files",
-      },
+        {
+          //command: `cp -R ${targetDir}/${appName}/. .sensible/cache`,
+          command: copyCommandHelper[currentPlatformId](
+            `${targetDir}/${appName}/.`,
+            `.sensible/cache`
+          ),
+          description: "Creating cache",
+        },
 
-      setNewDefaults,
-    ],
-  },
-];
+        {
+          command: `echo $(node -e 'log(Date.now())') > .sensible/updatedAt.txt`,
+          description: "Add current timestamp to cached files",
+        },
+
+        setNewDefaults,
+      ],
+    },
+  ];
+};
 
 const getCacheCommands = ({
   appName,
@@ -664,26 +772,33 @@ const getCacheCommands = ({
 }: {
   appName: string;
   remote: string | null;
-}) => [
-  {
-    dir: targetDir,
-    commands: [
-      {
-        command: `mkdir ${appName}`,
-        description: "Creating your app folder",
-      },
-      {
-        command: `cp -R $HOME/.sensible/cache/. ${targetDir}/${appName}`,
-        description: "Copying sensible from cache",
-      },
-      getOpenVSCodeCommand(appName),
-      openDocsCommand,
-      setNewDefaults,
-    ],
-  },
+}) => {
+  return [
+    {
+      dir: targetDir,
+      commands: [
+        {
+          command: `mkdir ${appName}`,
+          description: "Creating your app folder",
+        },
+        {
+          //command: `cp -R $HOME/.sensible/cache/. ${targetDir}/${appName}`,
+          command: copyCommandHelper[currentPlatformId](
+            `$HOME/.sensible/cache/.`,
+            `${targetDir}/${appName}`
+          ),
+          description: "Copying sensible from cache",
+        },
+        getOpenVSCodeCommand(appName),
+        openDocsCommand,
+        setNewDefaults,
+      ],
+    },
 
-  getPushToGitCommands(appName, remote),
-];
+
+    getPushToGitCommands(appName, remote),
+  ];
+};
 
 const getVersionParts = (versionString: string) => {
   const [major, minor, patch] = versionString.split(".").map(Number);
@@ -760,8 +875,6 @@ const main = async () => {
     const appName = await getName();
     const remote = await getRemote(appName);
     const selectedApps = await getApps();
-
-    // console.log({ selectedApps });
 
     await askOpenDocs();
 

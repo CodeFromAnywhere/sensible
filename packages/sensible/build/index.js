@@ -49,6 +49,7 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
+var _a, _b, _c, _d, _e, _f;
 Object.defineProperty(exports, "__esModule", { value: true });
 var readline_1 = __importDefault(require("readline"));
 var path_1 = __importDefault(require("path"));
@@ -57,8 +58,65 @@ var fs_1 = __importDefault(require("fs"));
 var os_1 = require("os");
 var util_templates_1 = require("./util.templates");
 var util_log_1 = require("./util.log");
+var util_platform_1 = require("./util.platform");
 var command_exists_1 = __importDefault(require("command-exists"));
+//InstallHelper
+var installHelper = (_a = {},
+    _a[util_platform_1.platformIds.macOS] = "brew",
+    _a[util_platform_1.platformIds.windows] = "choco",
+    _a[util_platform_1.platformIds.linux] = "brew",
+    _a);
+var openUrlHelper = (_b = {},
+    _b[util_platform_1.platformIds.macOS] = "open",
+    _b[util_platform_1.platformIds.windows] = "start",
+    _b[util_platform_1.platformIds.linux] = "open",
+    _b);
+var copyCommandHelper = (_c = {},
+    _c[util_platform_1.platformIds.macOS] = function (source, dest) {
+        return "cp -R ".concat(source, " ").concat(dest);
+    },
+    _c[util_platform_1.platformIds.windows] = function (source, dest) {
+        return "robocopy \"".concat(source, "\" \"").concat(dest, "\" /MIR");
+    },
+    _c[util_platform_1.platformIds.linux] = function (source, dest) {
+        return "cp -R ".concat(source, " ").concat(dest);
+    },
+    _c);
+var removeDirCommandHelper = (_d = {},
+    _d[util_platform_1.platformIds.macOS] = function (filePath) {
+        return "rm -rf ".concat(filePath);
+    },
+    _d[util_platform_1.platformIds.windows] = function (filePath) {
+        return "rmdir ".concat(filePath, " /s /q");
+    },
+    _d[util_platform_1.platformIds.linux] = function (filePath) {
+        return "rm -rf ".concat(filePath);
+    },
+    _d);
+var makeDirCommandHelper = (_e = {},
+    _e[util_platform_1.platformIds.macOS] = function (filePath) {
+        return "mkdir -p ".concat(filePath);
+    },
+    _e[util_platform_1.platformIds.windows] = function (filePath) {
+        return "mkdir \"".concat(filePath, "\"");
+    },
+    _e[util_platform_1.platformIds.linux] = function (filePath) {
+        return "mkdir -p ".concat(filePath);
+    },
+    _e);
+var removeDirAndRecreateEmptyHelper = (_f = {},
+    _f[util_platform_1.platformIds.macOS] = function (filePath) {
+        return "rm -rf ".concat(filePath, " && mkdir -p ").concat(filePath);
+    },
+    _f[util_platform_1.platformIds.windows] = function (filePath) {
+        return "if exist \"".concat(filePath, "\" (rmdir \"").concat(filePath, "\" /s /q && mkdir \"").concat(filePath, "\") else (mkdir \"").concat(filePath, "\")");
+    },
+    _f[util_platform_1.platformIds.linux] = function (filePath) {
+        return "rm -rf ".concat(filePath, " && mkdir -p ").concat(filePath);
+    },
+    _f);
 var os = process.platform;
+var currentPlatformId = (0, util_platform_1.getPlatformId)(os);
 //CONSTANTS
 var DEBUG_COMMANDS = false;
 var defaultAppName = "makes-sense";
@@ -140,7 +198,8 @@ var ask = function (question) {
 };
 var flagArgumentsString = process.argv
     .filter(function (a) { return a.startsWith("--"); })
-    .join(" ");
+    .join(",");
+//.join(" ");
 var argumentsWithoutFlags = process.argv.filter(function (a) { return !a.startsWith("--"); });
 var getArgumentOrAsk = function (argumentPosition, question) { return __awaiter(void 0, void 0, void 0, function () {
     var argument;
@@ -192,7 +251,11 @@ var getApps = function () { return __awaiter(void 0, void 0, void 0, function ()
                         .replaceAll(" ", ",")
                         .replaceAll(";", ",")
                         .split(",")
-                        .filter(function (x) { return !possibleApps.map(function (x) { return x.slug; }).includes(x); });
+                        .filter(function (canditateApp) {
+                        return possibleApps.map(function (app) { return app.slug; }).includes(canditateApp) ===
+                            true;
+                    });
+                //.filter((x) => !possibleApps.map((x) => x.slug).includes(x));
                 return [2 /*return*/, apps];
         }
     });
@@ -304,13 +367,25 @@ var executeCommand = function (command, dir, debug) {
             })
                 .on("exit", function (code) {
                 var CODE_SUCCESSFUL = 0;
-                if (code === CODE_SUCCESSFUL) {
+                var ALLOWED_ERRORS = [];
+                if (typeof command.command === "string" &&
+                    command.command.includes("robocopy")) {
+                    //with robocopy, errors 1, 2 and 4 are not really errors;
+                    ALLOWED_ERRORS.push(1, 2, 4);
+                }
+                if (typeof command.command === "string" &&
+                    command.command.includes("rmdir")) {
+                    //rmdir outputs 2 when it doesn't find the folder to delete
+                    ALLOWED_ERRORS.push(2);
+                }
+                if (code === CODE_SUCCESSFUL ||
+                    (code && ALLOWED_ERRORS.includes(code))) {
                     onFinish({ success: true });
                 }
                 else {
                     onFinish({ success: false });
                     (0, util_log_1.log)(messages.join("\n"));
-                    (0, util_log_1.log)("The following command failed: \"".concat(command.command, "\""));
+                    (0, util_log_1.log)("The following command failed: \"".concat(command.command, " (code ").concat(code, ")\""));
                     process.exit(1);
                 }
             })
@@ -347,6 +422,22 @@ var getSpawnCommandsReducer = function (dir, debug) {
         });
     }); };
 };
+var commandExistsAsync = function (command) { return __awaiter(void 0, void 0, void 0, function () {
+    return __generator(this, function (_a) {
+        return [2 /*return*/, new Promise(function (resolve, reject) {
+                (0, command_exists_1.default)(command, function (err, commandExists) {
+                    if (err) {
+                        reject("Some error checking if command exists. Details: " + err);
+                    }
+                    if (commandExists) {
+                        // proceed confidently knowing this command is available
+                        resolve(true);
+                    }
+                    resolve(false);
+                });
+            })];
+    });
+}); };
 var commandExistsOrInstall = function (_a) {
     var command = _a.command, installCommand = _a.installCommand, installInstructions = _a.installInstructions, exitIfNotInstalled = _a.exitIfNotInstalled;
     return __awaiter(void 0, void 0, void 0, function () {
@@ -407,7 +498,8 @@ var getPushToGitCommands = function (appName, remote) {
         dir: "".concat(targetDir, "/").concat(appName),
         commands: [
             {
-                command: "rm -rf .git",
+                //command: "rm -rf .git",
+                command: removeDirCommandHelper[currentPlatformId](".git"),
                 description: "Remove previous git",
             },
             {
@@ -441,11 +533,11 @@ var installRequiredStuff = function () { return __awaiter(void 0, void 0, void 0
             case 0: 
             //making sure you have brew, node, npm, yarn, code, git, jq, watchman
             return [4 /*yield*/, commandExistsOrInstall({
-                    command: "brew",
-                    installInstructions: "Please install brew. Go to https://brew.sh for instructions",
+                    command: installHelper[currentPlatformId],
+                    installInstructions: "Please install ".concat(installHelper[currentPlatformId], ". Go to \"https://brew.sh\" for instructions"),
                     installCommand: {
                         command: '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"',
-                        description: "Installing brew",
+                        description: "Installing ".concat(installHelper[currentPlatformId]),
                     },
                     exitIfNotInstalled: true,
                 })];
@@ -454,10 +546,10 @@ var installRequiredStuff = function () { return __awaiter(void 0, void 0, void 0
                 _a.sent();
                 return [4 /*yield*/, commandExistsOrInstall({
                         command: "node",
-                        installInstructions: 'Please run "brew install node" or go to https://formulae.brew.sh/formula/node for instructions',
+                        installInstructions: "Please run \"".concat(installHelper[currentPlatformId], " install node\" or go to https://formulae.brew.sh/formula/node for instructions"),
                         installCommand: {
-                            command: "brew install node",
-                            description: "Installing node using brew",
+                            command: "".concat(installHelper[currentPlatformId], " install node"),
+                            description: "Installing node using ".concat(installHelper[currentPlatformId]),
                         },
                         exitIfNotInstalled: true,
                     })];
@@ -467,8 +559,8 @@ var installRequiredStuff = function () { return __awaiter(void 0, void 0, void 0
                         command: "npm",
                         installInstructions: "Please install node and npm, see https://docs.npmjs.com/downloading-and-installing-node-js-and-npm",
                         installCommand: {
-                            command: "brew install node",
-                            description: "Installing node using brew",
+                            command: "".concat(installHelper[currentPlatformId], " install node"),
+                            description: "Installing node using ".concat(installHelper[currentPlatformId]),
                         },
                         exitIfNotInstalled: true,
                     })];
@@ -503,8 +595,8 @@ var installRequiredStuff = function () { return __awaiter(void 0, void 0, void 0
                         command: "jq",
                         exitIfNotInstalled: true,
                         installCommand: {
-                            command: "brew install jq",
-                            description: "Installing jq using brew",
+                            command: "".concat(installHelper[currentPlatformId], " install jq"),
+                            description: "Installing jq using ".concat(installHelper[currentPlatformId]),
                         },
                         installInstructions: "Please install jq, see https://stedolan.github.io/jq/download/ for instructions.",
                     })];
@@ -514,8 +606,8 @@ var installRequiredStuff = function () { return __awaiter(void 0, void 0, void 0
                         command: "watchman",
                         exitIfNotInstalled: true,
                         installCommand: {
-                            command: "brew install watchman",
-                            description: "Installing watchman using brew",
+                            command: "".concat(installHelper[currentPlatformId], " install watchman"),
+                            description: "Installing watchman using ".concat(installHelper[currentPlatformId]),
                         },
                         installInstructions: "Please install watchman, see https://facebook.github.io/watchman/docs/install.html for instructions.",
                     })];
@@ -545,12 +637,14 @@ var getCommandsWithoutCache = function (_a) {
             dir: targetDir,
             commands: [
                 {
-                    command: "mkdir ".concat(appName),
+                    //command: `mkdir ${appName}`,
+                    command: makeDirCommandHelper[currentPlatformId](appName),
                     description: "Making folder for your app",
                 },
                 {
                     //NB: "*" doesn't match hidden files, so we use "." here
-                    command: "cp -R ".concat(sensibleDir, "/templates/base/. ").concat(targetDir, "/").concat(appName),
+                    //`cp -R ${sensibleDir}/templates/base/. ${targetDir}/${appName}`,
+                    command: copyCommandHelper[currentPlatformId]("".concat(sensibleDir, "/templates/base/."), "".concat(targetDir, "/").concat(appName)),
                     description: "Copying sensible base",
                 },
                 {
@@ -593,7 +687,8 @@ var getCommandsWithoutCache = function (_a) {
         var filledInAppCommands = appsCommands.commands.map(commandReplaceVariables({}));
         var defaultAppsCommands = [
             {
-                command: "cp -R ".concat(sensibleDir, "/templates/apps/").concat(app, "/. ").concat(targetDir, "/").concat(appName, "/apps/").concat(app),
+                //`cp -R ${sensibleDir}/templates/apps/${app}/. ${targetDir}/${appName}/apps/${app}`
+                command: copyCommandHelper[currentPlatformId]("".concat(sensibleDir, "/templates/apps/").concat(app, "/."), "".concat(targetDir, "/").concat(appName, "/apps/").concat(app)),
                 description: "Copying ".concat(app, " template"),
             },
         ];
@@ -612,11 +707,13 @@ var getCommandsWithoutCache = function (_a) {
             commands: [
                 {
                     // NB: -p stands for parents and makes directories recursively
-                    command: "rm -rf .sensible/cache && mkdir -p .sensible/cache",
+                    //command: "rm -rf .sensible/cache && mkdir -p .sensible/cache",
+                    command: removeDirAndRecreateEmptyHelper[currentPlatformId](".sensible/cache"),
                     description: "Creating sensible cache folder",
                 },
                 {
-                    command: "cp -R ".concat(targetDir, "/").concat(appName, "/. .sensible/cache"),
+                    //command: `cp -R ${targetDir}/${appName}/. .sensible/cache`,
+                    command: copyCommandHelper[currentPlatformId]("".concat(targetDir, "/").concat(appName, "/."), ".sensible/cache"),
                     description: "Creating cache",
                 },
                 {
@@ -639,7 +736,8 @@ var getCacheCommands = function (_a) {
                     description: "Creating your app folder",
                 },
                 {
-                    command: "cp -R $HOME/.sensible/cache/. ".concat(targetDir, "/").concat(appName),
+                    //command: `cp -R $HOME/.sensible/cache/. ${targetDir}/${appName}`,
+                    command: copyCommandHelper[currentPlatformId]("$HOME/.sensible/cache/.", "".concat(targetDir, "/").concat(appName)),
                     description: "Copying sensible from cache",
                 },
                 getOpenVSCodeCommand(appName),
