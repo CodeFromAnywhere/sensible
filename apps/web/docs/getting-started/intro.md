@@ -8,7 +8,7 @@ Sensible is a full stack typescript framework that lets you build apps super qui
 
 Curious? Just run `npx sensible` and see the magic, or [check out the demo on the website](https://www.sensible.to)
 
-Want to know more? See the [docs](https://doc.sensible.to)
+Want to know more? See the [docs](https://sensible.to)
 
 ## Installation instructions
 

@@ -1,13 +1,7 @@
 module.exports = {
-  content: ["./src/**/*.{ts,tsx}", "../../packages/ui/src/**/*.{ts,tsx}"],
+  content: ["./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
-    extend: {
-      transitionProperty: {
-        height: "height",
-        color: "color",
-        spacing: "margin, padding",
-      },
-    },
+    extend: {},
   },
   plugins: [],
 };

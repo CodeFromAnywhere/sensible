@@ -91,7 +91,7 @@ const Header = () => {
               </div>
             </Link>
 
-            <Link passHref href={"https://doc.sensible.to"}>
+            <Link passHref href={"https://sensible.to"}>
               <a target="_blank">
                 <div className="py-2 px-3 mr-4 font-semibold cursor-pointer">
                   Docs

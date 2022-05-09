@@ -272,7 +272,7 @@ var askOpenDocs = function () { return __awaiter(void 0, void 0, void 0, functio
                 if (openDocs) {
                     (0, util_commands_1.executeCommand)({
                         description: "Opening docs",
-                        command: "".concat(openUrlHelper[currentPlatformId], " https://doc.sensible.to"),
+                        command: "".concat(openUrlHelper[currentPlatformId], " https://sensible.to"),
                     }, __dirname, false);
                 }
                 return [2 /*return*/];

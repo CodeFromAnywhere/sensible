@@ -1,9 +1,9 @@
 <p align="center">
-<a href="https://www.sensibleframework.co" target="_blank">
+<a href="https://www.sensible.to" target="_blank">
 <img src="./assets/icon2.png" width="250" /><br />
 website
 </a> |
-<a href="https://doc.sensible.to">docs</a>
+<a href="https://sensible.to">docs</a>
 </p>
 
 # Welcome
@@ -12,7 +12,7 @@ Sensible is a full stack typescript framework that lets you build apps super qui
 
 Curious? Just run `npx sensible` and see the magic, or [check out the demo on the website](https://www.sensible.to)
 
-Want to know more? See the [docs](https://doc.sensible.to)
+Want to know more? See the [docs](https://sensible.to)
 
 ## Installation instructions
 
@@ -61,9 +61,9 @@ If you need more help, just look in the auto-generated docs!
 - Decentralised, Open Source, Automatic
 
 <p align="center">
-<a href="https://www.sensibleframework.co" target="_blank">
+<a href="https://www.sensible.to" target="_blank">
 <img src="./assets/icon2.png" width="250" /><br />
 website
 </a> |
-<a href="https://doc.sensible.to">docs</a>
+<a href="https://www.sensible.to">docs</a>
 </p>

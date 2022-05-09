@@ -267,7 +267,7 @@ const askOpenDocs = async (): Promise<void> => {
     executeCommand(
       {
         description: "Opening docs",
-        command: `${openUrlHelper[currentPlatformId]} https://doc.sensible.to`,
+        command: `${openUrlHelper[currentPlatformId]} https://sensible.to`,
       },
       __dirname,
       false
