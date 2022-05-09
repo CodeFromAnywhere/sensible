@@ -350,25 +350,36 @@ var getSpawnCommandsReducer = function (dir, debug) {
 var commandExistsOrInstall = function (_a) {
     var command = _a.command, installCommand = _a.installCommand, installInstructions = _a.installInstructions, exitIfNotInstalled = _a.exitIfNotInstalled;
     return __awaiter(void 0, void 0, void 0, function () {
-        var isAvailable, installCommandString, ok;
+        var isAvailable, err_1, installCommandString, ok;
         return __generator(this, function (_b) {
             switch (_b.label) {
-                case 0: return [4 /*yield*/, (0, command_exists_1.default)(command)];
+                case 0:
+                    isAvailable = false;
+                    _b.label = 1;
                 case 1:
+                    _b.trys.push([1, 3, , 4]);
+                    return [4 /*yield*/, (0, command_exists_1.default)(command)];
+                case 2:
                     isAvailable = !!(_b.sent());
+                    return [3 /*break*/, 4];
+                case 3:
+                    err_1 = _b.sent();
+                    (0, util_log_1.log)("Command not found");
+                    return [3 /*break*/, 4];
+                case 4:
                     installCommandString = installCommand && getCommand(installCommand);
                     if (isAvailable)
                         return [2 /*return*/, true];
-                    if (!installCommand) return [3 /*break*/, 4];
-                    return [4 /*yield*/, askOk("You don't have ".concat(command, ", but we need it to set up your project. Shall we install it for you, using \"").concat(installCommand, "\"? \n\n yes/no \n\n"))];
-                case 2:
+                    if (!installCommand) return [3 /*break*/, 7];
+                    return [4 /*yield*/, askOk("You don't have ".concat(command, ", but we need it to set up your project. Shall we install it for you, using \"").concat(installCommand.command, "\"? \n\n yes/no \n\n"))];
+                case 5:
                     ok = _b.sent();
-                    if (!ok) return [3 /*break*/, 4];
+                    if (!ok) return [3 /*break*/, 7];
                     return [4 /*yield*/, executeCommand(installCommand, __dirname, !!isDebug)];
-                case 3:
+                case 6:
                     _b.sent();
                     return [2 /*return*/, true];
-                case 4:
+                case 7:
                     (0, util_log_1.log)(installInstructions);
                     if (exitIfNotInstalled) {
                         process.exit(1);

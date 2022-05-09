@@ -355,14 +355,20 @@ const commandExistsOrInstall = async ({
   installInstructions: string;
   exitIfNotInstalled?: boolean;
 }) => {
-  const isAvailable = !!(await commandExists(command));
+  // const isAvailable = !!(await commandExists(command));
+  let isAvailable = false;
+  try {
+    isAvailable = !!(await commandExists(command));
+  } catch (err) {
+    log("Command not found");
+  }
 
   const installCommandString = installCommand && getCommand(installCommand);
   if (isAvailable) return true;
 
   if (installCommand) {
     const ok = await askOk(
-      `You don't have ${command}, but we need it to set up your project. Shall we install it for you, using "${installCommand}"? \n\n yes/no \n\n`
+      `You don't have ${command}, but we need it to set up your project. Shall we install it for you, using "${installCommand.command}"? \n\n yes/no \n\n`
     );
 
     if (ok) {
