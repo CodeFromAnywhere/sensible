@@ -29,7 +29,7 @@ const copyCommandHelper = {
     return `cp -R ${source} ${dest}`;
   },
   [platformIds.windows]: (source: string, dest: string) => {
-    return `robocopy ${source} ${dest}`;
+    return `robocopy "${source}" "${dest}" /MIR`;
   },
   [platformIds.linux]: (source: string, dest: string) => {
     return `cp -R ${source} ${dest}`;
@@ -761,11 +761,11 @@ const main = async () => {
       ? getCacheCommands({ appName, remote })
       : getCommandsWithoutCache({ appName, remote, selectedApps });
 
-    console.log(
-      "[sensible]: ",
-      "these are the commands from folders: " +
-        JSON.stringify(commandsFromFolders)
-    );
+    // console.log(
+    //   "[sensible]: ",
+    //   "these are the commands from folders: " +
+    //     JSON.stringify(commandsFromFolders)
+    // );
 
     await commandsFromFolders.reduce(
       async (previous: Promise<void>, commandsObject: CommandsObject) => {

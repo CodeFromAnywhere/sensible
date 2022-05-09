@@ -76,7 +76,7 @@ var copyCommandHelper = (_c = {},
         return "cp -R ".concat(source, " ").concat(dest);
     },
     _c[util_platform_1.platformIds.windows] = function (source, dest) {
-        return "robocopy ".concat(source, " ").concat(dest);
+        return "robocopy \"".concat(source, "\" \"").concat(dest, "\" /MIR");
     },
     _c[util_platform_1.platformIds.linux] = function (source, dest) {
         return "cp -R ".concat(source, " ").concat(dest);
@@ -720,8 +720,11 @@ var main = function () { return __awaiter(void 0, void 0, void 0, function () {
                 commandsFromFolders = shouldGetCache
                     ? getCacheCommands({ appName: appName, remote: remote })
                     : getCommandsWithoutCache({ appName: appName, remote: remote, selectedApps: selectedApps });
-                console.log("[sensible]: ", "these are the commands from folders: " +
-                    JSON.stringify(commandsFromFolders));
+                // console.log(
+                //   "[sensible]: ",
+                //   "these are the commands from folders: " +
+                //     JSON.stringify(commandsFromFolders)
+                // );
                 return [4 /*yield*/, commandsFromFolders.reduce(function (previous, commandsObject) { return __awaiter(void 0, void 0, void 0, function () {
                         return __generator(this, function (_a) {
                             switch (_a.label) {
@@ -733,6 +736,11 @@ var main = function () { return __awaiter(void 0, void 0, void 0, function () {
                         });
                     }); }, Promise.resolve())];
             case 6:
+                // console.log(
+                //   "[sensible]: ",
+                //   "these are the commands from folders: " +
+                //     JSON.stringify(commandsFromFolders)
+                // );
                 _a.sent();
                 return [3 /*break*/, 8];
             case 7:
