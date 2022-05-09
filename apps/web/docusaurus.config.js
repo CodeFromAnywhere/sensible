@@ -126,10 +126,10 @@ const config = {
         ],
         copyright: `Copyright © ${new Date().getFullYear()} Sensible`,
       },
-      prism: {
-        theme: lightCodeTheme,
-        darkTheme: darkCodeTheme,
-      },
+      // prism: {
+      //   theme: lightCodeTheme,
+      //   darkTheme: darkCodeTheme,
+      // },
     }),
 };
 
