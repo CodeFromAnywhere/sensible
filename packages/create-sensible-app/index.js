@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+//wrapper around sensible init
 //this should run the whole script as a cli
 const child_process = require("child_process");
 const arguments = process.argv.slice(2).join(" ");

@@ -2999,12 +2999,6 @@
   "resolved" "https://registry.npmjs.org/acorn/-/acorn-7.4.1.tgz"
   "version" "7.4.1"
 
-"add-tailwind-rn-scripts@file:/Users/wijnandkarsens/Developer/Code-From-Anywhere/sensible/packages/add-tailwind-rn-scripts":
-  "resolved" "file:packages/add-tailwind-rn-scripts"
-  "version" "1.0.4"
-  dependencies:
-    "json-file-plus" "^3.3.1"
-
 "address@^1.0.1", "address@^1.1.2":
   "integrity" "sha512-tNEZYz5G/zYunxFm7sfhAxkXEuLj3K6BKwv6ZURlsF6yiUQ65z0Q2wZW9L5cPUl9ocofGvXOdFYbFHp0+6MOig=="
   "resolved" "https://registry.npmjs.org/address/-/address-1.2.0.tgz"
@@ -7806,7 +7800,7 @@
   "resolved" "https://registry.npmjs.org/is-buffer/-/is-buffer-2.0.5.tgz"
   "version" "2.0.5"
 
-"is-callable@^1.1.4", "is-callable@^1.1.5", "is-callable@^1.2.4":
+"is-callable@^1.1.4", "is-callable@^1.2.4":
   "integrity" "sha512-nsuwtxZfMX67Oryl9LCQ+upnC0Z0BgpwntpS89m1H/TLF0zNfzfLMV/9Wa/6MZsj0acpEjAO0KF1xT6ZdLl95w=="
   "resolved" "https://registry.npmjs.org/is-callable/-/is-callable-1.2.4.tgz"
   "version" "1.2.4"
@@ -8164,11 +8158,6 @@
   "resolved" "https://registry.npmjs.org/is-yarn-global/-/is-yarn-global-0.3.0.tgz"
   "version" "0.3.0"
 
-"is@^3.2.1":
-  "integrity" "sha512-nW24QBoPcFGGHJGUwnfpI7Yc5CdqWNdsyHQszVE/z2pKHXzh7FZ5GWhJqSyaQ9wMkQnsTx+kAI8bHlCX4tKdbg=="
-  "resolved" "https://registry.npmjs.org/is/-/is-3.3.0.tgz"
-  "version" "3.3.0"
-
 "isarray@~1.0.0":
   "integrity" "sha1-u5NdSFgsuhaMBoNJV6VKPgcSTxE="
   "resolved" "https://registry.npmjs.org/isarray/-/isarray-1.0.0.tgz"
@@ -8396,17 +8385,6 @@
   "integrity" "sha512-4bV5BfR2mqfQTJm+V5tPPdf+ZpuhiIvTuAB5g8kcrXOZpTT/QwwVRWBywX1ozr6lEuPdbHxwaJlm9G6mI2sfSQ=="
   "resolved" "https://registry.npmjs.org/json-buffer/-/json-buffer-3.0.1.tgz"
   "version" "3.0.1"
-
-"json-file-plus@^3.3.1":
-  "integrity" "sha512-wo0q1UuiV5NsDPQDup1Km8IwEeqe+olr8tkWxeJq9Bjtcp7DZ0l+yrg28fSC3DEtrE311mhTZ54QGS6oiqnZEA=="
-  "resolved" "https://registry.npmjs.org/json-file-plus/-/json-file-plus-3.3.1.tgz"
-  "version" "3.3.1"
-  dependencies:
-    "is" "^3.2.1"
-    "node.extend" "^2.0.0"
-    "object.assign" "^4.1.0"
-    "promiseback" "^2.0.2"
-    "safer-buffer" "^2.0.2"
 
 "json-parse-better-errors@^1.0.1", "json-parse-better-errors@^1.0.2":
   "integrity" "sha512-mrqyZKfX5EhL7hvqcV6WG1yYjnjeuYDzDhhcAAUrq8Po85NBQBJP+ZDUT75qZQ98IkUoBqdkExkukOU7Ts2wrw=="
@@ -9733,14 +9711,6 @@
   "resolved" "https://registry.npmjs.org/node-stream-zip/-/node-stream-zip-1.15.0.tgz"
   "version" "1.15.0"
 
-"node.extend@^2.0.0":
-  "integrity" "sha512-pDT4Dchl94/+kkgdwyS2PauDFjZG0Hk0IcHIB+LkW27HLDtdoeMxHTxZh39DYbPP8UflWXWj9JcdDozF+YDOpQ=="
-  "resolved" "https://registry.npmjs.org/node.extend/-/node.extend-2.0.2.tgz"
-  "version" "2.0.2"
-  dependencies:
-    "has" "^1.0.3"
-    "is" "^3.2.1"
-
 "nopt@^5.0.0":
   "integrity" "sha512-Tbj67rffqceeLpcRXrT7vKAN8CwfPeIBgM7E6iBkmKLV7bEMwpGgYLGv0jACUsECaa/vuxP0IjEont6umdMgtQ=="
   "resolved" "https://registry.npmjs.org/nopt/-/nopt-5.0.0.tgz"
@@ -10795,13 +10765,6 @@
   "resolved" "https://registry.npmjs.org/process-nextick-args/-/process-nextick-args-2.0.1.tgz"
   "version" "2.0.1"
 
-"promise-deferred@^2.0.3":
-  "integrity" "sha512-n10XaoznCzLfyPFOlEE8iurezHpxrYzyjgq/1eW9Wk1gJwur/N7BdBmjJYJpqMeMcXK4wEbzo2EvZQcqjYcKUQ=="
-  "resolved" "https://registry.npmjs.org/promise-deferred/-/promise-deferred-2.0.3.tgz"
-  "version" "2.0.3"
-  dependencies:
-    "promise" "^7.3.1"
-
 "promise-inflight@^1.0.1":
   "integrity" "sha1-mEcocL8igTL8vdhoEputEsPAKeM="
   "resolved" "https://registry.npmjs.org/promise-inflight/-/promise-inflight-1.0.1.tgz"
@@ -10815,7 +10778,7 @@
     "err-code" "^2.0.2"
     "retry" "^0.12.0"
 
-"promise@^7.0.1", "promise@^7.1.1", "promise@^7.3.1":
+"promise@^7.0.1", "promise@^7.1.1":
   "integrity" "sha512-nolQXZ/4L+bP/UGlkfaIujX9BKxGwmQ9OT4mOt5yvy8iK1h3wqTEJCijzGANTCCl9nWjY41juyAn2K3Q1hLLTg=="
   "resolved" "https://registry.npmjs.org/promise/-/promise-7.3.1.tgz"
   "version" "7.3.1"
@@ -10828,14 +10791,6 @@
   "version" "8.1.0"
   dependencies:
     "asap" "~2.0.6"
-
-"promiseback@^2.0.2":
-  "integrity" "sha512-VZXdCwS0ppVNTIRfNsCvVwJAaP2b+pxQF7lM8DMWfmpNWyTxB6O5YNbzs+8z0ki/KIBHKHk308NTIl4kJUem3w=="
-  "resolved" "https://registry.npmjs.org/promiseback/-/promiseback-2.0.3.tgz"
-  "version" "2.0.3"
-  dependencies:
-    "is-callable" "^1.1.5"
-    "promise-deferred" "^2.0.3"
 
 "prompts@^2.4.0", "prompts@^2.4.2":
   "integrity" "sha512-NxNv/kLguCA7p3jE8oL2aEBsrJWgAakBpgmgK6lpPWV+WuOmY6r2/zbAVnP+T8bQlA0nzHXSJSJW0Hq7ylaD2Q=="
@@ -11997,7 +11952,7 @@
   "resolved" "https://registry.npmjs.org/safe-stable-stringify/-/safe-stable-stringify-2.3.1.tgz"
   "version" "2.3.1"
 
-"safer-buffer@^2.0.2", "safer-buffer@>= 2.1.2 < 3", "safer-buffer@>= 2.1.2 < 3.0.0":
+"safer-buffer@>= 2.1.2 < 3", "safer-buffer@>= 2.1.2 < 3.0.0":
   "integrity" "sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg=="
   "resolved" "https://registry.npmjs.org/safer-buffer/-/safer-buffer-2.1.2.tgz"
   "version" "2.1.2"
@@ -12226,7 +12181,7 @@
 
 "sensible@file:/Users/wijnandkarsens/Developer/Code-From-Anywhere/sensible/packages/sensible":
   "resolved" "file:packages/sensible"
-  "version" "1.1.7"
+  "version" "1.1.8"
   dependencies:
     "@types/command-exists" "^1.2.0"
     "command-exists" "^1.2.9"

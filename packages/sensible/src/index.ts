@@ -3,13 +3,12 @@
 
 import readline from "readline";
 import path from "path";
-import { spawn } from "child_process";
+import { spawn, spawnSync } from "child_process";
 import fs from "fs";
 import { homedir } from "os";
 import { findAndRenameTemplateFiles } from "./util.templates";
 import { log } from "./util.log";
 import { getPlatformId, platformIds, platformNames } from "./util.platform";
-//import latestVersion from "latest-version";
 
 import commandExists from "command-exists";
 
@@ -815,12 +814,31 @@ const getVersionParts = (versionString: string) => {
   return { major, minor, patch };
 };
 
-const getPackageVersions = async (name: string) => {
-  const latest = ""; //await latestVersion(name);
+const getPackageVersions = async (
+  name: string
+): Promise<{ latest: string; current: string }> => {
+  const latest = spawn(`npm show ${name} version`);
+
   const current: string = JSON.parse(
     fs.readFileSync(path.resolve(sensibleDir, "package.json"), "utf8")
   ).version;
-  return { latest, current };
+
+  return new Promise((resolve, reject) => {
+    // You can also use a variable to save the output
+    // for when the script closes later
+    let latestVersion = "";
+    latest.stdout.setEncoding("utf8");
+    latest.stdout.on("data", function (data) {
+      latestVersion += data;
+    });
+    latest.on("close", function (code) {
+      //Here you can get the exit code of the script
+      console.log("closing code: " + code);
+      console.log("Full output of script: ", latestVersion);
+
+      resolve({ latest: latestVersion, current });
+    });
+  });
 };
 
 const getUpdateSeverity = async ({
@@ -860,7 +878,7 @@ const handleVersionUpdates = async () => {
     await executeCommand(
       {
         description: "Updating sensible",
-        command: "npm install --glopbal sensible@latest",
+        command: "npm install --global sensible@latest",
       },
       targetDir,
       !!isDebug
@@ -877,7 +895,7 @@ const handleVersionUpdates = async () => {
 
 const main = async () => {
   //problem with imports package.json ect. do some research to solve this.
-  //await handleVersionUpdates();
+  await handleVersionUpdates();
   await installRequiredStuff();
   const command = argumentsWithoutFlags[2];
 

@@ -1,7 +1,7 @@
 {
   "name": "sensible",
   "type": "commonjs",
-  "version": "1.1.7",
+  "version": "1.1.8",
   "description": "The main CLI for the sensible framework",
   "bin": {
     "sensible": "./build/index.js",
@@ -12,8 +12,8 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc -w",
-    "up": "npm version path -v",
-    "pub": "npm run pub && npm publish"
+    "up": "npm version patch -f",
+    "pub": "npm run up && npm publish"
   },
   "repository": {
     "type": "git",
