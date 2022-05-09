@@ -231,8 +231,12 @@ var getApps = function () { return __awaiter(void 0, void 0, void 0, function ()
         switch (_a.label) {
             case 0:
                 possibleApps = [
-                    { slug: "app", description: "Expo app (for android, iOS, web)" },
-                    { slug: "web", description: "Next.js app" },
+                    {
+                        slug: "app",
+                        description: "Expo app (for android, iOS, web)",
+                        default: true,
+                    },
+                    { slug: "web", description: "Next.js app", default: true },
                     { slug: "webreact", description: "Bare React.js app (Experimental)" },
                     { slug: "chrome", description: "Chrome extension (Experimental)" },
                     { slug: "vscode", description: "VSCode extension (Experimental)" },
@@ -241,13 +245,13 @@ var getApps = function () { return __awaiter(void 0, void 0, void 0, function ()
                         description: "Electron app (for Windows, Linux and MacOS) (Experimental)",
                     },
                 ];
-                return [4 /*yield*/, ask("Which apps do you want to create boilerplates for? Just press enter for all of them \n    \n".concat(possibleApps
+                return [4 /*yield*/, ask("Which apps do you want to create boilerplates for? Just press enter for all non-experimental ones \n    \n".concat(possibleApps
                         .map(function (possible) { return "- ".concat(possible.slug, ": ").concat(possible.description, "\n"); })
                         .join(""), "\n"))];
             case 1:
                 appsString = _a.sent();
                 apps = appsString === ""
-                    ? possibleApps.map(function (x) { return x.slug; })
+                    ? possibleApps.filter(function (x) { return x.default; }).map(function (x) { return x.slug; })
                     : appsString
                         .replaceAll(" ", ",")
                         .replaceAll(";", ",")
@@ -256,7 +260,6 @@ var getApps = function () { return __awaiter(void 0, void 0, void 0, function ()
                         return possibleApps.map(function (app) { return app.slug; }).includes(canditateApp) ===
                             true;
                     });
-                //.filter((x) => !possibleApps.map((x) => x.slug).includes(x));
                 return [2 /*return*/, apps];
         }
     });

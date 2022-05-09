@@ -231,9 +231,17 @@ const askOk = async (question: string): Promise<boolean> => {
 };
 
 const getApps = async (): Promise<string[]> => {
-  const possibleApps: { slug: string; description: string }[] = [
-    { slug: "app", description: "Expo app (for android, iOS, web)" },
-    { slug: "web", description: "Next.js app" },
+  const possibleApps: {
+    slug: string;
+    description: string;
+    default?: boolean;
+  }[] = [
+    {
+      slug: "app",
+      description: "Expo app (for android, iOS, web)",
+      default: true,
+    },
+    { slug: "web", description: "Next.js app", default: true },
     { slug: "webreact", description: "Bare React.js app (Experimental)" },
     { slug: "chrome", description: "Chrome extension (Experimental)" },
     { slug: "vscode", description: "VSCode extension (Experimental)" },
@@ -244,7 +252,7 @@ const getApps = async (): Promise<string[]> => {
   ];
 
   const appsString = await ask(
-    `Which apps do you want to create boilerplates for? Just press enter for all of them 
+    `Which apps do you want to create boilerplates for? Just press enter for all non-experimental ones 
     
 ${possibleApps
   .map((possible) => `- ${possible.slug}: ${possible.description}\n`)
@@ -253,7 +261,7 @@ ${possibleApps
 
   const apps =
     appsString === ""
-      ? possibleApps.map((x) => x.slug)
+      ? possibleApps.filter((x) => x.default).map((x) => x.slug)
       : appsString
           .replaceAll(" ", ",")
           .replaceAll(";", ",")
@@ -263,7 +271,7 @@ ${possibleApps
               possibleApps.map((app) => app.slug).includes(canditateApp) ===
               true
           );
-  //.filter((x) => !possibleApps.map((x) => x.slug).includes(x));
+
   return apps;
 };
 
