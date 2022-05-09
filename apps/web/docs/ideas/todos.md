@@ -1,5 +1,11 @@
 # Todos
 
+todos:
+
+- [ ] return todos from api (optionally behind auth)
+- [ ] render them and make them editable
+- [ ] add ways to prio them and make a trello board
+
 Todo's can exist in many ways:
 
 - [ ] issues
