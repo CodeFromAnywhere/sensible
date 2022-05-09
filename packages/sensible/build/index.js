@@ -198,7 +198,8 @@ var ask = function (question) {
 };
 var flagArgumentsString = process.argv
     .filter(function (a) { return a.startsWith("--"); })
-    .join(" ");
+    .join(",");
+//.join(" ");
 var argumentsWithoutFlags = process.argv.filter(function (a) { return !a.startsWith("--"); });
 var getArgumentOrAsk = function (argumentPosition, question) { return __awaiter(void 0, void 0, void 0, function () {
     var argument;
@@ -250,7 +251,11 @@ var getApps = function () { return __awaiter(void 0, void 0, void 0, function ()
                         .replaceAll(" ", ",")
                         .replaceAll(";", ",")
                         .split(",")
-                        .filter(function (x) { return !possibleApps.map(function (x) { return x.slug; }).includes(x); });
+                        .filter(function (canditateApp) {
+                        return possibleApps.map(function (app) { return app.slug; }).includes(canditateApp) ===
+                            true;
+                    });
+                //.filter((x) => !possibleApps.map((x) => x.slug).includes(x));
                 return [2 /*return*/, apps];
         }
     });
@@ -318,7 +323,6 @@ var getCommand = function (command) {
     if (!command.command) {
         return false;
     }
-    //console.log("[sensible]: ","executing command: " + command.command);
     if (isCommandPerOs(command.command)) {
         var cmd = command.command[os] || command.command.default;
         return cmd;
@@ -326,7 +330,6 @@ var getCommand = function (command) {
     return command.command;
 };
 var executeCommand = function (command, dir, debug) {
-    //console.log("[sensible]: ", "executing command");
     // if command is disabled, immediately resolve so it is skippped.
     if (command.isDisabled) {
         return new Promise(function (resolve) {
@@ -382,8 +385,7 @@ var executeCommand = function (command, dir, debug) {
                 else {
                     onFinish({ success: false });
                     (0, util_log_1.log)(messages.join("\n"));
-                    console.log("[sensible]: ", "command exited with code " + code);
-                    (0, util_log_1.log)("The following command failed: \"".concat(command.command, "\""));
+                    (0, util_log_1.log)("The following command failed: \"".concat(command.command, " (code ").concat(code, ")\""));
                     process.exit(1);
                 }
             })
@@ -520,10 +522,6 @@ var installRequiredStuff = function () { return __awaiter(void 0, void 0, void 0
         switch (_a.label) {
             case 0: 
             //making sure you have brew, node, npm, yarn, code, git, jq, watchman
-            // console.log(
-            //   "[sensible]: ",
-            //   `making sure you have ${installHelper[currentPlatformId]}`
-            // );
             return [4 /*yield*/, commandExistsOrInstall({
                     command: installHelper[currentPlatformId],
                     installInstructions: "Please install ".concat(installHelper[currentPlatformId], ". Go to \"https://brew.sh\" for instructions"),
@@ -535,12 +533,7 @@ var installRequiredStuff = function () { return __awaiter(void 0, void 0, void 0
                 })];
             case 1:
                 //making sure you have brew, node, npm, yarn, code, git, jq, watchman
-                // console.log(
-                //   "[sensible]: ",
-                //   `making sure you have ${installHelper[currentPlatformId]}`
-                // );
                 _a.sent();
-                //console.log("[sensible]: ", "making sure you have node");
                 return [4 /*yield*/, commandExistsOrInstall({
                         command: "node",
                         installInstructions: "Please run \"".concat(installHelper[currentPlatformId], " install node\" or go to https://formulae.brew.sh/formula/node for instructions"),
@@ -551,7 +544,6 @@ var installRequiredStuff = function () { return __awaiter(void 0, void 0, void 0
                         exitIfNotInstalled: true,
                     })];
             case 2:
-                //console.log("[sensible]: ", "making sure you have node");
                 _a.sent();
                 return [4 /*yield*/, commandExistsOrInstall({
                         command: "npm",
@@ -626,7 +618,6 @@ var setNewDefaults = {
 };
 var getCommandsWithoutCache = function (_a) {
     var appName = _a.appName, selectedApps = _a.selectedApps, remote = _a.remote;
-    console.log("[sensible]: ", "getting commands without cache");
     return __spreadArray(__spreadArray([
         {
             dir: targetDir,
@@ -719,7 +710,6 @@ var getCommandsWithoutCache = function (_a) {
 };
 var getCacheCommands = function (_a) {
     var appName = _a.appName, remote = _a.remote;
-    console.log("[sensible]: ", "getting commands from cache");
     return [
         {
             dir: targetDir,
@@ -744,12 +734,9 @@ var main = function () { return __awaiter(void 0, void 0, void 0, function () {
     var command, appName, remote, selectedApps, commandsFromFolders;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0:
-                console.log("[sensible]: ", "running main");
-                return [4 /*yield*/, installRequiredStuff()];
+            case 0: return [4 /*yield*/, installRequiredStuff()];
             case 1:
                 _a.sent();
-                console.log("[sensible]: ", "finished installing required stuff.");
                 command = argumentsWithoutFlags[2];
                 if (!(command === "init")) return [3 /*break*/, 7];
                 return [4 /*yield*/, getName()];
@@ -761,19 +748,12 @@ var main = function () { return __awaiter(void 0, void 0, void 0, function () {
                 return [4 /*yield*/, getApps()];
             case 4:
                 selectedApps = _a.sent();
-                console.log("[sensible]: ", "these are the selected apps: " + JSON.stringify(selectedApps));
                 return [4 /*yield*/, askOpenDocs()];
             case 5:
                 _a.sent();
-                console.log("[sensible]: ", "getting commands from folders");
                 commandsFromFolders = shouldGetCache
                     ? getCacheCommands({ appName: appName, remote: remote })
                     : getCommandsWithoutCache({ appName: appName, remote: remote, selectedApps: selectedApps });
-                // console.log(
-                //   "[sensible]: ",
-                //   "these are the commands from folders: " +
-                //     JSON.stringify(commandsFromFolders)
-                // );
                 return [4 /*yield*/, commandsFromFolders.reduce(function (previous, commandsObject) { return __awaiter(void 0, void 0, void 0, function () {
                         return __generator(this, function (_a) {
                             switch (_a.label) {
@@ -785,11 +765,6 @@ var main = function () { return __awaiter(void 0, void 0, void 0, function () {
                         });
                     }); }, Promise.resolve())];
             case 6:
-                // console.log(
-                //   "[sensible]: ",
-                //   "these are the commands from folders: " +
-                //     JSON.stringify(commandsFromFolders)
-                // );
                 _a.sent();
                 return [3 /*break*/, 8];
             case 7:

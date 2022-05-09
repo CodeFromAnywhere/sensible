@@ -204,7 +204,8 @@ const ask = (question: string): Promise<string> => {
 
 const flagArgumentsString = process.argv
   .filter((a) => a.startsWith("--"))
-  .join(" ");
+  .join(",");
+//.join(" ");
 const argumentsWithoutFlags = process.argv.filter((a) => !a.startsWith("--"));
 
 const getArgumentOrAsk = async (
@@ -255,8 +256,12 @@ ${possibleApps
           .replaceAll(" ", ",")
           .replaceAll(";", ",")
           .split(",")
-          .filter((x) => !possibleApps.map((x) => x.slug).includes(x));
-
+          .filter(
+            (canditateApp) =>
+              possibleApps.map((app) => app.slug).includes(canditateApp) ===
+              true
+          );
+  //.filter((x) => !possibleApps.map((x) => x.slug).includes(x));
   return apps;
 };
 
@@ -322,7 +327,6 @@ const getCommand = (command: Command): string | false => {
   if (!command.command) {
     return false;
   }
-  //console.log("[sensible]: ","executing command: " + command.command);
 
   if (isCommandPerOs(command.command)) {
     const cmd = command.command[os] || command.command.default!;
@@ -332,7 +336,6 @@ const getCommand = (command: Command): string | false => {
 };
 
 const executeCommand = (command: Command, dir: string, debug: boolean) => {
-  //console.log("[sensible]: ", "executing command");
   // if command is disabled, immediately resolve so it is skippped.
   if (command.isDisabled) {
     return new Promise<void>((resolve) => {
@@ -396,8 +399,10 @@ const executeCommand = (command: Command, dir: string, debug: boolean) => {
           } else {
             onFinish({ success: false });
             log(messages.join("\n"));
-            console.log("[sensible]: ", "command exited with code " + code);
-            log(`The following command failed: "${command.command}"`);
+
+            log(
+              `The following command failed: "${command.command} (code ${code})"`
+            );
             process.exit(1);
           }
         })
@@ -453,11 +458,9 @@ const commandExistsOrInstall = async ({
   installInstructions: string;
   exitIfNotInstalled?: boolean;
 }) => {
-  //console.log("[sensible]: ", `inside making sure you have ${command}`);
   let isAvailable;
   const isAvailableResult = await commandExistsAsync(command);
   isAvailable = !!isAvailableResult;
-  //console.log("[sensible]: ", `command ${command} exists: ` + isAvailable);
   const installCommandString = installCommand && getCommand(installCommand);
   if (isAvailable) return true;
 
@@ -535,10 +538,6 @@ const getPushToGitCommands = (appName: string, remote: string | null) => {
 };
 const installRequiredStuff = async () => {
   //making sure you have brew, node, npm, yarn, code, git, jq, watchman
-  // console.log(
-  //   "[sensible]: ",
-  //   `making sure you have ${installHelper[currentPlatformId]}`
-  // );
   await commandExistsOrInstall({
     command: installHelper[currentPlatformId],
     installInstructions: `Please install ${installHelper[currentPlatformId]}. Go to "https://brew.sh" for instructions`,
@@ -549,7 +548,6 @@ const installRequiredStuff = async () => {
     },
     exitIfNotInstalled: true,
   });
-  //console.log("[sensible]: ", "making sure you have node");
   await commandExistsOrInstall({
     command: "node",
     installInstructions: `Please run "${installHelper[currentPlatformId]} install node" or go to https://formulae.brew.sh/formula/node for instructions`,
@@ -639,7 +637,6 @@ const getCommandsWithoutCache = ({
   selectedApps: string[];
   remote: string | null;
 }) => {
-  console.log("[sensible]: ", "getting commands without cache");
   return [
     {
       dir: targetDir,
@@ -773,7 +770,6 @@ const getCacheCommands = ({
   appName: string;
   remote: string | null;
 }) => {
-  console.log("[sensible]: ", "getting commands from cache");
   return [
     {
       dir: targetDir,
@@ -800,32 +796,19 @@ const getCacheCommands = ({
 };
 
 const main = async () => {
-  console.log("[sensible]: ", "running main");
   await installRequiredStuff();
-  console.log("[sensible]: ", "finished installing required stuff.");
   const command = argumentsWithoutFlags[2];
 
   if (command === "init") {
     const appName = await getName();
     const remote = await getRemote(appName);
     const selectedApps = await getApps();
-    console.log(
-      "[sensible]: ",
-      "these are the selected apps: " + JSON.stringify(selectedApps)
-    );
-    await askOpenDocs();
 
-    console.log("[sensible]: ", "getting commands from folders");
+    await askOpenDocs();
 
     const commandsFromFolders = shouldGetCache
       ? getCacheCommands({ appName, remote })
       : getCommandsWithoutCache({ appName, remote, selectedApps });
-
-    // console.log(
-    //   "[sensible]: ",
-    //   "these are the commands from folders: " +
-    //     JSON.stringify(commandsFromFolders)
-    // );
 
     await commandsFromFolders.reduce(
       async (previous: Promise<void>, commandsObject: CommandsObject) => {
