@@ -2,7 +2,7 @@
 sidebar_position: 4
 ---
 
-# Example Sensible Apps
+# 🧐 Example Sensible Apps
 
 The following is a short list of apps created with Sensible:
 

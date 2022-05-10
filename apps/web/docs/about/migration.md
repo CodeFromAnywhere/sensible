@@ -2,7 +2,7 @@
 sidebar_position: 3
 ---
 
-# Migrating to Sensible
+# ➡️ Migrating to Sensible
 
 There's a lot of steps involved in migrating an existing codebase to start using Sensible. It can be divided into two parts: getting your old codebase to run, and refactoring it to make good use of all sensible features.
 

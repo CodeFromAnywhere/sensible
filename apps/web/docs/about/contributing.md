@@ -1,4 +1,4 @@
-# Contributing
+# 👷‍♂️ Contributing
 
 Please go ahead! Just let me know
 

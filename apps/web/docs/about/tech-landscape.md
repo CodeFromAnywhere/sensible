@@ -2,7 +2,7 @@
 sidebar_position: 1
 ---
 
-# A Birdseye View
+# 🦅 A Birdseye View
 
 ## Philosophy
 
