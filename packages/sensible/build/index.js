@@ -61,6 +61,7 @@ var command_exists_1 = __importDefault(require("command-exists"));
 var util_commands_1 = require("./util.commands");
 var util_userinput_1 = require("./util.userinput");
 var util_versions_1 = require("./util.versions");
+var util_commands_2 = require("./util.commands");
 //InstallHelper
 var installHelper = (_a = {},
     _a[util_platform_1.platformIds.macOS] = "brew",
@@ -529,7 +530,17 @@ var getCommandsWithoutCache = function (_a) {
         var appsCommands = fileString && fileString.length > 0
             ? JSON.parse(fileString)
             : { commands: [], tasks: [] };
-        var filledInAppCommands = appsCommands.commands.map(commandReplaceVariables({}));
+        var commandsPerOSreplaced = appsCommands.commands.map(function (command) {
+            //command.command: CommandPerOS | string
+            if (command.command) {
+                var isCommandObject = (0, util_commands_2.isCommandPerOs)(command.command);
+                if (isCommandObject) {
+                    command.command = (0, util_commands_1.getCommand)(command) || "";
+                }
+            }
+            return command;
+        });
+        var filledInAppCommands = commandsPerOSreplaced;
         var defaultAppsCommands = [
             {
                 //`cp -R ${sensibleDir}/templates/apps/${app}/. ${targetDir}/${appName}/apps/${app}`

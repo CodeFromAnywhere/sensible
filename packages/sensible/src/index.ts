@@ -11,6 +11,7 @@ import commandExists from "command-exists";
 import { Command, executeCommand, getCommand } from "./util.commands";
 import { ask, askOk, getArgumentOrAsk } from "./util.userinput";
 import { handleVersionUpdates } from "./util.versions";
+import { isCommandPerOs } from "./util.commands";
 
 //InstallHelper
 const installHelper = {
@@ -543,9 +544,19 @@ const getCommandsWithoutCache = ({
           ? JSON.parse(fileString)
           : { commands: [], tasks: [] };
 
-      const filledInAppCommands = appsCommands.commands.map(
-        commandReplaceVariables({})
+      const commandsPerOSreplaced = appsCommands.commands.map(
+        (command: Command) => {
+          //command.command: CommandPerOS | string
+          if (command.command) {
+            const isCommandObject = isCommandPerOs(command.command);
+            if (isCommandObject) {
+              command.command = getCommand(command) || "";
+            }
+          }
+          return command;
+        }
       );
+      const filledInAppCommands = commandsPerOSreplaced;
 
       const defaultAppsCommands: Command[] = [
         {
