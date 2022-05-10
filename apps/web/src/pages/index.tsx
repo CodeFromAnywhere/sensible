@@ -66,10 +66,6 @@ type Link = {
   subtitle?: string;
 };
 
-const communityLink =
-  "https://join.slack.com/t/codefromanywhere/shared_invite/zt-18r6mfudt-Zhb7FaZ70WlWVI1a_ZxgPw";
-const communityImage = "/slack.png";
-
 const tweets: string[] = []; //"1522222259326406657"
 
 const renderLink = (link: Link, index: number) => {
@@ -102,24 +98,6 @@ const renderLink = (link: Link, index: number) => {
 };
 
 const links: Link[] = [
-  {
-    path: "/github.png",
-    url: "https://github.com/Code-From-Anywhere/sensible",
-    alt: "Sensible",
-    subtitle: "GitHub",
-    isSmall: true,
-    target: "_blank",
-  },
-
-  {
-    path: communityImage,
-    url: communityLink,
-    alt: "Join our community!",
-    subtitle: "Community",
-    isSmall: true,
-    target: "_blank",
-  },
-
   {
     path: "/pasfoto.png",
     url: "https://twitter.com/wkarsens",

@@ -82,6 +82,12 @@ const config = {
             label: "Documentation",
           },
           // { to: "/blog", label: "Blog", position: "left" },
+
+          {
+            href: "https://join.slack.com/t/codefromanywhere/shared_invite/zt-18r6mfudt-Zhb7FaZ70WlWVI1a_ZxgPw",
+            position: "right",
+            label: "Community",
+          },
           {
             href: "https://github.com/Code-From-Anywhere/sensible",
             label: "GitHub",
