@@ -1,5 +1,7 @@
 # Walkthrough
 
+_**Please note**: this is a work in progress! I'm creating the walkthrough as we speak!_
+
 ## Installation instructions
 
 1. Make sure you have `brew`, `node`, `npm` and `npx`. If you don't, this is how to install them:
