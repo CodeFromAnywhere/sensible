@@ -6,4 +6,4 @@ This is a collection of all current ideas. It is also kind of the place where we
 
 Do you have more ideas to make Sensible even better?
 
-Email Wijnand at sensible@karsens.com
+Email us at info@codefromanywhere.com
