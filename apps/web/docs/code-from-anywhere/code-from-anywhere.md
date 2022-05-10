@@ -1,8 +1,6 @@
----
-draft: true
----
-
 # Code From Anywhere
+
+_**Please note**: This section is a work in progress_
 
 Code From Anywhere: How to remotify your developer career and be free
 
