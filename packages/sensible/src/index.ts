@@ -452,7 +452,7 @@ const installRequiredStuff = async () => {
 };
 
 const getOpenVSCodeCommand = (appName: string) => ({
-  command: `code ${targetDir}/${appName} --goto README.md:1:1`,
+  command: `code "${targetDir}/${appName}" --goto README.md:1:1`,
   description: "Opening your project in VSCode",
 });
 
@@ -556,8 +556,10 @@ const getCommandsWithoutCache = ({
           return command;
         }
       );
-      const filledInAppCommands = commandsPerOSreplaced;
-
+      //const filledInAppCommands = commandsPerOSreplaced;
+      const filledInAppCommands = commandsPerOSreplaced.map(
+        commandReplaceVariables({})
+      );
       const defaultAppsCommands: Command[] = [
         {
           //`cp -R ${sensibleDir}/templates/apps/${app}/. ${targetDir}/${appName}/apps/${app}`

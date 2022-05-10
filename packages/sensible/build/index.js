@@ -464,7 +464,7 @@ var installRequiredStuff = function () { return __awaiter(void 0, void 0, void 0
     });
 }); };
 var getOpenVSCodeCommand = function (appName) { return ({
-    command: "code ".concat(targetDir, "/").concat(appName, " --goto README.md:1:1"),
+    command: "code \"".concat(targetDir, "/").concat(appName, "\" --goto README.md:1:1"),
     description: "Opening your project in VSCode",
 }); };
 var openDocsCommand = {
@@ -540,7 +540,8 @@ var getCommandsWithoutCache = function (_a) {
             }
             return command;
         });
-        var filledInAppCommands = commandsPerOSreplaced;
+        //const filledInAppCommands = commandsPerOSreplaced;
+        var filledInAppCommands = commandsPerOSreplaced.map(commandReplaceVariables({}));
         var defaultAppsCommands = [
             {
                 //`cp -R ${sensibleDir}/templates/apps/${app}/. ${targetDir}/${appName}/apps/${app}`
