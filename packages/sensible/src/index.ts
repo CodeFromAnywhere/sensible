@@ -11,6 +11,7 @@ import commandExists from "command-exists";
 import { Command, executeCommand, getCommand } from "./util.commands";
 import { ask, askOk, getArgumentOrAsk } from "./util.userinput";
 import { handleVersionUpdates } from "./util.versions";
+import { isCommandPerOs } from "./util.commands";
 
 //InstallHelper
 const installHelper = {
@@ -451,7 +452,7 @@ const installRequiredStuff = async () => {
 };
 
 const getOpenVSCodeCommand = (appName: string) => ({
-  command: `code ${targetDir}/${appName} --goto README.md:1:1`,
+  command: `code "${targetDir}/${appName}" --goto README.md:1:1`,
   description: "Opening your project in VSCode",
 });
 
@@ -543,10 +544,22 @@ const getCommandsWithoutCache = ({
           ? JSON.parse(fileString)
           : { commands: [], tasks: [] };
 
-      const filledInAppCommands = appsCommands.commands.map(
+      const commandsPerOSreplaced = appsCommands.commands.map(
+        (command: Command) => {
+          //command.command: CommandPerOS | string
+          if (command.command) {
+            const isCommandObject = isCommandPerOs(command.command);
+            if (isCommandObject) {
+              command.command = getCommand(command) || "";
+            }
+          }
+          return command;
+        }
+      );
+      //const filledInAppCommands = commandsPerOSreplaced;
+      const filledInAppCommands = commandsPerOSreplaced.map(
         commandReplaceVariables({})
       );
-
       const defaultAppsCommands: Command[] = [
         {
           //`cp -R ${sensibleDir}/templates/apps/${app}/. ${targetDir}/${appName}/apps/${app}`

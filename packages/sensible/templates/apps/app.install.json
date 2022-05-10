@@ -18,7 +18,11 @@
       "description": "Creating expo-app"
     },
     {
-      "command": "cd app && rm -rf .git",
+      "command": {
+        "darwin": "cd app && rm -rf .git",
+        "win32": "cd app && rmdir .git /s /q",
+        "linux": "cd app && rm -rf .git"
+      },
       "description": "Removing git folder"
     },
     {

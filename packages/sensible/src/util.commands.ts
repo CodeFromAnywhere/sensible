@@ -91,8 +91,10 @@ export const executeCommand = (
             typeof command.command === "string" &&
             command.command.includes("robocopy")
           ) {
-            //with robocopy, errors 1, 2 and 4 are not really errors;
-            ALLOWED_ERRORS.push(1, 2, 4);
+            //with robocopy,
+            //An Exit Code of 0-7 is success and any value >= 8 indicates that there
+            // was at least one failure during the copy operation.
+            ALLOWED_ERRORS.push(0, 1, 2, 3, 4, 5, 6, 7);
           }
           if (
             typeof command.command === "string" &&
@@ -111,7 +113,7 @@ export const executeCommand = (
             log(messages.join("\n"));
 
             log(
-              `The following command failed: "${command.command} (code ${code})"`
+              `The following command failed (code ${code}): "${command.command}"`
             );
             process.exit(1);
           }

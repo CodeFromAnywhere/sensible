@@ -64,8 +64,10 @@ var executeCommand = function (command, dir, debug) {
                 var ALLOWED_ERRORS = [];
                 if (typeof command.command === "string" &&
                     command.command.includes("robocopy")) {
-                    //with robocopy, errors 1, 2 and 4 are not really errors;
-                    ALLOWED_ERRORS.push(1, 2, 4);
+                    //with robocopy,
+                    //An Exit Code of 0-7 is success and any value >= 8 indicates that there
+                    // was at least one failure during the copy operation.
+                    ALLOWED_ERRORS.push(0, 1, 2, 3, 4, 5, 6, 7);
                 }
                 if (typeof command.command === "string" &&
                     command.command.includes("rmdir")) {
@@ -79,7 +81,7 @@ var executeCommand = function (command, dir, debug) {
                 else {
                     onFinish({ success: false });
                     (0, util_log_1.log)(messages.join("\n"));
-                    (0, util_log_1.log)("The following command failed: \"".concat(command.command, " (code ").concat(code, ")\""));
+                    (0, util_log_1.log)("The following command failed (code ".concat(code, "): \"").concat(command.command, "\""));
                     process.exit(1);
                 }
             })

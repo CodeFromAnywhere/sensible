@@ -14,12 +14,20 @@
   "instructions": "",
   "commands": [
     {
-      "command": "yarn create next-app --typescript web",
+      "command": {
+        "darwin": "yarn create next-app --typescript web",
+        "win32": "npx create-next-app@latest --ts web",
+        "linux": "yarn create next-app --typescript web"
+      },
       "description": "Creating next-app"
     },
 
     {
-      "command": "cd web && rm -rf .git",
+      "command": {
+        "darwin": "cd web && rm -rf .git",
+        "win32": "cd web && rmdir .git /s /q",
+        "linux": "cd web && rm -rf .git"
+      },
       "description": "Removing web git folder"
     },
     {
@@ -35,7 +43,11 @@
       "description": "Installing web devDependencies"
     },
     {
-      "command": "rm -rf web/pages web/styles",
+      "command": {
+        "darwin": "rm -rf web/pages web/styles",
+        "win32": "rmdir \"web/pages\" \"web/styles\" /s /q",
+        "linux": "rm -rf web/pages web/styles"
+      },
       "description": "Remove unused boilerplate"
     },
     {
