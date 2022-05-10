@@ -16,4 +16,4 @@ The following is a short list of apps created with Sensible:
 
 ## By you
 
-We don't know about anyone else using Sensible yet. Let us know!
+We don't know about anyone else using Sensible yet. [Let us know](mailto:info@CodeFromAnywhere.com)!

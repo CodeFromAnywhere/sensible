@@ -1,59 +1,27 @@
-# Migration
+---
+sidebar_position: 3
+---
 
-Put the apps (app, web, server, etc.) in the "apps" folder.
-Also create a packages folder in which you create a core folder and ui folder.
+# Migrating to Sensible
 
-Add this package.json in your project root directory
+There's a lot of steps involved in migrating an existing codebase to start using Sensible. It can be divided into two parts: getting your old codebase to run, and refactoring it to make good use of all sensible features.
 
-```{
-    "name": "yourproject-monorepo",
-    "version": "0.0.0",
-    "private": true,
-    "workspaces": [
-      "apps/*",
-      "packages/*"
-    ],
-    "scripts": {
-      "build": "turbo run build",
-      "dev": "turbo run dev --parallel",
-      "lint": "turbo run lint",
-      "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    },
-    "devDependencies": {
-      "prettier": "^2.5.1",
-      "turbo": "latest"
-    },
-    "engines": {
-      "npm": ">=7.0.0",
-      "node": ">=14.0.0"
-    },
-    "packageManager": "pnpm@6.32.1"
-  }
-```
+## Getting it to run
 
-Create a turbo.json with this in your project root directory:
+1. The easiest way is to just run `sensible init` to create a new project.
+2. You can get your old codebase to run by simply copying your server and frontend(s) to the `apps` folder. It is advisable to use different folder-names and leave `app`, `web` and `server` in there, so you still have the examples of how to do it properly, for later.
+3. Fix package versioning problems (you can just have one version per package, or you need to use [nohoist](https://classic.yarnpkg.com/blog/2018/02/15/nohoist/])
+4. Deploy it all with this new monorepo.
 
-```
-{
- "pipeline": {
-   "build": {
-     "dependsOn": ["^build"],
-     "outputs": ["dist/**", ".next/**"]
-   },
-   "lint": {
-     "outputs": []
-   },
-   "dev": {
-     "cache": false
-   }
- }
-}
-```
+## Refactoring it sensibly
 
-Add the following dependencies to your apps and packages, where needed: core, ui
-And the following to devDependencies: config, tsconfig
-With version `"*"`
+Easy enough, but you're not done! To use sensible in a sensible way, you need to:
 
-### There's more.
+1. Put all type interfaces that need to be used in multiple apps, frontend and backend, inside `core` so they can be used everywhere. Remove type interfaces everywhere else, and use the `core` ones.
+2. Create endpoint definitions in core for all your endppoints
+3. Use the `core` definitions in the frontend: start using the `api` function everywhere.
+4. Refactor all your endpoints to use `makeEndpoint`.
+5. Put all your UI (screens, components, hooks, storage) in the `ui` package so they can be reused across different frontends.
+6. If you also want to reuse `ui` between `react` and `react-native`, you need to start using `react-with-native`.
 
-This is the most important part but there are probably more things, depending on your codebase. Let us help you! Contact us to discuss this.
+This may seem like a daunting task, and it probably is. If you need help, don't hestitate to [contact us](mailto:info@codefromanywhere.com). We would love to learn more about making migrations to Sensible easier. We'll even help you for free to a certain point!

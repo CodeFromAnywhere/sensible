@@ -1,8 +1,17 @@
 ---
-sidebar_position: 2
+sidebar_position: 1
 ---
 
-# Tech Landscape
+# A Birdseye View
+
+## Philosophy
+
+Sensible was built with a couple of things in mind. This is what we care about:
+
+- Codebase introspection (Documentation generation)
+- Full-stack code-sharing (full-stack auto-completion using Typescript)
+- Maximise learnability, minimise tech debt, simplify onboarding
+- Decentralised, Open Source, Automatic
 
 ## The stack
 
