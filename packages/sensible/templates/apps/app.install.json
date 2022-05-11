@@ -59,7 +59,7 @@
       "description": "install script to run all expo stuff at once"
     },
     {
-      "command": "npx setjsonkey package.json scripts.build:tailwind \"tailwindcss --input input.css --output tailwind.css --no-autoprefixer && tailwind-rn\" && npx setjsonkey package.json scripts.dev:tailwindcss \"tailwindcss --input input.css --output tailwind.css --no-autoprefixer --watch\" && npx setjsonkey package.json scripts.dev:tailwindrn \"tailwind-rn --watch\" && npx setjsonkey package.json scripts.dev \"npm-run-all dev:*\"",
+      "command": "cd app && npx setjsonkey package.json scripts.build:tailwind \"tailwindcss --input input.css --output tailwind.css --no-autoprefixer && tailwind-rn\" && npx setjsonkey package.json scripts.dev:tailwindcss \"tailwindcss --input input.css --output tailwind.css --no-autoprefixer --watch\" && npx setjsonkey package.json scripts.dev:tailwindrn \"tailwind-rn --watch\" && npx setjsonkey package.json scripts.dev \"npm-run-all dev:*\"",
       "description": "Metascripting your json, installing tailwind scripts"
     }
   ]
