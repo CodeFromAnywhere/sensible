@@ -9,6 +9,8 @@ export declare type Command = {
     nodeFunction?: (resolve: () => void) => void;
     description: string;
     isDisabled?: boolean;
+    allowedErrors?: Array<number>;
+    getAllowedErrors?: () => void;
 };
 export declare const isCommandPerOs: (command: CommandPerOSOrCommandString) => command is CommandPerOs;
 export declare const getCommand: (command: Command) => string | false;

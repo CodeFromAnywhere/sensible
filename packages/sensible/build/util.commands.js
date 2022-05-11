@@ -44,6 +44,37 @@ var executeCommand = function (command, dir, debug) {
                 resolve();
             }
         };
+        var getAllowed = function () {
+            var _a, _b;
+            command.allowedErrors = [];
+            switch (os) {
+                case "darwin":
+                    command.allowedErrors = [];
+                    break;
+                case "linux":
+                    command.allowedErrors = [];
+                    break;
+                case "win32":
+                    if (typeof command.command === "string" &&
+                        command.command.includes("robocopy")) {
+                        //with robocopy,
+                        //An Exit Code of 0-7 is success and any value >= 8 indicates that there
+                        // was at least one failure during the copy operation.
+                        (_a = command.allowedErrors) === null || _a === void 0 ? void 0 : _a.push(0, 1, 2, 3, 4, 5, 6, 7);
+                    }
+                    if (typeof command.command === "string" &&
+                        command.command.includes("rmdir")) {
+                        //rmdir outputs 2 when it doesn't find the folder to delete
+                        (_b = command.allowedErrors) === null || _b === void 0 ? void 0 : _b.push(2);
+                    }
+                    break;
+                default:
+                    command.allowedErrors = [];
+                    break;
+            }
+        };
+        command.getAllowedErrors = getAllowed;
+        command.getAllowedErrors();
         if (DEBUG_COMMANDS) {
             (0, util_log_1.log)("".concat(Date.toString(), ": extecuted ").concat(command, " in ").concat(dir));
             resolve();
@@ -60,22 +91,10 @@ var executeCommand = function (command, dir, debug) {
                 cwd: dir,
             })
                 .on("exit", function (code) {
+                var _a;
                 var CODE_SUCCESSFUL = 0;
-                var ALLOWED_ERRORS = [];
-                if (typeof command.command === "string" &&
-                    command.command.includes("robocopy")) {
-                    //with robocopy,
-                    //An Exit Code of 0-7 is success and any value >= 8 indicates that there
-                    // was at least one failure during the copy operation.
-                    ALLOWED_ERRORS.push(0, 1, 2, 3, 4, 5, 6, 7);
-                }
-                if (typeof command.command === "string" &&
-                    command.command.includes("rmdir")) {
-                    //rmdir outputs 2 when it doesn't find the folder to delete
-                    ALLOWED_ERRORS.push(2);
-                }
                 if (code === CODE_SUCCESSFUL ||
-                    (code && ALLOWED_ERRORS.includes(code))) {
+                    (code && ((_a = command.allowedErrors) === null || _a === void 0 ? void 0 : _a.includes(code)))) {
                     onFinish({ success: true });
                 }
                 else {
