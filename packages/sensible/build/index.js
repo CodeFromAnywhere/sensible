@@ -77,8 +77,9 @@ var copyCommandHelper = (_c = {},
     _c[util_platform_1.platformIds.macOS] = function (source, dest) {
         return "cp -R ".concat(source, " ").concat(dest);
     },
-    _c[util_platform_1.platformIds.windows] = function (source, dest) {
-        return "robocopy \"".concat(source, "\" \"").concat(dest, "\" /MIR");
+    _c[util_platform_1.platformIds.windows] = function (source, dest, flags) {
+        if (flags === void 0) { flags = "/MIR"; }
+        return "robocopy \"".concat(source, "\" \"").concat(dest, "\" ").concat(flags);
     },
     _c[util_platform_1.platformIds.linux] = function (source, dest) {
         return "cp -R ".concat(source, " ").concat(dest);
@@ -544,8 +545,7 @@ var getCommandsWithoutCache = function (_a) {
         var filledInAppCommands = commandsPerOSreplaced.map(commandReplaceVariables({}));
         var defaultAppsCommands = [
             {
-                //`cp -R ${sensibleDir}/templates/apps/${app}/. ${targetDir}/${appName}/apps/${app}`
-                command: copyCommandHelper[currentPlatformId]("".concat(sensibleDir, "/templates/apps/").concat(app, "/."), "".concat(targetDir, "/").concat(appName, "/apps/").concat(app)),
+                command: copyCommandHelper[currentPlatformId]("".concat(sensibleDir, "/templates/apps/").concat(app, "/."), "".concat(targetDir, "/").concat(appName, "/apps/").concat(app), "/E"),
                 description: "Copying ".concat(app, " template"),
                 isDisabled: appsCommands.commands.length === 0,
             },
