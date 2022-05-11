@@ -7,7 +7,7 @@ const CTA = () => {
   return (
     <a href="/docs/about" rel="noreferrer" className="my-10">
       <button
-        className={`disabled:hidden transition-all duration-600 w-40 lg:w-96 bg-blue-500 hover:bg-blue-400 border-t-blue-300 border-b-blue-700 border rounded-xl p-4`}
+        className={`text-white disabled:hidden transition-all duration-600 w-40 lg:w-96 bg-blue-500 hover:bg-blue-400 border-t-blue-300 border-b-blue-700 border rounded-xl p-4`}
       >
         {"Read the docs"}
       </button>
