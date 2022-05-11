@@ -64,7 +64,7 @@ export const findAndRenameTemplateFiles =
         newPath: renameTemplateToNormalFile(path),
       }))
       .map(({ oldPath, newPath }) => {
-        // console.log({ oldPath, newPath });
+        console.log("RENAMED: ", { oldPath, newPath });
         fs.renameSync(oldPath, newPath);
       });
     // not sure, maybe I need to make sure that it's renamed before resolving.... it's not waiting now. It could crash and still resolve!

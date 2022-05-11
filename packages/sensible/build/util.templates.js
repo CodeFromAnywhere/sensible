@@ -61,7 +61,7 @@ var findAndRenameTemplateFiles = function (appDir) { return function (onDone) {
     }); })
         .map(function (_a) {
         var oldPath = _a.oldPath, newPath = _a.newPath;
-        // console.log({ oldPath, newPath });
+        console.log("RENAMED: ", { oldPath: oldPath, newPath: newPath });
         fs_1.default.renameSync(oldPath, newPath);
     });
     // not sure, maybe I need to make sure that it's renamed before resolving.... it's not waiting now. It could crash and still resolve!

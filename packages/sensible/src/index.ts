@@ -30,8 +30,12 @@ const copyCommandHelper = {
   [platformIds.macOS]: (source: string, dest: string) => {
     return `cp -R ${source} ${dest}`;
   },
-  [platformIds.windows]: (source: string, dest: string) => {
-    return `robocopy "${source}" "${dest}" /MIR`;
+  [platformIds.windows]: (
+    source: string,
+    dest: string,
+    flags: string = "/MIR"
+  ) => {
+    return `robocopy "${source}" "${dest}" ${flags}`;
   },
   [platformIds.linux]: (source: string, dest: string) => {
     return `cp -R ${source} ${dest}`;
@@ -562,10 +566,10 @@ const getCommandsWithoutCache = ({
       );
       const defaultAppsCommands: Command[] = [
         {
-          //`cp -R ${sensibleDir}/templates/apps/${app}/. ${targetDir}/${appName}/apps/${app}`
           command: copyCommandHelper[currentPlatformId](
             `${sensibleDir}/templates/apps/${app}/.`,
-            `${targetDir}/${appName}/apps/${app}`
+            `${targetDir}/${appName}/apps/${app}`,
+            "/E"
           ),
           description: `Copying ${app} template`,
           isDisabled: appsCommands.commands.length === 0,
