@@ -58,15 +58,20 @@ export const executeCommand = (
   //tell the user what is happening, with a dot every second
 
   process.stdout.write(command.description);
-  const interval = setInterval(() => process.stdout.write("."), 1000);
+  let interval: NodeJS.Timer;
+  if (!debug) {
+    interval = setInterval(() => process.stdout.write("."), 1000);
+  }
 
   return new Promise<void>((resolve) => {
     const messages: string[] = [];
 
     const onFinish = ({ success }: { success: boolean }) => {
       //once done, clear the console
-      console.clear();
-      clearInterval(interval);
+      if (!debug) {
+        console.clear();
+        clearInterval(interval);
+      }
       if (success) {
         resolve();
       }

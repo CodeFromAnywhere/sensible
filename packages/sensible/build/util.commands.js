@@ -32,14 +32,19 @@ var executeCommand = function (command, dir, debug, shell) {
     }
     //tell the user what is happening, with a dot every second
     process.stdout.write(command.description);
-    var interval = setInterval(function () { return process.stdout.write("."); }, 1000);
+    var interval;
+    if (!debug) {
+        interval = setInterval(function () { return process.stdout.write("."); }, 1000);
+    }
     return new Promise(function (resolve) {
         var messages = [];
         var onFinish = function (_a) {
             var success = _a.success;
             //once done, clear the console
-            console.clear();
-            clearInterval(interval);
+            if (!debug) {
+                console.clear();
+                clearInterval(interval);
+            }
             if (success) {
                 resolve();
             }
