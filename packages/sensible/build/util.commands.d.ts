@@ -14,6 +14,6 @@ export declare type Command = {
 };
 export declare const isCommandPerOs: (command: CommandPerOSOrCommandString) => command is CommandPerOs;
 export declare const getCommand: (command: Command) => string | false;
-export declare const executeCommand: (command: Command, dir: string, debug?: boolean | undefined) => Promise<void>;
+export declare const executeCommand: (command: Command, dir: string, debug?: boolean | undefined, shell?: string | boolean | undefined) => Promise<void>;
 export {};
 //# sourceMappingURL=util.commands.d.ts.map

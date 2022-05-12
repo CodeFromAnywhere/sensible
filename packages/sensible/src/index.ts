@@ -15,9 +15,9 @@ import { isCommandPerOs } from "./util.commands";
 
 //InstallHelper
 const installHelper = {
-  [platformIds.macOS]: "brew",
-  [platformIds.windows]: "choco",
-  [platformIds.linux]: "brew",
+  [platformIds.macOS]: ["brew", "https://brew.sh"],
+  [platformIds.windows]: ["choco", "https://chocolatey.org/install"],
+  [platformIds.linux]: ["brew", "https://brew.sh"],
 };
 
 const openUrlHelper = {
@@ -292,11 +292,13 @@ const commandExistsOrInstall = async ({
   installCommand,
   installInstructions,
   exitIfNotInstalled,
+  shell,
 }: {
   command: string;
   installCommand?: Command;
   installInstructions: string;
   exitIfNotInstalled?: boolean;
+  shell?: boolean | string;
 }) => {
   let isAvailable = false;
   try {
@@ -314,7 +316,7 @@ const commandExistsOrInstall = async ({
     );
 
     if (ok) {
-      await executeCommand(installCommand, __dirname, !!isDebug);
+      await executeCommand(installCommand, __dirname, !!isDebug, shell);
       return true;
     }
   }
@@ -388,21 +390,28 @@ const getPushToGitCommands = (appName: string, remote: string | null) => {
 const installRequiredStuff = async () => {
   //making sure you have brew, node, npm, yarn, code, git, watchman
   await commandExistsOrInstall({
-    command: installHelper[currentPlatformId],
-    installInstructions: `Please install ${installHelper[currentPlatformId]}. Go to "https://brew.sh" for instructions`,
+    command: installHelper[currentPlatformId][0],
+    installInstructions: `Please install ${installHelper[currentPlatformId][0]}. Go to " ${installHelper[currentPlatformId][1]}" for instructions`,
     installCommand: {
-      command:
-        '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"',
-      description: `Installing ${installHelper[currentPlatformId]}`,
+      command: {
+        win32:
+          "Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))",
+        darwin:
+          '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"',
+        linux:
+          '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"',
+      },
+      description: `Installing ${installHelper[currentPlatformId][0]}`,
     },
     exitIfNotInstalled: true,
+    shell: os === "win32" ? "powershell.exe" : true,
   });
   await commandExistsOrInstall({
     command: "node",
-    installInstructions: `Please run "${installHelper[currentPlatformId]} install node" or go to https://formulae.brew.sh/formula/node for instructions`,
+    installInstructions: `Please run "${installHelper[currentPlatformId][0]} install node" or go to https://formulae.brew.sh/formula/node for instructions`,
     installCommand: {
-      command: `${installHelper[currentPlatformId]} install node`,
-      description: `Installing node using ${installHelper[currentPlatformId]}`,
+      command: `${installHelper[currentPlatformId][0]} install node`,
+      description: `Installing node using ${installHelper[currentPlatformId][0]}`,
     },
     exitIfNotInstalled: true,
   });
@@ -412,8 +421,8 @@ const installRequiredStuff = async () => {
     installInstructions:
       "Please install node and npm, see https://docs.npmjs.com/downloading-and-installing-node-js-and-npm",
     installCommand: {
-      command: `${installHelper[currentPlatformId]} install node`,
-      description: `Installing node using ${installHelper[currentPlatformId]}`,
+      command: `${installHelper[currentPlatformId][0]} install node`,
+      description: `Installing node using ${installHelper[currentPlatformId][0]}`,
     },
     exitIfNotInstalled: true,
   });
@@ -447,8 +456,12 @@ const installRequiredStuff = async () => {
     command: "watchman",
     exitIfNotInstalled: true,
     installCommand: {
-      command: `${installHelper[currentPlatformId]} install watchman`,
-      description: `Installing watchman using ${installHelper[currentPlatformId]}`,
+      command: {
+        win32: "choco install watchman",
+        darwin: "brew install watchman",
+        linux: "brew install watchman",
+      },
+      description: `Installing watchman using ${installHelper[currentPlatformId][0]}`,
     },
     installInstructions:
       "Please install watchman, see https://facebook.github.io/watchman/docs/install.html for instructions.",

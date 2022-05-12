@@ -46,7 +46,8 @@ export const getCommand = (command: Command): string | false => {
 export const executeCommand = (
   command: Command,
   dir: string,
-  debug?: boolean
+  debug?: boolean,
+  shell?: boolean | string
 ) => {
   // if command is disabled, immediately resolve so it is skippped.
   if (command.isDisabled) {
@@ -119,7 +120,7 @@ export const executeCommand = (
 
       spawn(commandString, {
         stdio: debug ? "inherit" : "ignore",
-        shell: true,
+        shell: shell || true,
         cwd: dir,
       })
         .on("exit", (code) => {

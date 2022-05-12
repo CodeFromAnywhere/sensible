@@ -23,7 +23,7 @@ var getCommand = function (command) {
     return command.command;
 };
 exports.getCommand = getCommand;
-var executeCommand = function (command, dir, debug) {
+var executeCommand = function (command, dir, debug, shell) {
     // if command is disabled, immediately resolve so it is skippped.
     if (command.isDisabled) {
         return new Promise(function (resolve) {
@@ -87,7 +87,7 @@ var executeCommand = function (command, dir, debug) {
             }
             (0, child_process_1.spawn)(commandString, {
                 stdio: debug ? "inherit" : "ignore",
-                shell: true,
+                shell: shell || true,
                 cwd: dir,
             })
                 .on("exit", function (code) {
