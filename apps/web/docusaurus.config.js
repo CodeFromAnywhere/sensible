@@ -59,6 +59,7 @@ const config = {
           editUrl:
             "https://github.com/Code-From-Anywhere/sensible/tree/main/apps/web/",
         },
+
         theme: {
           customCss: require.resolve("./src/css/custom.css"),
         },
@@ -78,9 +79,21 @@ const config = {
         items: [
           {
             type: "doc",
-            docId: "about/about",
+            docId: "docs/about/about",
             position: "left",
             label: "Documentation",
+          },
+          {
+            type: "doc",
+            docId: "jobs/coworksurf",
+            position: "left",
+            label: "Jobs",
+          },
+          {
+            type: "doc",
+            docId: "ideas/ideas",
+            position: "left",
+            label: "Ideas",
           },
           // { to: "/blog", label: "Blog", position: "left" },
 
