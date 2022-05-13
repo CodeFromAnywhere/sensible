@@ -46,7 +46,8 @@ export const getCommand = (command: Command): string | false => {
 export const executeCommand = (
   command: Command,
   dir: string,
-  debug?: boolean
+  debug?: boolean,
+  shell?: boolean | string
 ) => {
   // if command is disabled, immediately resolve so it is skippped.
   if (command.isDisabled) {
@@ -57,15 +58,20 @@ export const executeCommand = (
   //tell the user what is happening, with a dot every second
 
   process.stdout.write(command.description);
-  const interval = setInterval(() => process.stdout.write("."), 1000);
+  let interval: NodeJS.Timer;
+  if (!debug) {
+    interval = setInterval(() => process.stdout.write("."), 1000);
+  }
 
   return new Promise<void>((resolve) => {
     const messages: string[] = [];
 
     const onFinish = ({ success }: { success: boolean }) => {
       //once done, clear the console
-      console.clear();
-      clearInterval(interval);
+      if (!debug) {
+        console.clear();
+        clearInterval(interval);
+      }
       if (success) {
         resolve();
       }
@@ -119,7 +125,7 @@ export const executeCommand = (
 
       spawn(commandString, {
         stdio: debug ? "inherit" : "ignore",
-        shell: true,
+        shell: shell || true,
         cwd: dir,
       })
         .on("exit", (code) => {

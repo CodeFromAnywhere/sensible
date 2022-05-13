@@ -64,9 +64,9 @@ var util_versions_1 = require("./util.versions");
 var util_commands_2 = require("./util.commands");
 //InstallHelper
 var installHelper = (_a = {},
-    _a[util_platform_1.platformIds.macOS] = "brew",
-    _a[util_platform_1.platformIds.windows] = "choco",
-    _a[util_platform_1.platformIds.linux] = "brew",
+    _a[util_platform_1.platformIds.macOS] = ["brew", "https://brew.sh"],
+    _a[util_platform_1.platformIds.windows] = ["choco", "https://chocolatey.org/install"],
+    _a[util_platform_1.platformIds.linux] = ["brew", "https://brew.sh"],
     _a);
 var openUrlHelper = (_b = {},
     _b[util_platform_1.platformIds.macOS] = "open",
@@ -294,7 +294,7 @@ var getSpawnCommandsReducer = function (dir, debug) {
     }); };
 };
 var commandExistsOrInstall = function (_a) {
-    var command = _a.command, installCommand = _a.installCommand, installInstructions = _a.installInstructions, exitIfNotInstalled = _a.exitIfNotInstalled;
+    var command = _a.command, installCommand = _a.installCommand, installInstructions = _a.installInstructions, exitIfNotInstalled = _a.exitIfNotInstalled, shell = _a.shell;
     return __awaiter(void 0, void 0, void 0, function () {
         var isAvailable, err_1, installCommandString, ok;
         return __generator(this, function (_b) {
@@ -321,7 +321,7 @@ var commandExistsOrInstall = function (_a) {
                 case 5:
                     ok = _b.sent();
                     if (!ok) return [3 /*break*/, 7];
-                    return [4 /*yield*/, (0, util_commands_1.executeCommand)(installCommand, __dirname, !!isDebug)];
+                    return [4 /*yield*/, (0, util_commands_1.executeCommand)(installCommand, __dirname, !!isDebug, shell)];
                 case 6:
                     _b.sent();
                     return [2 /*return*/, true];
@@ -391,23 +391,28 @@ var installRequiredStuff = function () { return __awaiter(void 0, void 0, void 0
             case 0: 
             //making sure you have brew, node, npm, yarn, code, git, watchman
             return [4 /*yield*/, commandExistsOrInstall({
-                    command: installHelper[currentPlatformId],
-                    installInstructions: "Please install ".concat(installHelper[currentPlatformId], ". Go to \"https://brew.sh\" for instructions"),
+                    command: installHelper[currentPlatformId][0],
+                    installInstructions: "Please install ".concat(installHelper[currentPlatformId][0], ". Go to \" ").concat(installHelper[currentPlatformId][1], "\" for instructions"),
                     installCommand: {
-                        command: '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"',
-                        description: "Installing ".concat(installHelper[currentPlatformId]),
+                        command: {
+                            win32: "Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))",
+                            darwin: '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"',
+                            linux: '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"',
+                        },
+                        description: "Installing ".concat(installHelper[currentPlatformId][0]),
                     },
                     exitIfNotInstalled: true,
+                    shell: os === "win32" ? "powershell.exe" : true,
                 })];
             case 1:
                 //making sure you have brew, node, npm, yarn, code, git, watchman
                 _a.sent();
                 return [4 /*yield*/, commandExistsOrInstall({
                         command: "node",
-                        installInstructions: "Please run \"".concat(installHelper[currentPlatformId], " install node\" or go to https://formulae.brew.sh/formula/node for instructions"),
+                        installInstructions: "Please run \"".concat(installHelper[currentPlatformId][0], " install node\" or go to https://formulae.brew.sh/formula/node for instructions"),
                         installCommand: {
-                            command: "".concat(installHelper[currentPlatformId], " install node"),
-                            description: "Installing node using ".concat(installHelper[currentPlatformId]),
+                            command: "".concat(installHelper[currentPlatformId][0], " install node"),
+                            description: "Installing node using ".concat(installHelper[currentPlatformId][0]),
                         },
                         exitIfNotInstalled: true,
                     })];
@@ -417,8 +422,8 @@ var installRequiredStuff = function () { return __awaiter(void 0, void 0, void 0
                         command: "npm",
                         installInstructions: "Please install node and npm, see https://docs.npmjs.com/downloading-and-installing-node-js-and-npm",
                         installCommand: {
-                            command: "".concat(installHelper[currentPlatformId], " install node"),
-                            description: "Installing node using ".concat(installHelper[currentPlatformId]),
+                            command: "".concat(installHelper[currentPlatformId][0], " install node"),
+                            description: "Installing node using ".concat(installHelper[currentPlatformId][0]),
                         },
                         exitIfNotInstalled: true,
                     })];
@@ -453,8 +458,12 @@ var installRequiredStuff = function () { return __awaiter(void 0, void 0, void 0
                         command: "watchman",
                         exitIfNotInstalled: true,
                         installCommand: {
-                            command: "".concat(installHelper[currentPlatformId], " install watchman"),
-                            description: "Installing watchman using ".concat(installHelper[currentPlatformId]),
+                            command: {
+                                win32: "choco install watchman",
+                                darwin: "brew install watchman",
+                                linux: "brew install watchman",
+                            },
+                            description: "Installing watchman using ".concat(installHelper[currentPlatformId][0]),
                         },
                         installInstructions: "Please install watchman, see https://facebook.github.io/watchman/docs/install.html for instructions.",
                     })];

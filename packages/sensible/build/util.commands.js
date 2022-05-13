@@ -23,7 +23,7 @@ var getCommand = function (command) {
     return command.command;
 };
 exports.getCommand = getCommand;
-var executeCommand = function (command, dir, debug) {
+var executeCommand = function (command, dir, debug, shell) {
     // if command is disabled, immediately resolve so it is skippped.
     if (command.isDisabled) {
         return new Promise(function (resolve) {
@@ -32,14 +32,19 @@ var executeCommand = function (command, dir, debug) {
     }
     //tell the user what is happening, with a dot every second
     process.stdout.write(command.description);
-    var interval = setInterval(function () { return process.stdout.write("."); }, 1000);
+    var interval;
+    if (!debug) {
+        interval = setInterval(function () { return process.stdout.write("."); }, 1000);
+    }
     return new Promise(function (resolve) {
         var messages = [];
         var onFinish = function (_a) {
             var success = _a.success;
             //once done, clear the console
-            console.clear();
-            clearInterval(interval);
+            if (!debug) {
+                console.clear();
+                clearInterval(interval);
+            }
             if (success) {
                 resolve();
             }
@@ -87,7 +92,7 @@ var executeCommand = function (command, dir, debug) {
             }
             (0, child_process_1.spawn)(commandString, {
                 stdio: debug ? "inherit" : "ignore",
-                shell: true,
+                shell: shell || true,
                 cwd: dir,
             })
                 .on("exit", function (code) {
