@@ -217,7 +217,7 @@ const Home = () => {
                     <div className="flex flex-1 w-full max-w-sm lg:max-w-xl">
                       <iframe
                         width="100%"
-                        src="https://www.youtube.com/embed/2JvhgY01hJM?autoplay=1&mute=1&showinfo=0&rel=0&loop=1"
+                        src="https://www.youtube.com/embed/PulTxo5Cgc8?autoplay=1&mute=1&showinfo=0&rel=0&loop=1"
                         title="Sensible Demo"
                         frameBorder="0"
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
