@@ -21,6 +21,16 @@ npx sensible init
 
 ## init
 
+  <iframe
+    width="100%"
+    src="https://www.youtube.com/embed/J0EmjTW8QOY?showinfo=0&rel=0"
+    title="Sensible Demo"
+    frameBorder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+    className="rounded-lg mt-5 aspect-video"
+    ></iframe>
+
 ## idea, plan, todo
 
 ## VSCode Tasks
