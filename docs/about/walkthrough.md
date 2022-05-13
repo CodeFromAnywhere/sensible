@@ -19,17 +19,9 @@ npx sensible init
 
 3. Follow the instructions on the terminal and wait for the project to be set up
 
-## init
+## Starting a new sensible project
 
-  <iframe
-    width="100%"
-    src="https://www.youtube.com/embed/J0EmjTW8QOY?showinfo=0&rel=0"
-    title="Sensible Demo"
-    frameBorder="0"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-    allowFullScreen
-    className="rounded-lg mt-5 aspect-video"
-    ></iframe>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/J0EmjTW8QOY" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 ## idea, plan, todo
 
