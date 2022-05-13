@@ -70,6 +70,9 @@ allExtensions=(
     "urbantrout.refactor-css"
     "WakaTime.vscode-wakatime"
     "yzane.markdown-pdf"
+    "yzhang.markdown-all-in-one"
+    "hnw.vscode-auto-open-markdown-preview"
+    "code-from-anywhere.sensible"
 )
 
 for t in ${allExtensions[@]}; do
