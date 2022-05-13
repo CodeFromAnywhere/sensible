@@ -1,3 +1,7 @@
+---
+sidebar_position: 2
+---
+
 # 🐰 Walkthrough
 
 _**Please note**: this is a work in progress! I'm creating the walkthrough as we speak!_
