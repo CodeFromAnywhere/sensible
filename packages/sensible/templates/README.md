@@ -1,3 +1,3 @@
 # Templates
 
-[go here](https://sensible.to/)
+[go here](https://sensiblestack.com/)

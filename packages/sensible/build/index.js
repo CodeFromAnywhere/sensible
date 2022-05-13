@@ -201,6 +201,7 @@ var getApps = function () { return __awaiter(void 0, void 0, void 0, function ()
                         default: true,
                     },
                     { slug: "web", description: "Next.js app", default: true },
+                    { slug: "docs", description: "Docusaurus documentation (Experimental)" },
                     { slug: "webreact", description: "Bare React.js app (Experimental)" },
                     { slug: "chrome", description: "Chrome extension (Experimental)" },
                     { slug: "vscode", description: "VSCode extension (Experimental)" },
@@ -274,7 +275,7 @@ var askOpenDocs = function () { return __awaiter(void 0, void 0, void 0, functio
                 if (openDocs) {
                     (0, util_commands_1.executeCommand)({
                         description: "Opening docs",
-                        command: "".concat(openUrlHelper[currentPlatformId], " https://sensible.to"),
+                        command: "".concat(openUrlHelper[currentPlatformId], " https://sensiblestack.com"),
                     }, __dirname, false);
                 }
                 return [2 /*return*/];
@@ -547,6 +548,7 @@ var getCommandsWithoutCache = function (_a) {
             {
                 command: copyCommandHelper[currentPlatformId]("".concat(sensibleDir, "/templates/apps/").concat(app, "/."), "".concat(targetDir, "/").concat(appName, "/apps/").concat(app), "/E"),
                 description: "Copying ".concat(app, " template"),
+                // NB: this implies there must be at least one command to copy the template, isn't always the case!
                 isDisabled: appsCommands.commands.length === 0,
             },
         ];

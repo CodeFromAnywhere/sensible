@@ -196,6 +196,7 @@ const getApps = async (): Promise<string[]> => {
       default: true,
     },
     { slug: "web", description: "Next.js app", default: true },
+    { slug: "docs", description: "Docusaurus documentation (Experimental)" },
     { slug: "webreact", description: "Bare React.js app (Experimental)" },
     { slug: "chrome", description: "Chrome extension (Experimental)" },
     { slug: "vscode", description: "VSCode extension (Experimental)" },
@@ -272,7 +273,7 @@ const askOpenDocs = async (): Promise<void> => {
     executeCommand(
       {
         description: "Opening docs",
-        command: `${openUrlHelper[currentPlatformId]} https://sensible.to`,
+        command: `${openUrlHelper[currentPlatformId]} https://sensiblestack.com`,
       },
       __dirname,
       false
@@ -572,6 +573,7 @@ const getCommandsWithoutCache = ({
             "/E"
           ),
           description: `Copying ${app} template`,
+          // NB: this implies there must be at least one command to copy the template, isn't always the case!
           isDisabled: appsCommands.commands.length === 0,
         },
       ];

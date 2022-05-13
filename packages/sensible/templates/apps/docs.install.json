@@ -1,0 +1,12 @@
+{
+  "config": {
+    "tasks": []
+  },
+  "instructions": "",
+  "commands": [
+    {
+      "command": "npm install",
+      "description": "Installing docs"
+    }
+  ]
+}

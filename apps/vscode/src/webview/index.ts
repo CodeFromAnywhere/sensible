@@ -81,7 +81,7 @@ export class WebviewPanel {
                     <title>Sensible Docs</title>
                 </head>
                 <body style="padding:0">
-                <iframe frameBorder="0" width="100%"  style="height:100vh" src="https://www.sensible.to" title="Google">
+                <iframe frameBorder="0" width="100%"  style="height:100vh" src="https://www.sensiblestack.com" title="Google">
                 </iframe>
                 </body>
                 </html>`;

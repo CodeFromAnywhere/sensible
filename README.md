@@ -1,18 +1,18 @@
 <p align="center">
-<a href="https://www.sensible.to" target="_blank">
+<a href="https://www.sensiblestack.com" target="_blank">
 <img src="./assets/icon2.png" width="250" /><br />
 website
 </a> |
-<a href="https://sensible.to">docs</a>
+<a href="https://sensiblestack.com">docs</a>
 </p>
 
 # Welcome
 
 Sensible is a full stack typescript framework that lets you build apps super quickly and smoothly. Sensible lets you easily share your code between `React` and `React Native`, and between `front-end` and `back-end`. It has never been this easy! Sensible's mission is to boost the productivity of 100.000+ Software Developers, making it as easy as possible to build high-quality full-stack mobile- and web-apps.
 
-Curious? Just run `npx sensible` and see the magic, or [check out the demo on the website](https://www.sensible.to)
+Curious? Just run `npx sensible` and see the magic, or [check out the demo on the website](https://www.sensiblestack.com)
 
-Want to know more? See the [docs](https://sensible.to)
+Want to know more? See the [docs](https://sensiblestack.com)
 
 ## Installation instructions
 
@@ -61,9 +61,9 @@ If you need more help, just look in the auto-generated docs!
 - Decentralised, Open Source, Automatic
 
 <p align="center">
-<a href="https://www.sensible.to" target="_blank">
+<a href="https://www.sensiblestack.com" target="_blank">
 <img src="./assets/icon2.png" width="250" /><br />
 website
 </a> |
-<a href="https://www.sensible.to">docs</a>
+<a href="https://www.sensiblestack.com">docs</a>
 </p>
