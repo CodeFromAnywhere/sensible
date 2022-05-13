@@ -14,7 +14,7 @@ There's a lot of work to do, so we’re hoping to find a friendly cofounder who'
 
 ## Main skills we hope to find:
 
-React Native & Node.js, self-starting, entrepreneurial.
+React, Next.js & Node.js, self-starting, entrepreneurial. We also use the framework of this website (Sensible)
 
 ### Ideal, but not necessary:
 
