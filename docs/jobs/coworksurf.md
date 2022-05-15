@@ -1,7 +1,3 @@
----
-sidebar_label: Coworksurf
----
-
 # Technical Cofounder at Coworksurf
 
 ## How will people live, work and travel in 2030?
