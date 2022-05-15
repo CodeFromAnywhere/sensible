@@ -21,6 +21,6 @@ We're looking for anyone willing to learn how to make full stack typescript apps
 - A positive attitude
 - Willingness to not only do software development but also marketing and other stuff, anything, really.
 
-Interested? [contact me](mailto:jobs@karsens.com)
+Interested? [join our community](https://sensiblestack.com/) and join `#studygroup` to get in touch.
 
 Wijnand
