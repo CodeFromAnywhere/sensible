@@ -15,7 +15,7 @@ We're looking for anyone willing to learn how to make full stack typescript apps
 
 - A strong work ethic and motivation to become the best in your field and reach your full potential
 - A collaborative mindset where you're not afraid to help others in need.
-- A will to change the world and solve problems like climate change and bad applications of AI
+- A will to solve big problems, especially climate change and bad applications of AI
 - A positive attitude
 
 Interested? [contact me](mailto:jobs@karsens.com)
