@@ -2,6 +2,8 @@
 
 We're looking for anyone willing to learn how to make full stack typescript apps.
 
+![our team](./cfa-team.jpeg)
+
 **What we can offer you**
 
 - Weekly guidance guiding you through learning how to make full stack apps with Sensible
