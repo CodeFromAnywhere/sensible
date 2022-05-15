@@ -17,6 +17,6 @@ We're looking for anyone willing to learn how to make full stack typescript apps
 - A collaborative mindset where you're not afraid to help others in need.
 - A will to change the world and solve problems like climate change and bad applications of AI.
 
-Interested? [contact me](jobs@karsens.com)
+Interested? [contact me](mailto:jobs@karsens.com)
 
 Wijnand
