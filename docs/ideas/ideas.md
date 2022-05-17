@@ -26,4 +26,4 @@ In the sidebar, you can find a collection of some ideas. It is also kind of the 
 
 ## Submit your ideas
 
-Do you have more ideas to make Sensible even better? Feel free to discuss them in our community! See the menu above for the link.
+Do you have more ideas to make Sensible even better? Feel free to discuss them in our [community](/community)!
