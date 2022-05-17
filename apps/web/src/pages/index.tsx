@@ -221,7 +221,9 @@ const Home = () => {
                       clever use of Typescript and bundle techniques, we have
                       managed to share a lot of code between different frontends
                       (app, web, extensions, electron) and also the front and
-                      backend.
+                      backend. Besides this, our framework features automatic
+                      documentation, a CLI to get started in no-time, a VSCode
+                      extension, and much more!
                     </p>
                   </div>
                 </div>
