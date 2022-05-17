@@ -117,20 +117,20 @@ const links: Link[] = [
   },
 ];
 const brands: Link[] = [
-  {
-    path: "/emesa.jpeg",
-    url: "https://emesa.nl",
-    noFollow: true,
-    alt: "Emesa",
-    target: "_blank",
-  },
-  {
-    path: "/stoic.jpeg",
-    url: "https://stoicstrats.com",
-    noFollow: true,
-    alt: "Stoic Strategies",
-    target: "_blank",
-  },
+  // {
+  //   path: "/emesa.jpeg",
+  //   url: "https://emesa.nl",
+  //   noFollow: true,
+  //   alt: "Emesa",
+  //   target: "_blank",
+  // },
+  // {
+  //   path: "/stoic.jpeg",
+  //   url: "https://stoicstrats.com",
+  //   noFollow: true,
+  //   alt: "Stoic Strategies",
+  //   target: "_blank",
+  // },
   {
     path: "/king.webp",
     url: "https://getking.co",
@@ -141,6 +141,12 @@ const brands: Link[] = [
     path: "/coworksurf.png",
     url: "https://coworksurf.com",
     alt: "Coworksurf",
+    target: "_blank",
+  },
+  {
+    path: "/reactwithnative.png",
+    url: "https://reactwithnative.com",
+    alt: "React with Native",
     target: "_blank",
   },
 ];
