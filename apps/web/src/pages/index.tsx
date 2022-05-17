@@ -214,17 +214,15 @@ const Home = () => {
                       </h1>
                     </div>
 
-                    <div className="flex flex-1 w-full max-w-sm lg:max-w-xl">
-                      <iframe
-                        width="100%"
-                        src="https://www.youtube.com/embed/PulTxo5Cgc8?autoplay=1&mute=1&showinfo=0&rel=0&loop=1"
-                        title="Sensible Demo"
-                        frameBorder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                        className="rounded-lg mt-5 aspect-video"
-                      ></iframe>
-                    </div>
+                    <p className="text-center">
+                      Sensible is a collection of tools, conventions and a large
+                      SDK that brings together the well-known frameworks such as
+                      Node.js, Expo.dev and Next.js under 1 bigger whole. By
+                      clever use of Typescript and bundle techniques, we have
+                      managed to share a lot of code between different frontends
+                      (app, web, extensions, electron) and also the front and
+                      backend.
+                    </p>
                   </div>
                 </div>
               </div>
