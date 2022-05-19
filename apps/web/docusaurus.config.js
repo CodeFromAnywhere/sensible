@@ -103,9 +103,20 @@ const config = {
             position: "left",
             label: "Community",
           },
+
+          {
+            href: "https://codefromanywhere.com",
+            label: "Course",
+            position: "right",
+          },
           {
             href: "https://github.com/Code-From-Anywhere/sensible",
             label: "GitHub",
+            position: "right",
+          },
+          {
+            href: "https://twitter.com/wkarsens",
+            label: "Twitter",
             position: "right",
           },
         ],

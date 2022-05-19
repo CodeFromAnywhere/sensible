@@ -98,23 +98,22 @@ const renderLink = (link: Link, index: number) => {
 };
 
 const links: Link[] = [
-  {
-    path: "/pasfoto.png",
-    url: "https://twitter.com/wkarsens",
-    alt: "Follow me",
-    subtitle: "Twitter",
-    isSmall: true,
-    target: "_blank",
-  },
-
-  {
-    path: "/cfa.png",
-    url: "https://codefromanywhere.com",
-    alt: "About us",
-    subtitle: "About us",
-    isSmall: true,
-    target: "_blank",
-  },
+  // {
+  //   path: "/pasfoto.png",
+  //   url: "https://twitter.com/wkarsens",
+  //   alt: "Follow me",
+  //   subtitle: "Twitter",
+  //   isSmall: true,
+  //   target: "_blank",
+  // },
+  // {
+  //   path: "/cfa.png",
+  //   url: "https://codefromanywhere.com",
+  //   alt: "About us",
+  //   subtitle: "About us",
+  //   isSmall: true,
+  //   target: "_blank",
+  // },
 ];
 const brands: Link[] = [
   // {
