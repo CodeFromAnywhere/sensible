@@ -162,6 +162,68 @@ const targetDir = process.cwd();
 
 //UTILITY FUNCTIONS
 
+const installApp =
+  ({ appName, isExistingApp }: { appName?: string; isExistingApp?: boolean }) =>
+  (app: string) => {
+    const appsDir = isExistingApp
+      ? path.join(targetDir, "apps")
+      : path.join(targetDir, appName!, "apps");
+
+    const destinationPath = path.join(appsDir, app);
+
+    const installFilePath = path.join(
+      sensibleDir,
+      `templates/apps/${app}.install.json`
+    );
+
+    const templateLocationPath = `${sensibleDir}/templates/apps/${app}/.`;
+
+    const fileString = fs.existsSync(installFilePath)
+      ? fs.readFileSync(installFilePath, { encoding: "utf8" })
+      : "";
+
+    const appsCommands: InstallObject =
+      fileString && fileString.length > 0
+        ? JSON.parse(fileString)
+        : { commands: [], tasks: [] };
+
+    const commandsPerOSreplaced = appsCommands.commands.map(
+      (command: Command) => {
+        //command.command: CommandPerOS | string
+        if (command.command) {
+          const isCommandObject = isCommandPerOs(command.command);
+          if (isCommandObject) {
+            command.command = getCommand(command) || "";
+          }
+        }
+        return command;
+      }
+    );
+    //const filledInAppCommands = commandsPerOSreplaced;
+    const filledInAppCommands = commandsPerOSreplaced.map(
+      commandReplaceVariables({})
+    );
+
+    //lets assume you are running "add" in the root folder of your project
+    const defaultAppsCommands: Command[] = [
+      {
+        command: copyCommandHelper[currentPlatformId](
+          templateLocationPath,
+          destinationPath,
+          "/E"
+        ),
+        description: `Copying ${app} template`,
+        // NB: this implies there must be at least one command to copy the template, isn't always the case!
+        isDisabled: appsCommands.commands.length === 0,
+      },
+    ];
+
+    return {
+      dir: appsDir,
+      commands: filledInAppCommands.concat(defaultAppsCommands),
+    };
+  };
+
 function slugify(string: string) {
   var a =
     "àáâäæãåāăąçćčđďèéêëēėęěğǵḧîïíīįìıİłḿñńǹňôöòóœøōõőṕŕřßśšşșťțûüùúūǘůűųẃẍÿýžźż·/_,:;";
@@ -182,36 +244,38 @@ function slugify(string: string) {
     .replace(/-+$/, ""); // Trim - from end of text
 }
 
+const possibleApps: AppType[] = [
+  {
+    slug: "app",
+    description: "Expo app (for android, iOS, web)",
+    default: true,
+  },
+  { slug: "web", description: "Next.js app", default: true },
+  { slug: "docs", description: "Docusaurus documentation (Experimental)" },
+  { slug: "webreact", description: "Bare React.js app (Experimental)" },
+  { slug: "chrome", description: "Chrome extension (Experimental)" },
+  { slug: "vscode", description: "VSCode extension (Experimental)" },
+  {
+    slug: "computer",
+    description: "Electron app (for Windows, Linux and MacOS) (Experimental)",
+  },
+];
+
 const flagArgumentsString = process.argv
   .filter((a) => a.startsWith("--"))
   .join(",");
 //.join(" ");
 const argumentsWithoutFlags = process.argv.filter((a) => !a.startsWith("--"));
 
-const getApps = async (): Promise<string[]> => {
-  const possibleApps: AppType[] = [
-    {
-      slug: "app",
-      description: "Expo app (for android, iOS, web)",
-      default: true,
-    },
-    { slug: "web", description: "Next.js app", default: true },
-    { slug: "docs", description: "Docusaurus documentation (Experimental)" },
-    { slug: "webreact", description: "Bare React.js app (Experimental)" },
-    { slug: "chrome", description: "Chrome extension (Experimental)" },
-    { slug: "vscode", description: "VSCode extension (Experimental)" },
-    {
-      slug: "computer",
-      description: "Electron app (for Windows, Linux and MacOS) (Experimental)",
-    },
-  ];
+const appsHumanReadable = possibleApps
+  .map((possible) => `- ${possible.slug}: ${possible.description}\n`)
+  .join("");
 
+const getApps = async (): Promise<string[]> => {
   const appsString = await ask(
     `Which apps do you want to create boilerplates for? Just press enter for all non-experimental ones 
     
-${possibleApps
-  .map((possible) => `- ${possible.slug}: ${possible.description}\n`)
-  .join("")}\n`
+${appsHumanReadable}\n`
   );
 
   const apps =
@@ -535,54 +599,7 @@ const getCommandsWithoutCache = ({
     },
 
     // only install selected apps
-    ...selectedApps.map((app) => {
-      const installFilePath = path.join(
-        sensibleDir,
-        `templates/apps/${app}.install.json`
-      );
-      const fileString = fs.existsSync(installFilePath)
-        ? fs.readFileSync(installFilePath, { encoding: "utf8" })
-        : "";
-
-      const appsCommands: InstallObject =
-        fileString && fileString.length > 0
-          ? JSON.parse(fileString)
-          : { commands: [], tasks: [] };
-
-      const commandsPerOSreplaced = appsCommands.commands.map(
-        (command: Command) => {
-          //command.command: CommandPerOS | string
-          if (command.command) {
-            const isCommandObject = isCommandPerOs(command.command);
-            if (isCommandObject) {
-              command.command = getCommand(command) || "";
-            }
-          }
-          return command;
-        }
-      );
-      //const filledInAppCommands = commandsPerOSreplaced;
-      const filledInAppCommands = commandsPerOSreplaced.map(
-        commandReplaceVariables({})
-      );
-      const defaultAppsCommands: Command[] = [
-        {
-          command: copyCommandHelper[currentPlatformId](
-            `${sensibleDir}/templates/apps/${app}/.`,
-            `${targetDir}/${appName}/apps/${app}`,
-            "/E"
-          ),
-          description: `Copying ${app} template`,
-          // NB: this implies there must be at least one command to copy the template, isn't always the case!
-          isDisabled: appsCommands.commands.length === 0,
-        },
-      ];
-
-      return {
-        dir: path.join(targetDir, appName, "apps"),
-        commands: filledInAppCommands.concat(defaultAppsCommands),
-      };
-    }),
+    ...selectedApps.map(installApp({ appName })),
 
     {
       dir: `${targetDir}/${appName}`,
@@ -695,6 +712,16 @@ const main = async () => {
       process.cwd(),
       true
     );
+  } else if (command === "add") {
+    const appType = await getArgumentOrAsk(
+      2,
+      `Which app do you want to install?\n\n${appsHumanReadable}`
+    );
+    if (!possibleApps.map((x) => x.slug).includes(appType)) {
+      process.exit(0);
+    }
+
+    installApp({ isExistingApp: true })(appType);
   } else {
     log('please run "sensible init" to use this cli.', "FgCyan");
   }

@@ -167,6 +167,48 @@ var mainBranchName = typeof mainBranch === "string" && mainBranch.length > 0 ? m
 var sensibleDir = path_1.default.resolve(__dirname, "..");
 var targetDir = process.cwd();
 //UTILITY FUNCTIONS
+var installApp = function (_a) {
+    var appName = _a.appName, isExistingApp = _a.isExistingApp;
+    return function (app) {
+        var appsDir = isExistingApp
+            ? path_1.default.join(targetDir, "apps")
+            : path_1.default.join(targetDir, appName, "apps");
+        var destinationPath = path_1.default.join(appsDir, app);
+        var installFilePath = path_1.default.join(sensibleDir, "templates/apps/".concat(app, ".install.json"));
+        var templateLocationPath = "".concat(sensibleDir, "/templates/apps/").concat(app, "/.");
+        var fileString = fs_1.default.existsSync(installFilePath)
+            ? fs_1.default.readFileSync(installFilePath, { encoding: "utf8" })
+            : "";
+        var appsCommands = fileString && fileString.length > 0
+            ? JSON.parse(fileString)
+            : { commands: [], tasks: [] };
+        var commandsPerOSreplaced = appsCommands.commands.map(function (command) {
+            //command.command: CommandPerOS | string
+            if (command.command) {
+                var isCommandObject = (0, util_commands_2.isCommandPerOs)(command.command);
+                if (isCommandObject) {
+                    command.command = (0, util_commands_1.getCommand)(command) || "";
+                }
+            }
+            return command;
+        });
+        //const filledInAppCommands = commandsPerOSreplaced;
+        var filledInAppCommands = commandsPerOSreplaced.map(commandReplaceVariables({}));
+        //lets assume you are running "add" in the root folder of your project
+        var defaultAppsCommands = [
+            {
+                command: copyCommandHelper[currentPlatformId](templateLocationPath, destinationPath, "/E"),
+                description: "Copying ".concat(app, " template"),
+                // NB: this implies there must be at least one command to copy the template, isn't always the case!
+                isDisabled: appsCommands.commands.length === 0,
+            },
+        ];
+        return {
+            dir: appsDir,
+            commands: filledInAppCommands.concat(defaultAppsCommands),
+        };
+    };
+};
 function slugify(string) {
     var a = "àáâäæãåāăąçćčđďèéêëēėęěğǵḧîïíīįìıİłḿñńǹňôöòóœøōõőṕŕřßśšşșťțûüùúūǘůűųẃẍÿýžźż·/_,:;";
     var b = "aaaaaaaaaacccddeeeeeeeegghiiiiiiiilmnnnnoooooooooprrsssssttuuuuuuuuuwxyyzzz------";
@@ -184,35 +226,35 @@ function slugify(string) {
         .replace(/^-+/, "") // Trim - from start of text
         .replace(/-+$/, ""); // Trim - from end of text
 }
+var possibleApps = [
+    {
+        slug: "app",
+        description: "Expo app (for android, iOS, web)",
+        default: true,
+    },
+    { slug: "web", description: "Next.js app", default: true },
+    { slug: "docs", description: "Docusaurus documentation (Experimental)" },
+    { slug: "webreact", description: "Bare React.js app (Experimental)" },
+    { slug: "chrome", description: "Chrome extension (Experimental)" },
+    { slug: "vscode", description: "VSCode extension (Experimental)" },
+    {
+        slug: "computer",
+        description: "Electron app (for Windows, Linux and MacOS) (Experimental)",
+    },
+];
 var flagArgumentsString = process.argv
     .filter(function (a) { return a.startsWith("--"); })
     .join(",");
 //.join(" ");
 var argumentsWithoutFlags = process.argv.filter(function (a) { return !a.startsWith("--"); });
+var appsHumanReadable = possibleApps
+    .map(function (possible) { return "- ".concat(possible.slug, ": ").concat(possible.description, "\n"); })
+    .join("");
 var getApps = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var possibleApps, appsString, apps;
+    var appsString, apps;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0:
-                possibleApps = [
-                    {
-                        slug: "app",
-                        description: "Expo app (for android, iOS, web)",
-                        default: true,
-                    },
-                    { slug: "web", description: "Next.js app", default: true },
-                    { slug: "docs", description: "Docusaurus documentation (Experimental)" },
-                    { slug: "webreact", description: "Bare React.js app (Experimental)" },
-                    { slug: "chrome", description: "Chrome extension (Experimental)" },
-                    { slug: "vscode", description: "VSCode extension (Experimental)" },
-                    {
-                        slug: "computer",
-                        description: "Electron app (for Windows, Linux and MacOS) (Experimental)",
-                    },
-                ];
-                return [4 /*yield*/, (0, util_userinput_1.ask)("Which apps do you want to create boilerplates for? Just press enter for all non-experimental ones \n    \n".concat(possibleApps
-                        .map(function (possible) { return "- ".concat(possible.slug, ": ").concat(possible.description, "\n"); })
-                        .join(""), "\n"))];
+            case 0: return [4 /*yield*/, (0, util_userinput_1.ask)("Which apps do you want to create boilerplates for? Just press enter for all non-experimental ones \n    \n".concat(appsHumanReadable, "\n"))];
             case 1:
                 appsString = _a.sent();
                 apps = appsString === ""
@@ -524,39 +566,7 @@ var getCommandsWithoutCache = function (_a) {
                     description: "Adding third-party repo: ".concat(slug),
                 }); }),
         }
-    ], selectedApps.map(function (app) {
-        var installFilePath = path_1.default.join(sensibleDir, "templates/apps/".concat(app, ".install.json"));
-        var fileString = fs_1.default.existsSync(installFilePath)
-            ? fs_1.default.readFileSync(installFilePath, { encoding: "utf8" })
-            : "";
-        var appsCommands = fileString && fileString.length > 0
-            ? JSON.parse(fileString)
-            : { commands: [], tasks: [] };
-        var commandsPerOSreplaced = appsCommands.commands.map(function (command) {
-            //command.command: CommandPerOS | string
-            if (command.command) {
-                var isCommandObject = (0, util_commands_2.isCommandPerOs)(command.command);
-                if (isCommandObject) {
-                    command.command = (0, util_commands_1.getCommand)(command) || "";
-                }
-            }
-            return command;
-        });
-        //const filledInAppCommands = commandsPerOSreplaced;
-        var filledInAppCommands = commandsPerOSreplaced.map(commandReplaceVariables({}));
-        var defaultAppsCommands = [
-            {
-                command: copyCommandHelper[currentPlatformId]("".concat(sensibleDir, "/templates/apps/").concat(app, "/."), "".concat(targetDir, "/").concat(appName, "/apps/").concat(app), "/E"),
-                description: "Copying ".concat(app, " template"),
-                // NB: this implies there must be at least one command to copy the template, isn't always the case!
-                isDisabled: appsCommands.commands.length === 0,
-            },
-        ];
-        return {
-            dir: path_1.default.join(targetDir, appName, "apps"),
-            commands: filledInAppCommands.concat(defaultAppsCommands),
-        };
-    }), true), [
+    ], selectedApps.map(installApp({ appName: appName })), true), [
         {
             dir: "".concat(targetDir, "/").concat(appName),
             commands: [getOpenVSCodeCommand(appName)],
@@ -609,7 +619,7 @@ var getCacheCommands = function (_a) {
     ];
 };
 var main = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var command, appName, remote, selectedApps, commandsFromFolders;
+    var command, appName, remote, selectedApps, commandsFromFolders, appType;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0: 
@@ -650,20 +660,29 @@ var main = function () { return __awaiter(void 0, void 0, void 0, function () {
                     }); }, Promise.resolve())];
             case 7:
                 _a.sent();
-                return [3 /*break*/, 9];
+                return [3 /*break*/, 12];
             case 8:
-                if (command === "setup") {
-                    (0, util_commands_1.executeCommand)({
-                        description: "Setting up your computer for developing sensible apps",
-                        ///bin/bash -c \"
-                        command: '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Code-From-Anywhere/sensible/main/packages/sensible/setup-mac/install.sh)"',
-                    }, process.cwd(), true);
+                if (!(command === "setup")) return [3 /*break*/, 9];
+                (0, util_commands_1.executeCommand)({
+                    description: "Setting up your computer for developing sensible apps",
+                    ///bin/bash -c \"
+                    command: '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Code-From-Anywhere/sensible/main/packages/sensible/setup-mac/install.sh)"',
+                }, process.cwd(), true);
+                return [3 /*break*/, 12];
+            case 9:
+                if (!(command === "add")) return [3 /*break*/, 11];
+                return [4 /*yield*/, (0, util_userinput_1.getArgumentOrAsk)(2, "Which app do you want to install?\n\n".concat(appsHumanReadable))];
+            case 10:
+                appType = _a.sent();
+                if (!possibleApps.map(function (x) { return x.slug; }).includes(appType)) {
+                    process.exit(0);
                 }
-                else {
-                    (0, util_log_1.log)('please run "sensible init" to use this cli.', "FgCyan");
-                }
-                _a.label = 9;
-            case 9: return [2 /*return*/];
+                installApp({ isExistingApp: true })(appType);
+                return [3 /*break*/, 12];
+            case 11:
+                (0, util_log_1.log)('please run "sensible init" to use this cli.', "FgCyan");
+                _a.label = 12;
+            case 12: return [2 /*return*/];
         }
     });
 }); };
