@@ -2,7 +2,8 @@ import { resolve } from "path";
 import { onlyUnique, InterpretableTypes } from "sensible-core";
 import { findFiles } from "sensible-files";
 
-// the next line resolves the address of the core folder. We know this is there because of the sensible convention
+// the next line resolves the address of the core folder.
+// We know this is there because of the sensible convention
 const basePath = resolve("../../packages/core/src");
 export const endpoints = findFiles("endpoint", basePath);
 export const types = findFiles("type", basePath);
