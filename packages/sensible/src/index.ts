@@ -162,9 +162,9 @@ const targetDir = process.cwd();
 
 //UTILITY FUNCTIONS
 
-const installApp =
+const getInstallAppCommands =
   ({ appName, isExistingApp }: { appName?: string; isExistingApp?: boolean }) =>
-  (app: string) => {
+  (app: string): CommandsObject => {
     const appsDir = isExistingApp
       ? path.join(targetDir, "apps")
       : path.join(targetDir, appName!, "apps");
@@ -599,7 +599,7 @@ const getCommandsWithoutCache = ({
     },
 
     // only install selected apps
-    ...selectedApps.map(installApp({ appName })),
+    ...selectedApps.map(getInstallAppCommands({ appName })),
 
     {
       dir: `${targetDir}/${appName}`,
@@ -674,6 +674,12 @@ const getCacheCommands = ({
   ];
 };
 
+const executeCommandsObjectOneByOne = (commandsObject: CommandsObject) => {
+  return commandsObject.commands.reduce(
+    getSpawnCommandsReducer(commandsObject.dir, !!isDebug),
+    Promise.resolve()
+  );
+};
 const main = async () => {
   //problem with imports package.json ect. do some research to solve this.
   await handleVersionUpdates("sensible", targetDir);
@@ -694,10 +700,7 @@ const main = async () => {
     await commandsFromFolders.reduce(
       async (previous: Promise<void>, commandsObject: CommandsObject) => {
         await previous;
-        return commandsObject.commands.reduce(
-          getSpawnCommandsReducer(commandsObject.dir, !!isDebug),
-          Promise.resolve()
-        );
+        return executeCommandsObjectOneByOne(commandsObject);
       },
       Promise.resolve()
     );
@@ -718,10 +721,25 @@ const main = async () => {
       `Which app do you want to install?\n\n${appsHumanReadable}`
     );
     if (!possibleApps.map((x) => x.slug).includes(appType)) {
+      console.log(`Couldn't find app type "${appType}"`);
       process.exit(0);
     }
 
-    installApp({ isExistingApp: true })(appType);
+    const targetAppDir = path.join(targetDir, "apps", appType);
+    if (fs.existsSync(targetAppDir)) {
+      return log(
+        `You already have an app with this type in your app folder. Please rename it first.`,
+        "FgRed"
+      );
+    }
+
+    const commandsObject = getInstallAppCommands({ isExistingApp: true })(
+      appType
+    );
+
+    await executeCommandsObjectOneByOne(commandsObject);
+
+    log(`Added ${appType} to your apps`, "FgCyan");
   } else {
     log('please run "sensible init" to use this cli.', "FgCyan");
   }

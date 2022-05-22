@@ -1,2 +1,2 @@
 import { Pages } from "ui";
-export default Pages.index;
+export default Pages.about;

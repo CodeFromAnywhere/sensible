@@ -10,6 +10,7 @@
     "core": "*",
     "react-with-native": "*",
     "react-with-native-store": "*",
+    "react-with-native-router": "*",
     "sensible-core": "*"
   },
   "devDependencies": {

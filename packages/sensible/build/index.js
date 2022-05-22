@@ -167,7 +167,7 @@ var mainBranchName = typeof mainBranch === "string" && mainBranch.length > 0 ? m
 var sensibleDir = path_1.default.resolve(__dirname, "..");
 var targetDir = process.cwd();
 //UTILITY FUNCTIONS
-var installApp = function (_a) {
+var getInstallAppCommands = function (_a) {
     var appName = _a.appName, isExistingApp = _a.isExistingApp;
     return function (app) {
         var appsDir = isExistingApp
@@ -566,7 +566,7 @@ var getCommandsWithoutCache = function (_a) {
                     description: "Adding third-party repo: ".concat(slug),
                 }); }),
         }
-    ], selectedApps.map(installApp({ appName: appName })), true), [
+    ], selectedApps.map(getInstallAppCommands({ appName: appName })), true), [
         {
             dir: "".concat(targetDir, "/").concat(appName),
             commands: [getOpenVSCodeCommand(appName)],
@@ -618,8 +618,11 @@ var getCacheCommands = function (_a) {
         getPushToGitCommands(appName, remote),
     ];
 };
+var executeCommandsObjectOneByOne = function (commandsObject) {
+    return commandsObject.commands.reduce(getSpawnCommandsReducer(commandsObject.dir, !!isDebug), Promise.resolve());
+};
 var main = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var command, appName, remote, selectedApps, commandsFromFolders, appType;
+    var command, appName, remote, selectedApps, commandsFromFolders, appType, targetAppDir, commandsObject;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0: 
@@ -654,13 +657,13 @@ var main = function () { return __awaiter(void 0, void 0, void 0, function () {
                                 case 0: return [4 /*yield*/, previous];
                                 case 1:
                                     _a.sent();
-                                    return [2 /*return*/, commandsObject.commands.reduce(getSpawnCommandsReducer(commandsObject.dir, !!isDebug), Promise.resolve())];
+                                    return [2 /*return*/, executeCommandsObjectOneByOne(commandsObject)];
                             }
                         });
                     }); }, Promise.resolve())];
             case 7:
                 _a.sent();
-                return [3 /*break*/, 12];
+                return [3 /*break*/, 13];
             case 8:
                 if (!(command === "setup")) return [3 /*break*/, 9];
                 (0, util_commands_1.executeCommand)({
@@ -668,21 +671,30 @@ var main = function () { return __awaiter(void 0, void 0, void 0, function () {
                     ///bin/bash -c \"
                     command: '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Code-From-Anywhere/sensible/main/packages/sensible/setup-mac/install.sh)"',
                 }, process.cwd(), true);
-                return [3 /*break*/, 12];
+                return [3 /*break*/, 13];
             case 9:
-                if (!(command === "add")) return [3 /*break*/, 11];
+                if (!(command === "add")) return [3 /*break*/, 12];
                 return [4 /*yield*/, (0, util_userinput_1.getArgumentOrAsk)(2, "Which app do you want to install?\n\n".concat(appsHumanReadable))];
             case 10:
                 appType = _a.sent();
                 if (!possibleApps.map(function (x) { return x.slug; }).includes(appType)) {
+                    console.log("Couldn't find app type \"".concat(appType, "\""));
                     process.exit(0);
                 }
-                installApp({ isExistingApp: true })(appType);
-                return [3 /*break*/, 12];
+                targetAppDir = path_1.default.join(targetDir, "apps", appType);
+                if (fs_1.default.existsSync(targetAppDir)) {
+                    return [2 /*return*/, (0, util_log_1.log)("You already have an app with this type in your app folder. Please rename it first.", "FgRed")];
+                }
+                commandsObject = getInstallAppCommands({ isExistingApp: true })(appType);
+                return [4 /*yield*/, executeCommandsObjectOneByOne(commandsObject)];
             case 11:
+                _a.sent();
+                (0, util_log_1.log)("Added ".concat(appType, " to your apps"), "FgCyan");
+                return [3 /*break*/, 13];
+            case 12:
                 (0, util_log_1.log)('please run "sensible init" to use this cli.', "FgCyan");
-                _a.label = 12;
-            case 12: return [2 /*return*/];
+                _a.label = 13;
+            case 13: return [2 /*return*/];
         }
     });
 }); };
