@@ -1,1 +1,0 @@
-`sensible add [template-slug] [destination-name]` should add the template to your project. Sensible add should make you choose which ones are available. Obviously, destination-name is the name of the template-slug by default.
