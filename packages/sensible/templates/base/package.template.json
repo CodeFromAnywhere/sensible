@@ -2,14 +2,15 @@
   "name": "sensible",
   "version": "0.0.0",
   "private": true,
-  "workspaces": [
-    "apps/*",
-    "packages/*",
-    "third-party/*/packages/*"
-  ],
+  "workspaces": ["apps/*", "packages/*", "third-party/*/packages/*"],
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev --parallel",
+    "start": "turbo run start --parallel",
+    "start:app": "cd apps/app && yarn start",
+    "start:docs": "cd apps/docs && yarn start",
+    "start:web": "cd apps/web && yarn start",
+    "start:server": "cd apps/server && yarn start",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
