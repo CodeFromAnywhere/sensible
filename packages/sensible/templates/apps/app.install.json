@@ -61,6 +61,10 @@
     {
       "command": "cd app && npx setjsonkey package.json scripts.build:tailwind \"tailwindcss --input input.css --output tailwind.css --no-autoprefixer && tailwind-rn\" && npx setjsonkey package.json scripts.dev:tailwindcss \"tailwindcss --input input.css --output tailwind.css --no-autoprefixer --watch\" && npx setjsonkey package.json scripts.dev:tailwindrn \"tailwind-rn --watch\" && npx setjsonkey package.json scripts.dev:expo \"expo start\" && npx setjsonkey package.json scripts.dev \"npm-run-all --parallel dev:**\"",
       "description": "Metascripting your json, installing tailwind scripts"
+    },
+    {
+      "command": "cd app && npx setjsonkey package.json scripts.deploy \"npx eas-cli build --platform all --non-interactive --auto-submit\" && npx setjsonkey package.json scripts.build:apk \"npx eas-cli build --platform android --profile preview\" && npx setjsonkey package.json scripts.build:aab \"npx eas-cli build --platform android\" && npx setjsonkey package.json scripts.build:ios \"npx eas-cli build --platform ios\"",
+      "description": "Installing build scripts"
     }
   ]
 }
