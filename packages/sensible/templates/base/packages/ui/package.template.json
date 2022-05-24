@@ -3,7 +3,9 @@
   "version": "0.0.0",
   "description": "All frontend components can go here",
   "main": "src/index.ts",
-  "scripts": {},
+  "scripts": {
+    "dev": "tailwindcss -w -o css.css"
+  },
   "author": "",
   "license": "ISC",
   "dependencies": {
@@ -16,6 +18,8 @@
   "devDependencies": {
     "config": "*",
     "react-native": "*",
-    "tsconfig": "*"
+    "tsconfig": "*",
+    "tailwindcss": "*",
+    "npm-run-all": "*"
   }
 }

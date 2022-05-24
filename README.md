@@ -3,7 +3,7 @@
 <img src="./assets/icon2.png" width="250" /><br />
 website
 </a> |
-<a href="https://sensiblestack.com">docs</a>
+<a href="https://sensiblestack.com">docs</a> | <a href="https://demo.sensiblestack.com">demo</a>
 </p>
 
 # Welcome
@@ -53,17 +53,31 @@ If you need more help, just look in the auto-generated docs!
 
 ![docs](./assets/docs-gif2.gif)
 
-# The Core Sensible Philosophy
+## The Core Sensible Philosophy
 
 - Codebase introspection (Documentation generation)
 - Full-stack code-sharing (full-stack auto-completion using Typescript)
 - Maximise learnability, minimise tech debt, simplify onboarding
 - Decentralised, Open Source, Automatic
 
+## Demo
+
+Check [our demo](https://demo.sensiblestack.com) here.
+
+To run the app locally, do the following
+
+- clone this repo
+- follow the [expo installation instructions](https://docs.expo.dev/get-started/installation/) of expo (react-native)
+- `yarn` in root folder
+- `yarn dev` in root folder
+- new terminal tab: `yarn start:server` in root folder
+- new terminal tab: `yarn start:app` in root folder. Open your camera and **scan the QR code** or run the app using the simulator ([XCode required](https://docs.expo.dev/workflow/ios-simulator/))
+- new terminal tab: `yarn start:web` in root folder (show it at http://localhost:3000)
+
 <p align="center">
 <a href="https://www.sensiblestack.com" target="_blank">
 <img src="./assets/icon2.png" width="250" /><br />
 website
 </a> |
-<a href="https://www.sensiblestack.com">docs</a>
+<a href="https://sensiblestack.com">docs</a> | <a href="https://demo.sensiblestack.com">demo</a>
 </p>
