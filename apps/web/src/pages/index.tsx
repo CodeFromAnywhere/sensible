@@ -207,9 +207,9 @@ const Home = () => {
           >
             <div className="backdrop-blur-xl bg-white/80 min-h-[80vh] rounded-xl mx-4 py-4 lg:mx-10 flex-col flex items-center justify-center px-4 lg:px-16">
               <div className="relative w-full">
-                <div className="absolute top-0 -left-4 w-32 lg:w-96 h-32 lg:h-96 bg-purple-900 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
+                {/* <div className="absolute top-0 -left-4 w-32 lg:w-96 h-32 lg:h-96 bg-purple-900 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
                 <div className="absolute top-0 -right-4 w-32 lg:w-96 h-32 lg:h-96 bg-yellow-900 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
-                <div className="absolute -bottom-8 left-20 w-32 lg:w-96 h-32 lg:h-96 bg-blue-900 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
+                <div className="absolute -bottom-8 left-20 w-32 lg:w-96 h-32 lg:h-96 bg-blue-900 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div> */}
 
                 <div className="lg:m-8 relative flex flex-col">
                   <div
