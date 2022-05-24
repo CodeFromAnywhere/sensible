@@ -172,7 +172,7 @@ const Home = () => {
     <Layout noFooter>
       <div
         className={
-          "bg-gradient-to-r from-blue-200 via-blue-500 to-blue-800 background-animate"
+          "bg-gradient-to-r from-blue-700 via-blue-600 to-blue-900 background-animate"
         }
       >
         <style>{`
