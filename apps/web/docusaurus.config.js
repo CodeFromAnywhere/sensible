@@ -110,6 +110,11 @@ const config = {
             position: "right",
           },
           {
+            href: "https://demo.sensiblestack.com",
+            label: "Demo",
+            position: "right",
+          },
+          {
             href: "https://github.com/Code-From-Anywhere/sensible",
             label: "GitHub",
             position: "right",
