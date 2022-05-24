@@ -5,13 +5,28 @@ import { isEmail } from "sensible-core";
 import { api } from "ui";
 const CTA = () => {
   return (
-    <a href="/docs/about" rel="noreferrer" className="my-10">
-      <button
-        className={`cursor-pointer text-white disabled:hidden transition-all duration-600 w-40 lg:w-96 bg-blue-500 hover:bg-blue-400 border-t-blue-300 border-b-blue-700 border rounded-xl p-4`}
+    <div className="flex flex-row">
+      <a href="/docs/about" rel="noreferrer" className="mr-4 my-10">
+        <button
+          className={`cursor-pointer text-white disabled:hidden transition-all duration-600 w-40 lg:w-96 bg-blue-500 hover:bg-blue-400 border-t-blue-300 border-b-blue-700 border rounded-xl p-4`}
+        >
+          {"Documentation"}
+        </button>
+      </a>
+
+      <a
+        href="https://demo.sensiblestack.com"
+        target="_blank"
+        rel="noreferrer"
+        className="ml-4 my-10"
       >
-        {"Read the docs"}
-      </button>
-    </a>
+        <button
+          className={`cursor-pointer text-white disabled:hidden transition-all duration-600 w-40 lg:w-96 bg-blue-500 hover:bg-blue-400 border-t-blue-300 border-b-blue-700 border rounded-xl p-4`}
+        >
+          {"Demo"}
+        </button>
+      </a>
+    </div>
   );
 };
 
@@ -157,7 +172,7 @@ const Home = () => {
     <Layout noFooter>
       <div
         className={
-          "bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500 background-animate"
+          "bg-gradient-to-r from-blue-200 via-blue-500 to-blue-800 background-animate"
         }
       >
         <style>{`
@@ -192,9 +207,9 @@ const Home = () => {
           >
             <div className="backdrop-blur-xl bg-white/80 min-h-[80vh] rounded-xl mx-4 py-4 lg:mx-10 flex-col flex items-center justify-center px-4 lg:px-16">
               <div className="relative w-full">
-                <div className="absolute top-0 -left-4 w-32 lg:w-96 h-32 lg:h-96 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
-                <div className="absolute top-0 -right-4 w-32 lg:w-96 h-32 lg:h-96 bg-yellow-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
-                <div className="absolute -bottom-8 left-20 w-32 lg:w-96 h-32 lg:h-96 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
+                <div className="absolute top-0 -left-4 w-32 lg:w-96 h-32 lg:h-96 bg-purple-900 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
+                <div className="absolute top-0 -right-4 w-32 lg:w-96 h-32 lg:h-96 bg-yellow-900 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
+                <div className="absolute -bottom-8 left-20 w-32 lg:w-96 h-32 lg:h-96 bg-blue-900 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
 
                 <div className="lg:m-8 relative flex flex-col">
                   <div
