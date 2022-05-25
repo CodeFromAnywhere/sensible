@@ -2,10 +2,23 @@ import menu from "./pages/menu";
 import index from "./pages/index";
 import form from "./pages/form";
 import utilities from "./pages/utilities";
+import login from "./pages/login";
+import signup from "./pages/signup";
+import messages from "./pages/messages";
 import { PageType } from "./types";
+import users from "./pages/users";
 
 // here we create an object containing all our pages
-export const pagesObject = { menu, index, form, utilities };
+export const pagesObject = {
+  menu,
+  index,
+  form,
+  utilities,
+  login,
+  signup,
+  messages,
+  users,
+};
 // based on this, a type is created for all page keys
 type PageKey = keyof typeof pagesObject;
 // these keys are put in an array

@@ -7,6 +7,7 @@ export const publicUserFields = [
   "image",
   "createdAt",
   "updatedAt",
+  "email",
 ];
 
 export const meUserFields = publicUserFields.concat(["loginToken", "email"]);
@@ -17,6 +18,7 @@ export interface PublicUserType extends DefaultModelType {
   name: string;
   username: string;
   image: string;
+  email: string;
 }
 
 export interface MeUserType extends PublicUserType {

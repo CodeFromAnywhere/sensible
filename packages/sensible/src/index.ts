@@ -251,7 +251,7 @@ const possibleApps: AppType[] = [
     default: true,
   },
   { slug: "web", description: "Next.js app", default: true },
-  { slug: "docs", description: "Docusaurus documentation (Experimental)" },
+  { slug: "docs", description: "Docusaurus documentation", default: true },
   { slug: "webreact", description: "Bare React.js app (Experimental)" },
   { slug: "chrome", description: "Chrome extension (Experimental)" },
   { slug: "vscode", description: "VSCode extension (Experimental)" },
@@ -576,7 +576,7 @@ const getCommandsWithoutCache = ({
       commands: [
         {
           command:
-            "yarn add cors dotenv md5 reflect-metadata sequelize sequelize-typescript server sqlite3 typescript",
+            "yarn add cors dotenv md5 reflect-metadata sequelize sequelize-typescript server sqlite3 typescript@4.5.5",
           description: "Installing server dependencies",
         },
         {
