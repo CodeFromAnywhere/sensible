@@ -24,9 +24,6 @@
     {
       "command": "cd vscode && yarn",
       "description": "Installing Dependencies..."
-    },
-    {
-      "command": ""
     }
   ]
 }

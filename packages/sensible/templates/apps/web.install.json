@@ -35,12 +35,22 @@
       "description": "Install right react version to prevent invalid hook call"
     },
     {
-      "command": "cd web && yarn add core@* ui@* react-query react-with-native react-with-native-form react-with-native-password-input react-with-native-store react-with-native-text-input react-with-native-router next-transpile-modules @badrap/bar-of-progress",
+      "command": "cd web && yarn add core@* ui@* react-query react-with-native react-with-native-store react-with-native-router next-transpile-modules @badrap/bar-of-progress",
       "description": "Installing web dependencies"
     },
     {
       "command": "cd web && yarn add -D config@* tsconfig@*",
       "description": "Installing web devDependencies"
+    },
+
+    {
+      "command": "cd web && yarn add react-datepicker react-dropzone react-map-gl react-autosuggest react-stars rc-time-picker react-datetime",
+      "description": "Installing react-with-native-form-inputs"
+    },
+
+    {
+      "command": "cd web && yarn add -D @types/react-datepicker @types/react-autosuggest @types/react-stars",
+      "description": "Installing react-with-native-form-inputs devDependencies"
     },
     {
       "command": {

@@ -1,28 +1,45 @@
-import { Div, P, Input } from "react-with-native";
-import { useRouter } from "react-with-native-router";
-import Button from "../components";
+import { Div, Input, P } from "react-with-native";
+import UI from "react-with-native-ui";
+import { CodeLink } from "../components";
 import useStore from "../store";
+import { RWNPage } from "../types";
 
-const HomePage = () => {
+const Page: RWNPage = () => {
   const [name, setName] = useStore("name");
-  const router = useRouter();
+  const [email, setEmail] = useStore("email");
   return (
-    <Div>
-      <P>Hello World!</P>
+    <Div className="p-4 lg:p-20">
+      <Div className="flex flex-row justify-end">
+        <CodeLink pageKey="index" />
+      </Div>
+      <P>
+        Welcome to this demo. This demo runs on React with Next.js as well as on
+        React Native with Expo.
+      </P>
 
-      <P>What's your name?</P>
-      <Input
-        className="border p-2"
-        type="text"
-        value={name || ""}
-        onChange={(e) => setName(e.target.value)}
-        native={{ onChangeText: (text) => setName(text) }}
-      />
+      <Div className="bg-gray-200 rounded-xl p-4">
+        <P>Your name:</P>
+        <Input
+          value={name || ""}
+          onChange={(e) => setName(e.target.value)}
+          native={{ onChangeText: setName }}
+          className={UI.input}
+        />
 
-      <Button title="Contact" onClick={() => router.push("contact")} />
-      <Button title="About" onClick={() => router.push("about")} />
+        <P>Your email:</P>
+        <Input
+          value={email || ""}
+          onChange={(e) => setEmail(e.target.value)}
+          native={{ onChangeText: setName }}
+          className={UI.input}
+        />
+      </Div>
     </Div>
   );
 };
 
-export default HomePage;
+Page.options = {
+  title: "Home",
+};
+
+export default Page;

@@ -3,13 +3,12 @@
   "version": "0.0.0",
   "main": "src/index.ts",
   "scripts": {
-    "start": "node build/index.js",
-    "dev": "ts-node-dev src/index.ts --deps",
+    "start": "ts-node-dev src/index.ts --deps",
     "serve": "NODE_ENV=production pm2 start build/index.js",
     "restart": "pm2 restart build/index.js",
-    "cluster": "NODE_ENV=production pm2 start build/index.js -i 0 --name king",
-    "clusterReload": "NODE_ENV=production pm2 reload king",
-    "reloadAll": "git pull && yarn && yarn build && yarn clusterReload",
+    "cluster": "NODE_ENV=production pm2 start build/index.js -i 0 --name sensibleapp",
+    "clusterReload": "NODE_ENV=production pm2 reload sensibleapp",
+    "reloadAll": "cd ../.. && git pull && yarn && yarn build && cd apps/server && yarn clusterReload",
     "build": "tsc"
   },
   "license": "ISC",

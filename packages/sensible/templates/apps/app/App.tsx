@@ -3,29 +3,22 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { StoreProvider, Pages } from "ui";
 import { TailwindProvider } from "tailwind-rn";
-import { QueryClient, QueryClientProvider } from "react-query";
-import { registerRootComponent } from "expo";
-import utilities from "./tailwind.json";
+import { AlertProvider } from "react-with-native-alert";
+import { ModalProvider } from "react-with-native-modal";
 
+import utilities from "./tailwind.json";
 const Stack = createNativeStackNavigator();
 
+import { registerRootComponent } from "expo";
+
+import { QueryClient, QueryClientProvider } from "react-query";
+import { getPageTitle } from "ui/src/pages";
+
+import { LogBox } from "react-native";
+
+LogBox.ignoreLogs(["ViewPropTypes will be removed", "Require cycle"]);
 // Create a client
 const queryClient = new QueryClient();
-
-const output = [
-  {
-    city: "Groningen",
-    state: "Groningen",
-  },
-  {
-    city: "Amsterdam",
-    state: "North-Holland",
-  },
-  {
-    city: "Maastricht",
-    state: "Limburg",
-  },
-].map((location) => `${location.city}, ${location.state}`);
 
 function App() {
   return (
@@ -33,28 +26,40 @@ function App() {
       <TailwindProvider utilities={utilities}>
         <StoreProvider>
           <NavigationContainer>
-            <Stack.Navigator initialRouteName="index">
-              {Object.keys(Pages).map((page) => {
-                // @ts-ignore
-                const component = Pages[page];
-                //@ts-ignore
-                const options: ScreenOptions = Pages[page].options;
-                return (
-                  <Stack.Screen
-                    key={`page${page}`}
-                    name={page}
-                    component={component}
-                    options={options}
-                  />
-                );
-              })}
-            </Stack.Navigator>
+            <AlertProvider>
+              <ModalProvider>
+                <Stack.Navigator initialRouteName="menu">
+                  {Pages.map((page) => {
+                    const defaultNavigationOptions = {
+                      title: getPageTitle(page),
+                    };
+
+                    const options = page.reactNavigationOptions
+                      ? {
+                          ...defaultNavigationOptions,
+                          ...page.reactNavigationOptions,
+                        }
+                      : defaultNavigationOptions;
+
+                    return (
+                      <Stack.Screen
+                        key={`page${page.key}`}
+                        name={page.key}
+                        component={page.component}
+                        options={options}
+                      />
+                    );
+                  })}
+                </Stack.Navigator>
+              </ModalProvider>
+            </AlertProvider>
           </NavigationContainer>
         </StoreProvider>
       </TailwindProvider>
     </QueryClientProvider>
   );
 }
+
 // registerRootComponent calls AppRegistry.registerComponent('main', () => App);
 // It also ensures that whether you load the app in Expo Go or in a native build,
 // the environment is set up appropriately

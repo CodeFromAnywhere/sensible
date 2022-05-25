@@ -4,22 +4,32 @@
   "description": "All frontend components can go here",
   "main": "src/index.ts",
   "scripts": {
-    "dev": "tailwindcss -w -o css.css"
+    "dev": "tailwindcss -o css.css"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "core": "*",
     "react-with-native": "*",
+    "react-with-native-alert": "*",
+    "react-with-native-modal": "*",
     "react-with-native-store": "*",
-    "react-with-native-router": "*",
+    "react-with-native-notification": "*",
+    "react-with-native-ui": "*",
+    "react-with-native-form-inputs": "*",
+    "react-with-native-form": "*",
+    "react-with-native-select": "*",
     "sensible-core": "*"
   },
   "devDependencies": {
+    "@headlessui/react": "^1.6.2",
+    "@react-navigation/native-stack": "^6.6.2",
     "config": "*",
+    "react-datepicker": "^4.8.0",
+    "react-datetime": "^3.1.1",
     "react-native": "*",
-    "tsconfig": "*",
-    "tailwindcss": "*",
-    "npm-run-all": "*"
+    "react-toastify": "^9.0.1",
+    "tailwindcss": "^3.0.24",
+    "tsconfig": "*"
   }
 }

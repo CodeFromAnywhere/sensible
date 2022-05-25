@@ -35,7 +35,7 @@
     },
 
     {
-      "command": "cd app && npx expo-cli install core@* ui@* sensible-core@* react-query react-with-native react-with-native-form react-with-native-store @react-native-async-storage/async-storage react-with-native-text-input",
+      "command": "cd app && npx expo-cli install core@* ui@* sensible-core@* react-query @react-native-async-storage/async-storage expo-notifications",
       "description": "Installing app dependencies"
     },
 
@@ -55,11 +55,16 @@
     },
 
     {
+      "command": "cd app && yarn add react-native-modal-datetime-picker @react-native-community/datetimepicker",
+      "description": "Install react-with-native-form-inputs"
+    },
+
+    {
       "command": "cd app && yarn add -D npm-run-all",
       "description": "install script to run all expo stuff at once"
     },
     {
-      "command": "cd app && npx setjsonkey package.json scripts.build:tailwind \"tailwindcss --input input.css --output tailwind.css --no-autoprefixer && tailwind-rn\" && npx setjsonkey package.json scripts.dev:tailwindcss \"tailwindcss --input input.css --output tailwind.css --no-autoprefixer --watch\" && npx setjsonkey package.json scripts.dev:tailwindrn \"tailwind-rn --watch\" && npx setjsonkey package.json scripts.dev:expo \"expo start\" && npx setjsonkey package.json scripts.dev \"npm-run-all --parallel dev:**\"",
+      "command": "cd app && npx setjsonkey package.json scripts.build:tailwind \"tailwindcss --input input.css --output tailwind.css --no-autoprefixer && tailwind-rn\" && npx setjsonkey package.json scripts.dev:tailwindcss \"tailwindcss --input input.css --output tailwind.css --no-autoprefixer --watch\" && npx setjsonkey package.json scripts.dev:tailwindrn \"tailwind-rn --watch\" && npx setjsonkey package.json scripts.dev:expo \"expo start\" && npx setjsonkey package.json scripts.dev \"yarn build:tailwind && npm-run-all --parallel dev:**\"",
       "description": "Metascripting your json, installing tailwind scripts"
     },
     {
