@@ -247,7 +247,7 @@ const Home = () => {
                     </p>
                     <p color="red">
                       Sensible has been superseded by{" "}
-                      <a href="https://typerepo.com">Typerepo</a>
+                      <a href="https://typerepo.com">Typerepo</a>!
                     </p>
                   </div>
                 </div>
